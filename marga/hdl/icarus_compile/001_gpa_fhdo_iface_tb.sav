@@ -1,0 +1,39 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Fri Nov 20 03:02:01 2020
+[*]
+[dumpfile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/000_gpa_fhdo_iface_tb.lxt"
+[dumpfile_mtime] "Fri Nov 20 03:01:35 2020"
+[dumpfile_size] 598750
+[savefile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/001_gpa_fhdo_iface_tb.sav"
+[timestart] 0
+[size] 1920 1025
+[pos] 2559 359
+*-17.752323 301000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] gpa_fhdo_iface_tb.
+[sst_width] 263
+[signals_width] 170
+[sst_expanded] 1
+[sst_vpaned_height] 294
+@28
+gpa_fhdo_iface_tb.UUT.clk[0]
+gpa_fhdo_iface_tb.UUT.valid_i[0]
+gpa_fhdo_iface_tb.UUT.fhd_clk_o[0]
+gpa_fhdo_iface_tb.UUT.fhd_sdo_o[0]
+gpa_fhdo_iface_tb.UUT.fhd_csn_o[0]
+@200
+-
+@28
+gpa_fhdo_iface_tb.busy_o[0]
+@22
+gpa_fhdo_iface_tb.adc_value_o[15:0]
+@200
+-
+@22
+gpa_fhdo_iface_tb.voutx[15:0]
+gpa_fhdo_iface_tb.vouty[15:0]
+gpa_fhdo_iface_tb.voutz[15:0]
+@23
+gpa_fhdo_iface_tb.voutz2[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,73 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Sat Dec 19 20:51:59 2020
+[*]
+[dumpfile] "/home/vlad/Documents/mri/marga/hdl/icarus_compile/000_marbuffer_tb.lxt"
+[dumpfile_mtime] "Sat Dec 19 20:51:47 2020"
+[dumpfile_size] 52825
+[savefile] "/home/vlad/Documents/mri/marga/hdl/icarus_compile/001_marbuffer_tb.sav"
+[timestart] 0
+[size] 1920 1025
+[pos] -1 -1
+*-15.091105 72850 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] marbuffer_tb.
+[sst_width] 230
+[signals_width] 262
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+marbuffer_tb.clk[0]
+@24
+[color] 2
+marbuffer_tb.data_i[15:0]
+[color] 2
+marbuffer_tb.delay_i[6:0]
+@28
+[color] 2
+marbuffer_tb.valid_i[0]
+@200
+-
+@24
+[color] 3
+marbuffer_tb.data_o[15:0]
+@28
+[color] 4
+marbuffer_tb.stb_o[0]
+[color] 3
+marbuffer_tb.empty_o[0]
+[color] 3
+marbuffer_tb.full_o[0]
+[color] 3
+marbuffer_tb.err_o[0]
+@200
+-
+-marbuffer
+@24
+[color] 7
+marbuffer_tb.UUT.fifo_in_ptr[1:0]
+[color] 7
+marbuffer_tb.UUT.fifo_out_ptr[1:0]
+marbuffer_tb.UUT.fifo_ptr_diff[1:0]
+@28
+[color] 6
+marbuffer_tb.UUT.fifo_ptrs_almost_equal[0]
+@24
+marbuffer_tb.UUT.delay_cnt[6:0]
+@8024
+marbuffer_tb.UUT.delay_cnt[6:0]
+@20000
+-
+-
+-
+@22
+marbuffer_tb.UUT.state[1:0]
+marbuffer_tb.UUT.fifo_out[22:0]
+@24
+marbuffer_tb.UUT.data_r[15:0]
+@200
+-
+@28
+marbuffer_tb.UUT.valid_i[0]
+marbuffer_tb.UUT.valid_r[0]
+[pattern_trace] 1
+[pattern_trace] 0

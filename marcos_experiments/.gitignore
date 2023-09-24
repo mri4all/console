@@ -1,0 +1,6 @@
+*~
+*.log
+__pycache__
+*.npy
+*.out
+*.asv

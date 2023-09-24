@@ -1,0 +1,105 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Wed Dec 30 11:14:10 2020
+[*]
+[dumpfile] "/mnt/ubuntu/home/vlad/Documents/mri/marga/hdl/icarus_compile/000_marga_simple_tb.lxt"
+[dumpfile_mtime] "Wed Dec 30 11:13:13 2020"
+[dumpfile_size] 14816
+[savefile] "/mnt/ubuntu/home/vlad/Documents/mri/marga/hdl/icarus_compile/001_marga_simple_tb.sav"
+[timestart] 0
+[size] 1920 992
+[pos] -1 -1
+*-10.469954 4545 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] marga_simple_tb.
+[treeopen] marga_simple_tb.UUT.
+[sst_width] 230
+[signals_width] 182
+[sst_expanded] 1
+[sst_vpaned_height] 280
+@28
+marga_simple_tb.clk[0]
+marga_simple_tb.s0_axi_aresetn[0]
+@200
+-
+@800200
+-s0_axi
+@22
+marga_simple_tb.s0_axi_araddr[18:0]
+@28
+marga_simple_tb.s0_axi_aresetn[0]
+marga_simple_tb.s0_axi_arprot[2:0]
+marga_simple_tb.s0_axi_arready[0]
+marga_simple_tb.s0_axi_arvalid[0]
+@22
+marga_simple_tb.s0_axi_awaddr[18:0]
+@28
+marga_simple_tb.s0_axi_awprot[2:0]
+marga_simple_tb.s0_axi_awready[0]
+marga_simple_tb.s0_axi_awvalid[0]
+marga_simple_tb.s0_axi_bready[0]
+marga_simple_tb.s0_axi_bresp[1:0]
+marga_simple_tb.s0_axi_bvalid[0]
+@22
+marga_simple_tb.s0_axi_rdata[31:0]
+@28
+marga_simple_tb.s0_axi_rready[0]
+marga_simple_tb.s0_axi_rresp[1:0]
+marga_simple_tb.s0_axi_rvalid[0]
+@22
+marga_simple_tb.s0_axi_wdata[31:0]
+@28
+marga_simple_tb.s0_axi_wready[0]
+@22
+marga_simple_tb.s0_axi_wstrb[3:0]
+@28
+marga_simple_tb.s0_axi_wvalid[0]
+[color] 2
+marga_simple_tb.UUT.fld.aw_en[0]
+@1000200
+-s0_axi
+@200
+-
+@800200
+-ocra1
+@22
+marga_simple_tb.UUT.grad_data[31:0]
+@28
+marga_simple_tb.UUT.ocra1_data_valid[0]
+marga_simple_tb.ocra1.clk[0]
+marga_simple_tb.ocra1.clrn[0]
+marga_simple_tb.ocra1.ldacn[0]
+marga_simple_tb.ocra1.resetn[0]
+marga_simple_tb.ocra1.sdox[0]
+marga_simple_tb.ocra1.sdoy[0]
+marga_simple_tb.ocra1.sdoz2[0]
+marga_simple_tb.ocra1.sdoz[0]
+marga_simple_tb.ocra1.syncn[0]
+@420
+marga_simple_tb.ocra1.voutx[17:0]
+marga_simple_tb.ocra1.vouty[17:0]
+marga_simple_tb.ocra1.voutz[17:0]
+marga_simple_tb.ocra1.voutz2[17:0]
+@1000200
+-ocra1
+@200
+-
+@800200
+-fhdo
+@22
+marga_simple_tb.UUT.grad_data[31:0]
+@29
+marga_simple_tb.UUT.fhdo_data_valid[0]
+@28
+marga_simple_tb.fhdo.clk[0]
+marga_simple_tb.fhdo.csn[0]
+marga_simple_tb.fhdo.sdi[0]
+marga_simple_tb.fhdo.sdo[0]
+@24
+marga_simple_tb.fhdo.voutx[15:0]
+marga_simple_tb.fhdo.vouty[15:0]
+marga_simple_tb.fhdo.voutz[15:0]
+marga_simple_tb.fhdo.voutz2[15:0]
+@1000200
+-fhdo
+[pattern_trace] 1
+[pattern_trace] 0
