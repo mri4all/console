@@ -37,3 +37,7 @@ WTForms~=3.0.1
 plotly~=5.9.0
 deap~=1.4.1
 imageio~=2.19.3
+
+PyQt5
+qtawesome
+pyqtdarktheme
