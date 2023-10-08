@@ -8,6 +8,7 @@ from PyQt5.QtGui import *
 import qdarktheme
 import qtawesome as qta
 
+
 if hasattr(Qt, 'AA_EnableHighDpiScaling'):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -35,6 +36,7 @@ class RegistrationWindow(QMainWindow):
         msg.setWindowTitle("MessageBox demo")
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msg.exec_()
+
 
 def main():
     app = QApplication(sys.argv)
