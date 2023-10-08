@@ -9,13 +9,6 @@ import qdarktheme
 import qtawesome as qta
 
 
-if hasattr(Qt, 'AA_EnableHighDpiScaling'):
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-
-if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-
-
 class RegistrationWindow(QMainWindow):
     def __init__(self):
         super(RegistrationWindow, self).__init__()
@@ -35,11 +28,20 @@ class RegistrationWindow(QMainWindow):
         msg.setDetailedText("This is additional information")
         msg.setWindowTitle("MessageBox demo")
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.setWindowIcon(QIcon('assets/mri4all_icon.png'))
         msg.exec_()
+
+
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 
 def main():
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon('assets/mri4all_icon.png'))
 
     qss = """
     QPushButton {

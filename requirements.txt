@@ -1,3 +1,5 @@
+# Dependencies of the acquisition framework
+# TODO: Remove unneeded dependencies
 absl-py>=0.7.1
 astor>=0.7.1
 Click>=7.0
@@ -38,6 +40,10 @@ plotly~=5.9.0
 deap~=1.4.1
 imageio~=2.19.3
 
+# Dependencies of the GUI service
 PyQt5
 qtawesome
 pyqtdarktheme
+
+# Global dependencies
+rpyc
