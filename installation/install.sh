@@ -17,7 +17,7 @@ install_linux_packages() {
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential make wget curl git git-lfs python3-wheel python3-dev python3 python3-venv python3-virtualenv ffmpeg libsm6 libxext6
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev libgdbm-dev libnss3-dev libedit-dev libc6-dev
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y virtualbox-guest-utils virtualbox-guest-x11 xfce4
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y virtualbox-guest-utils virtualbox-guest-x11 xfce4 xfce4-terminal
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y qtcreator
   # Installing firefox takes a while, so don't do it by default
   #sudo DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
