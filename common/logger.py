@@ -1,9 +1,22 @@
 import logging, sys, os, re
+from logging.handlers import RotatingFileHandler
 
 import common.runtime as rt
 
-logger_setup_complete = False
+# Global logger instance
 logger = None
+logger_setup_complete = False
+
+
+class TaskIDFilter(logging.Filter):
+    """
+    This is a filter which injects information about the active task ID into the log
+    """
+
+    def filter(self, record):
+        record.taskID = rt.get_current_task_id()
+        return True
+
 
 def get_logger():
     """Returns an instance of the logger service."""
@@ -14,15 +27,21 @@ def get_logger():
         logger = logging.getLogger(rt.service_name)
         logger_setup_complete = True
         logger.setLevel(get_loglevel())
+        logger.addFilter(TaskIDFilter())
+
+        formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(taskID)s | %(message)s")
 
         # Create console handler
         ch = logging.StreamHandler()
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)
         logger.addHandler(ch)
 
+        file_handler = RotatingFileHandler(f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=1000000, backupCount=5)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
         return logger
-    return logger    
+    return logger
 
 
 def get_loglevel() -> int:
@@ -39,4 +58,3 @@ def get_loglevel() -> int:
         return logging.DEBUG
 
     return logging.INFO
-

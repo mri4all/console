@@ -68,6 +68,7 @@ create_folders () {
   create_folder $MRI4ALL_BASE
   create_folder $MRI4ALL_BASE/data
   create_folder $MRI4ALL_BASE/config
+  create_folder $MRI4ALL_BASE/logs
 }
 
 install_console() {
