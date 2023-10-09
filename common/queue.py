@@ -2,6 +2,7 @@ import os
 import common.runtime as rt
 import common.logger as logger
 
+log = logger.get_logger()
 
 def check_data_folders() -> bool:
     # Check if data folders exist
