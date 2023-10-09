@@ -1,18 +1,23 @@
 import sys
+import os
 
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtGui import *  # type: ignore
 
-import qdarktheme
-import qtawesome as qta
+import qdarktheme # type: ignore
+import qtawesome as qta # type: ignore
 
 
 class RegistrationWindow(QMainWindow):
     def __init__(self):
         super(RegistrationWindow, self).__init__()
-        uic.loadUi('forms/mainwindow.ui', self)   
+
+        dir_name = os.path.dirname(__file__)
+        form_name = os.path.join(dir_name, 'forms/mainwindow.ui')
+
+        uic.loadUi(form_name, self)   
         self.setWindowTitle('MRI4ALL')
         fa5_icon = qta.icon('fa5s.play')
         self.pushButton.setIcon(fa5_icon)
@@ -39,7 +44,7 @@ if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 
-def main():
+def run():
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon('assets/mri4all_icon.png'))
 
@@ -74,4 +79,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run()

@@ -47,3 +47,4 @@ pyqtdarktheme
 
 # Global dependencies
 rpyc
+mypy
