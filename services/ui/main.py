@@ -44,6 +44,19 @@ class DemoWindow(QMainWindow):
         QApplication.quit()
 
 
+class RegistrationWindow(QMainWindow):
+    def __init__(self):        
+        super(RegistrationWindow, self).__init__()
+        uic.loadUi(f"{rt.get_base_path()}/services/ui/forms/registration.ui", self)
+        self.registerButton.setProperty("type", "highlight")
+        self.registerButton.setIcon(qta.icon("fa5s.play"))   
+        self.registerButton.setText(" Register Patient")
+        self.registerButton.clicked.connect(self.button_clicked)   
+    
+    def button_clicked(self):
+        self.parent().setCurrentIndex(1)
+
+
 def set_MRI4ALL_style(app):
     # Define custom styles for individual widgets
     qss = """
@@ -96,6 +109,8 @@ def run():
     set_MRI4ALL_style(app)
 
     window = QStackedWidget()
+    window.setWindowTitle("MRI4ALL")
+    window.addWidget(RegistrationWindow())    
     window.addWidget(DemoWindow())
     window.showFullScreen()
 
