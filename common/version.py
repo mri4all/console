@@ -72,7 +72,7 @@ class SemanticVersion:
         set to '0.0.0-invalid.0' and all numerical version numbers are set to 0."""
 
         # Read the version string from the file VERSION in mercure's app folder
-        version_filepath = rt.base_path + "/VERSION"
+        version_filepath = rt.get_console_path() + "/VERSION"
         version_file = Path(version_filepath)
 
         if not version_file.exists():

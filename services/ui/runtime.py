@@ -27,3 +27,8 @@ def register_patient():
 
 def close_patient():
     stacked_widget.setCurrentIndex(0)
+
+
+def get_screen_size() -> (int, int):
+    screen = QDesktopWidget().screenGeometry()
+    return screen.width(), screen.height()

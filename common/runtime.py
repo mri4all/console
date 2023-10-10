@@ -2,7 +2,7 @@ import os
 import __main__ as main
 
 service_name = "unknown"
-base_path = os.path.dirname(os.path.realpath(main.__file__))
+base_path = os.path.dirname(os.path.dirname(os.path.realpath(main.__file__)))
 current_task_id = ""
 
 
@@ -20,6 +20,11 @@ def get_service_name():
 def get_base_path():
     """Get the base path of the MRI4ALL installation."""
     return base_path
+
+
+def get_console_path():
+    """Get the base path of the MRI4ALL installation."""
+    return base_path + "/console"
 
 
 def set_current_task_id(task_id: str):

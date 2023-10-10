@@ -23,7 +23,7 @@ import services.ui.runtime as ui_runtime
 class DemoWindow(QMainWindow):
     def __init__(self):
         super(DemoWindow, self).__init__()
-        uic.loadUi(f"{rt.get_base_path()}/services/ui/forms/demo.ui", self)
+        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/demo.ui", self)
         self.setWindowTitle("MRI4ALL")
         fa5_icon = qta.icon("fa5s.play")
         self.pushButton.setIcon(fa5_icon)
@@ -39,7 +39,7 @@ class DemoWindow(QMainWindow):
         msg.setDetailedText("This is additional information")
         msg.setWindowTitle("MessageBox demo")
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg.setWindowIcon(QIcon(f"{rt.get_base_path()}/services/ui/assets/mri4all_icon.png"))
+        msg.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
         msg.exec_()
 
     def shutdown_clicked(self):
@@ -108,7 +108,7 @@ def run():
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     ui_runtime.app = QApplication(sys.argv)
-    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_base_path()}/services/ui/assets/mri4all_icon.png"))
+    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
     set_MRI4ALL_style(ui_runtime.app)
 
     ui_runtime.stacked_widget = QStackedWidget()

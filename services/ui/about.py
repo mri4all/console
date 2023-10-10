@@ -15,7 +15,7 @@ def show_about():
 class AboutWindow(QDialog):
     def __init__(self):
         super(AboutWindow, self).__init__()
-        uic.loadUi(f"{rt.get_base_path()}/services/ui/forms/about.ui", self)
+        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/about.ui", self)
         self.setWindowTitle("About MRI4ALL")
         self.versionLabel.setText(
             f'<html><head/><body><p><span style="font-weight:600;">MRI4ALL Console</span></p><p>The Open-Source MRI Software</p><p>Version {mri4all_version.get_version_string()}</p></body></html>'

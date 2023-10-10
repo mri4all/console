@@ -14,7 +14,7 @@ import services.ui.logviewer as logviewer
 class RegistrationWindow(QMainWindow):
     def __init__(self):
         super(RegistrationWindow, self).__init__()
-        uic.loadUi(f"{rt.get_base_path()}/services/ui/forms/registration.ui", self)
+        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/registration.ui", self)
         self.registerButton.setProperty("type", "highlight")
         self.registerButton.setIcon(qta.icon("fa5s.play"))
         self.registerButton.setText(" Start Examination")

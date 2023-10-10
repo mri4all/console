@@ -16,11 +16,11 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QFrame" name="frame">
+     <widget class="QFrame" name="inlineViewerFrame">
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>800</height>
+        <height>600</height>
        </size>
       </property>
       <property name="frameShape">
@@ -91,7 +91,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QFrame" name="frame_2">
+          <widget class="QFrame" name="seqQueueFrame">
            <property name="maximumSize">
             <size>
              <width>400</width>
@@ -169,7 +169,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="sequenceFrame">
+          <widget class="QFrame" name="seqParamsFrame">
            <property name="minimumSize">
             <size>
              <width>600</width>
@@ -182,6 +182,90 @@
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="rightToolbarFrame">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>0</number>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMinimumSize</enum>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="protocolBrowserButton">
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Protocol Browser</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="settingsButton">
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>PushButton</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>431</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -205,8 +289,9 @@
      <string>Control</string>
     </property>
     <addaction name="actionSystem_Status"/>
-    <addaction name="actionConfiguration"/>
     <addaction name="actionLog_Viewer"/>
+    <addaction name="separator"/>
+    <addaction name="actionConfiguration"/>
     <addaction name="separator"/>
     <addaction name="actionShutdown"/>
    </widget>
