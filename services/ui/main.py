@@ -41,7 +41,7 @@ class DemoWindow(QMainWindow):
         msg.exec_()
 
     def shutdown_clicked(self):
-        self.close()
+        QApplication.quit()
 
 
 def set_MRI4ALL_style(app):
@@ -95,7 +95,8 @@ def run():
     app.setWindowIcon(QIcon(f"{rt.get_base_path()}/services/ui/assets/mri4all_icon.png"))
     set_MRI4ALL_style(app)
 
-    window = DemoWindow()
+    window = QStackedWidget()
+    window.addWidget(DemoWindow())
     window.showFullScreen()
 
     return_value = app.exec_()
