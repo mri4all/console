@@ -5,7 +5,6 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-
 import qdarktheme  # type: ignore
 import qtawesome as qta  # type: ignore
 
@@ -16,6 +15,9 @@ rt.set_service_name("ui")
 log = logger.get_logger()
 
 from common.version import mri4all_version
+from services.ui import registration
+from services.ui import examination
+import services.ui.runtime as ui_runtime
 
 
 class DemoWindow(QMainWindow):
@@ -41,20 +43,7 @@ class DemoWindow(QMainWindow):
         msg.exec_()
 
     def shutdown_clicked(self):
-        QApplication.quit()
-
-
-class RegistrationWindow(QMainWindow):
-    def __init__(self):        
-        super(RegistrationWindow, self).__init__()
-        uic.loadUi(f"{rt.get_base_path()}/services/ui/forms/registration.ui", self)
-        self.registerButton.setProperty("type", "highlight")
-        self.registerButton.setIcon(qta.icon("fa5s.play"))   
-        self.registerButton.setText(" Register Patient")
-        self.registerButton.clicked.connect(self.button_clicked)   
-    
-    def button_clicked(self):
-        self.parent().setCurrentIndex(1)
+        ui_runtime.shutdown()
 
 
 def set_MRI4ALL_style(app):
@@ -69,13 +58,27 @@ def set_MRI4ALL_style(app):
         background-color: #E0A526;    
     }    
     QPushButton[type = "highlight"] {
-         color: #FFFFFF;
-         background-color: rgba(224, 165, 38, 120); 
+        color: #FFFFFF;
+        background-color: rgba(224, 165, 38, 120); 
     }  
-    QPushButton[type = "highlight"]:hover {
-         color: #FFFFFF;
-         background-color: #E0A526;    
-    }         
+    QPushButton[type = "highlight"]:hover, QPushButton[type = "highlight"]:focus {
+        color: #FFFFFF;
+        background-color: #E0A526;    
+    }  
+    QGroupBox::title {
+        background-color: transparent;
+        color: #E0A526;    
+    }  
+    QGroupBox[type = "highlight"] {
+        font-size: 20px;
+    }              
+    QCalendarWidget QAbstractItemView
+    {
+        background-color: #262C44;
+    }    
+    QLabel[type = "dimmed"] {
+        color: #424d76;
+    }      
     """
 
     qdarktheme.setup_theme(
@@ -104,17 +107,19 @@ def run():
     if hasattr(Qt, "AA_UseHighDpiPixmaps"):
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
-    app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(f"{rt.get_base_path()}/services/ui/assets/mri4all_icon.png"))
-    set_MRI4ALL_style(app)
+    ui_runtime.app = QApplication(sys.argv)
+    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_base_path()}/services/ui/assets/mri4all_icon.png"))
+    set_MRI4ALL_style(ui_runtime.app)
 
-    window = QStackedWidget()
-    window.setWindowTitle("MRI4ALL")
-    window.addWidget(RegistrationWindow())    
-    window.addWidget(DemoWindow())
-    window.showFullScreen()
+    ui_runtime.stacked_widget = QStackedWidget()
+    ui_runtime.stacked_widget.setWindowTitle("MRI4ALL")
+    ui_runtime.registration_widget = registration.RegistrationWindow()
+    ui_runtime.stacked_widget.addWidget(ui_runtime.registration_widget)
+    ui_runtime.examination_widget = examination.ExaminationWindow()
+    ui_runtime.stacked_widget.addWidget(ui_runtime.examination_widget)
+    ui_runtime.stacked_widget.showFullScreen()
 
-    return_value = app.exec_()
+    return_value = ui_runtime.app.exec_()
 
     log.info("UI service terminated")
     log.info("-------------")
