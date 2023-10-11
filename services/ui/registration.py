@@ -9,6 +9,7 @@ from common.version import mri4all_version
 import services.ui.runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
+import services.ui.systemstatus as systemstatus
 
 
 class RegistrationWindow(QMainWindow):
@@ -16,8 +17,8 @@ class RegistrationWindow(QMainWindow):
         super(RegistrationWindow, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/registration.ui", self)
         self.registerButton.setProperty("type", "highlight")
-        self.registerButton.setIcon(qta.icon("fa5s.play"))
-        self.registerButton.setText(" Start Examination")
+        self.registerButton.setIcon(qta.icon("fa5s.check"))
+        self.registerButton.setText(" Start Exam")
         self.registerButton.clicked.connect(self.register_clicked)
         self.phantomButton.setText(" Phantom")
         self.phantomButton.setIcon(qta.icon("fa5s.flask"))
@@ -25,6 +26,13 @@ class RegistrationWindow(QMainWindow):
         self.resetButton.setText(" Reset")
         self.patientGroupBox.setProperty("type", "highlight")
         self.examGroupBox.setProperty("type", "highlight")
+
+        self.powerButton.setText("")
+        self.powerButton.setProperty("type", "dimmed")
+
+        self.powerButton.setIcon(qta.icon("fa5s.power-off", color="#424d76"))
+        self.powerButton.setIconSize(QSize(32, 32))
+        self.powerButton.clicked.connect(self.shutdown_clicked)
 
         fmt = self.dobEdit.calendarWidget().weekdayTextFormat(Qt.Sunday)
         fmt.setForeground(QColor("white"))
@@ -37,6 +45,7 @@ class RegistrationWindow(QMainWindow):
         self.actionShutdown.triggered.connect(self.shutdown_clicked)
         self.actionAbout.triggered.connect(about.show_about)
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
+        self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
 
     def register_clicked(self):
         ui_runtime.register_patient()

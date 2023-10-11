@@ -32,7 +32,16 @@ def register_patient():
 
 
 def close_patient():
-    stacked_widget.setCurrentIndex(0)
+    msg = QMessageBox()
+    ret = msg.question(
+        None,
+        "End Examination?",
+        "Do you really want to close the active examination?",
+        msg.Yes | msg.No,
+    )
+
+    if ret == msg.Yes:
+        stacked_widget.setCurrentIndex(0)
 
 
 def get_screen_size() -> Tuple[int, int]:

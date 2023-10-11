@@ -20,41 +20,12 @@ from services.ui import examination
 import services.ui.runtime as ui_runtime
 
 
-class DemoWindow(QMainWindow):
-    def __init__(self):
-        super(DemoWindow, self).__init__()
-        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/demo.ui", self)
-        self.setWindowTitle("MRI4ALL")
-        fa5_icon = qta.icon("fa5s.play")
-        self.pushButton.setIcon(fa5_icon)
-        self.pushButton.setProperty("type", "highlight")
-        self.pushButton.clicked.connect(self.button_clicked)
-        self.label.setText(
-            'This is something with a <a href="https://www.google.com">link</a>.'
-        )
-        self.actionShutdown.triggered.connect(self.shutdown_clicked)
-
-    def button_clicked(self):
-        msg = QMessageBox()
-        msg.setText(
-            "This is a message box This is a message box This is a message box This is a message box"
-        )
-        msg.setInformativeText("This is additional information")
-        msg.setDetailedText("This is additional information")
-        msg.setWindowTitle("MessageBox demo")
-        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg.setWindowIcon(
-            QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png")
-        )
-        msg.exec_()
-
-    def shutdown_clicked(self):
-        ui_runtime.shutdown()
-
-
 def set_MRI4ALL_style(app):
     # Define custom styles for individual widgets
     qss = """
+    QWidget {
+        font-size: 16px;
+    }
     QPushButton {
         color: #FFFFFF;
         background-color: #FFFFFF;    
@@ -63,6 +34,12 @@ def set_MRI4ALL_style(app):
         color: #FFFFFF;
         background-color: #E0A526;    
     }    
+    QPushButton:focus {
+        color: #FFFFFF;
+    }   
+    QPushButton:default {
+        color: #FFFFFF;
+    }      
     QPushButton[type = "highlight"] {
         color: #FFFFFF;
         background-color: rgba(224, 165, 38, 120); 
