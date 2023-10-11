@@ -241,14 +241,14 @@
                   </widget>
                  </item>
                  <item row="5" column="2">
-                  <widget class="QSpinBox" name="spinBox">
+                  <widget class="QSpinBox" name="weightSpinBox">
                    <property name="maximum">
                     <number>800</number>
                    </property>
                   </widget>
                  </item>
                  <item row="4" column="2">
-                  <widget class="QComboBox" name="comboBox_2">
+                  <widget class="QComboBox" name="genderComboBox">
                    <item>
                     <property name="text">
                      <string>Male</string>
@@ -327,7 +327,7 @@
                   </widget>
                  </item>
                  <item row="6" column="2">
-                  <widget class="QSpinBox" name="spinBox_2">
+                  <widget class="QSpinBox" name="heightSpinBox">
                    <property name="maximum">
                     <number>300</number>
                    </property>
@@ -491,7 +491,7 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QComboBox" name="comboBox">
+                  <widget class="QComboBox" name="patientPositionComboBox">
                    <item>
                     <property name="text">
                      <string>Head-First Supine [HFS]</string>
@@ -542,7 +542,7 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QLineEdit" name="lineEdit_4">
+                  <widget class="QLineEdit" name="accEdit">
                    <property name="inputMask">
                     <string>NNNNNNNNNNNNNNNN</string>
                    </property>
@@ -817,10 +817,10 @@
   <tabstop>firstnameEdit</tabstop>
   <tabstop>mrnEdit</tabstop>
   <tabstop>dobEdit</tabstop>
-  <tabstop>comboBox_2</tabstop>
-  <tabstop>spinBox</tabstop>
-  <tabstop>spinBox_2</tabstop>
-  <tabstop>comboBox</tabstop>
+  <tabstop>genderComboBox</tabstop>
+  <tabstop>weightSpinBox</tabstop>
+  <tabstop>heightSpinBox</tabstop>
+  <tabstop>patientPositionComboBox</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>resetButton</tabstop>
   <tabstop>phantomButton</tabstop>

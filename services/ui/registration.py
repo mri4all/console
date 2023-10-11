@@ -1,3 +1,6 @@
+from random import seed
+from random import random
+
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -6,6 +9,7 @@ import qtawesome as qta  # type: ignore
 
 import common.runtime as rt
 from common.version import mri4all_version
+from common.helper import generate_uid
 import services.ui.runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -24,6 +28,7 @@ class RegistrationWindow(QMainWindow):
         self.phantomButton.setText(" Phantom")
         self.phantomButton.setIcon(qta.icon("fa5s.flask"))
         self.phantomButton.setIconSize(QSize(20, 20))
+        self.phantomButton.clicked.connect(self.generate_phantom_data)
         self.resetButton.setIcon(qta.icon("fa5s.undo-alt"))
         self.resetButton.setIconSize(QSize(20, 20))
         self.resetButton.setText(" Reset")
@@ -64,8 +69,26 @@ class RegistrationWindow(QMainWindow):
         self.firstnameEdit.setText("")
         self.mrnEdit.setText("")
         self.dobEdit.setDate(QDate(2000, 1, 1))
-        self.validationLabel.setText("")
         self.lastnameEdit.setFocus()
+        self.weightSpinBox.setValue(0)
+        self.heightSpinBox.setValue(0)
+        self.genderComboBox.setCurrentIndex(0)
+        self.accEdit.setText("")
+        self.patientPositionComboBox.setCurrentIndex(0)
+        self.validationLabel.setText("")
+
+    def generate_phantom_data(self):
+        self.lastnameEdit.setText("Phantom")
+        self.firstnameEdit.setText(str(round(random() * 9999)))
+        self.mrnEdit.setText(generate_uid()[:8])
+        self.accEdit.setText(generate_uid()[:8])
+        self.dobEdit.setDate(QDate(2023, 10, 16))
+        self.registerButton.setFocus()
+        self.genderComboBox.setCurrentIndex(2)
+        self.patientPositionComboBox.setCurrentIndex(0)
+        self.weightSpinBox.setValue(20)
+        self.heightSpinBox.setValue(100)
+        self.validationLabel.setText("")
 
     def register_clicked(self):
         error = ""

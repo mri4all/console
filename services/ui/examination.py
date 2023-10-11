@@ -61,15 +61,38 @@ class ExaminationWindow(QMainWindow):
         self.addScanButton.setIcon(qta.icon("fa5s.plus-square"))
         self.addScanButton.setIconSize(QSize(24, 24))
         self.addScanButton.setProperty("type", "toolbar")
+        self.addScanButton.setStyleSheet(
+            """QPushButton::menu-indicator {
+                                                image: none;
+                                                subcontrol-position: right top;
+                                                subcontrol-origin: padding;
+                                            }
+            QMenu::item:selected {
+                background: #0ff;
+                color: red;
+            }                                            
+            """
+        )
+
+        self.add_sequence_menu = QMenu(self)
+        action1 = self.add_sequence_menu.addAction("Action 1")
+        action2 = self.add_sequence_menu.addAction("Action 2")
+        action3 = self.add_sequence_menu.addAction("Action 3")
+        self.addScanButton.setMenu(self.add_sequence_menu)
+        self.add_sequence_menu.setStyleSheet(
+            """
+            QMenu::item:selected {
+                background: #E0A526; 
+                color: #FFF;
+            }                                            
+            """
+        )
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
-
-        self.update_size()
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
         )
-
         self.tabWidget.setStyleSheet(
             """ QTabBar { 
                     font-size: 16px;
@@ -79,6 +102,35 @@ class ExaminationWindow(QMainWindow):
                 }"""
         )
 
+        self.update_size()
+        self.update_scanlist()
+
+    def prepare_examination(self):
+        self.statusBar().showMessage("Scanner ready", 0)
+
+        patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
+        patient_text += chr(0xA0) + chr(0xA0)
+        patient_text += f"(MRN: {ui_runtime.patient_information.mrn})</span>"
+        self.patientLabel.setText(patient_text)
+
+    def close_examination(self):
+        ui_runtime.close_patient()
+
+    def shutdown_clicked(self):
+        ui_runtime.shutdown()
+
+    def update_size(self):
+        screen_width, screen_height = ui_runtime.get_screen_size()
+
+        self.inlineViewerFrame.setMaximumHeight(int(screen_height * 0.5))
+        self.inlineViewerFrame.setMinimumHeight(int(screen_height * 0.5))
+
+        self.seqQueueFrame.setMaximumWidth(int(screen_width * 0.25))
+        self.seqQueueFrame.setMinimumWidth(int(screen_width * 0.25))
+        self.timerFrame.setMaximumWidth(int(screen_width * 0.25))
+        self.timerFrame.setMinimumWidth(int(screen_width * 0.25))
+
+    def update_scanlist(self):
         # Dummy items for seq list
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
@@ -167,28 +219,3 @@ class ExaminationWindow(QMainWindow):
         item2.setSizeHint(widget.sizeHint())
         self.queueWidget.addItem(item2)
         self.queueWidget.setItemWidget(item2, widget)
-
-    def prepare_examination(self):
-        self.statusBar().showMessage("Scanner ready", 0)
-
-        patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
-        patient_text += chr(0xA0) + chr(0xA0)
-        patient_text += f"(MRN {ui_runtime.patient_information.mrn})</span>"
-        self.patientLabel.setText(patient_text)
-
-    def close_examination(self):
-        ui_runtime.close_patient()
-
-    def shutdown_clicked(self):
-        ui_runtime.shutdown()
-
-    def update_size(self):
-        screen_width, screen_height = ui_runtime.get_screen_size()
-
-        self.inlineViewerFrame.setMaximumHeight(int(screen_height * 0.5))
-        self.inlineViewerFrame.setMinimumHeight(int(screen_height * 0.5))
-
-        self.seqQueueFrame.setMaximumWidth(int(screen_width * 0.25))
-        self.seqQueueFrame.setMinimumWidth(int(screen_width * 0.25))
-        self.timerFrame.setMaximumWidth(int(screen_width * 0.25))
-        self.timerFrame.setMinimumWidth(int(screen_width * 0.25))

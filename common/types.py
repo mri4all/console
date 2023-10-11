@@ -8,4 +8,4 @@ class PatientInformation(BaseModel):
 
     @classmethod
     def get_full_name(cls):
-        return f"{cls.first_name} {cls.last_name}"
+        return f"{cls.last_name}, {cls.first_name}"
