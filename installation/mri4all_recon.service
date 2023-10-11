@@ -1,0 +1,16 @@
+[Unit]
+Description=MRI4ALL Reconstruction Service
+Documentation=https://github.com/mri4all/console
+After=network.target
+Requires=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mri4all/console
+ExecStart=/opt/mri4all/env/bin/python /opt/mri4all/console/run_recon.py
+Restart=on-failure
+RestartSec=3
+User=mri4all
+
+[Install]
+WantedBy=multi-user.target

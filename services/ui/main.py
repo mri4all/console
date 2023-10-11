@@ -29,17 +29,23 @@ class DemoWindow(QMainWindow):
         self.pushButton.setIcon(fa5_icon)
         self.pushButton.setProperty("type", "highlight")
         self.pushButton.clicked.connect(self.button_clicked)
-        self.label.setText('This is something with a <a href="https://www.google.com">link</a>.')
+        self.label.setText(
+            'This is something with a <a href="https://www.google.com">link</a>.'
+        )
         self.actionShutdown.triggered.connect(self.shutdown_clicked)
 
     def button_clicked(self):
         msg = QMessageBox()
-        msg.setText("This is a message box This is a message box This is a message box This is a message box")
+        msg.setText(
+            "This is a message box This is a message box This is a message box This is a message box"
+        )
         msg.setInformativeText("This is additional information")
         msg.setDetailedText("This is additional information")
         msg.setWindowTitle("MessageBox demo")
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
+        msg.setWindowIcon(
+            QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png")
+        )
         msg.exec_()
 
     def shutdown_clicked(self):
@@ -108,7 +114,9 @@ def run():
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     ui_runtime.app = QApplication(sys.argv)
-    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
+    ui_runtime.app.setWindowIcon(
+        QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png")
+    )
     set_MRI4ALL_style(ui_runtime.app)
 
     ui_runtime.stacked_widget = QStackedWidget()
@@ -117,6 +125,8 @@ def run():
     ui_runtime.stacked_widget.addWidget(ui_runtime.registration_widget)
     ui_runtime.examination_widget = examination.ExaminationWindow()
     ui_runtime.stacked_widget.addWidget(ui_runtime.examination_widget)
+
+    ui_runtime.stacked_widget.show()
     ui_runtime.stacked_widget.showFullScreen()
 
     return_value = ui_runtime.app.exec_()

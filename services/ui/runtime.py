@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
+from typing import Tuple
 
 app = None
 stacked_widget = None
@@ -12,7 +13,12 @@ def shutdown():
     global app
 
     msg = QMessageBox()
-    ret = msg.question(None, "Shutdown Console?", "Do you really want to shutdown the console?", msg.Yes | msg.No)
+    ret = msg.question(
+        None,
+        "Shutdown Console?",
+        "Do you really want to shutdown the console?",
+        msg.Yes | msg.No,
+    )
 
     if ret == msg.Yes:
         if app is not None:
@@ -29,6 +35,6 @@ def close_patient():
     stacked_widget.setCurrentIndex(0)
 
 
-def get_screen_size() -> (int, int):
+def get_screen_size() -> Tuple[int, int]:
     screen = QDesktopWidget().screenGeometry()
     return screen.width(), screen.height()
