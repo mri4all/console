@@ -2,10 +2,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 from typing import Tuple
 
+from common.types import PatientInformation
+
 app = None
 stacked_widget = None
 registration_widget = None
 examination_widget = None
+
+patient_information = PatientInformation
 
 
 def shutdown():
@@ -35,12 +39,13 @@ def close_patient():
     msg = QMessageBox()
     ret = msg.question(
         None,
-        "End Examination?",
-        "Do you really want to close the active examination?",
+        "End Exam?",
+        "Do you really want to close the active exam?",
         msg.Yes | msg.No,
     )
 
     if ret == msg.Yes:
+        registration_widget.clear_form()
         stacked_widget.setCurrentIndex(0)
 
 

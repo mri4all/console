@@ -48,3 +48,4 @@ pyqtdarktheme
 # Global dependencies
 rpyc
 mypy
+pydantic

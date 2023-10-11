@@ -37,6 +37,11 @@ class LogViewerWindow(QDialog):
         self.refreshButton.clicked.connect(self.update_log)
         self.logEdit.setStyleSheet("color: rgba(255, 255, 255, 220);")
         self.logfileBox.currentIndexChanged.connect(self.update_log)
+
+        log_font = QFont("Monospace")
+        log_font.setStyleHint(QFont.TypeWriter)
+        self.logEdit.setFont(log_font)
+
         self.update_log()
 
     def close_clicked(self):

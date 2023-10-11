@@ -18,18 +18,21 @@ class RegistrationWindow(QMainWindow):
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/registration.ui", self)
         self.registerButton.setProperty("type", "highlight")
         self.registerButton.setIcon(qta.icon("fa5s.check"))
+        self.registerButton.setIconSize(QSize(20, 20))
         self.registerButton.setText(" Start Exam")
         self.registerButton.clicked.connect(self.register_clicked)
         self.phantomButton.setText(" Phantom")
         self.phantomButton.setIcon(qta.icon("fa5s.flask"))
+        self.phantomButton.setIconSize(QSize(20, 20))
         self.resetButton.setIcon(qta.icon("fa5s.undo-alt"))
+        self.resetButton.setIconSize(QSize(20, 20))
         self.resetButton.setText(" Reset")
+        self.resetButton.clicked.connect(self.clear_form)
         self.patientGroupBox.setProperty("type", "highlight")
         self.examGroupBox.setProperty("type", "highlight")
 
         self.powerButton.setText("")
         self.powerButton.setProperty("type", "dimmed")
-
         self.powerButton.setIcon(qta.icon("fa5s.power-off", color="#424d76"))
         self.powerButton.setIconSize(QSize(32, 32))
         self.powerButton.clicked.connect(self.shutdown_clicked)
@@ -47,8 +50,38 @@ class RegistrationWindow(QMainWindow):
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
 
+        self.mrnEdit.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        if source == self.mrnEdit and event.type() == QEvent.MouseButtonPress:
+            self.mrnEdit.setFocus(Qt.MouseFocusReason)
+            self.mrnEdit.setCursorPosition(0)
+            return True
+        return super().eventFilter(source, event)
+
+    def clear_form(self):
+        self.lastnameEdit.setText("")
+        self.firstnameEdit.setText("")
+        self.mrnEdit.setText("")
+        self.dobEdit.setDate(QDate(2000, 1, 1))
+        self.validationLabel.setText("")
+        self.lastnameEdit.setFocus()
+
     def register_clicked(self):
-        ui_runtime.register_patient()
+        error = ""
+        if self.lastnameEdit.text() == "" or self.firstnameEdit.text() == "":
+            error = "Invalid patient name"
+
+        if not error and self.mrnEdit.text() == "":
+            error = "Medical record number (MRN) missing"
+
+        if error:
+            self.validationLabel.setText('<b><span style="color: #E5554F;">Error: </span>' + chr(0xA0) + f"{error}</b>")
+        else:
+            ui_runtime.patient_information.first_name = self.firstnameEdit.text()
+            ui_runtime.patient_information.last_name = self.lastnameEdit.text()
+            ui_runtime.patient_information.mrn = self.mrnEdit.text()
+            ui_runtime.register_patient()
 
     def shutdown_clicked(self):
         ui_runtime.shutdown()

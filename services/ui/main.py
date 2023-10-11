@@ -40,14 +40,26 @@ def set_MRI4ALL_style(app):
     QPushButton:default {
         color: #FFFFFF;
     }      
-    QPushButton[type = "highlight"] {
+    QPushButton[type = "highlight"], QPushButton[type = "highlight"]:focus {
         color: #FFFFFF;
         background-color: rgba(224, 165, 38, 120); 
     }  
-    QPushButton[type = "highlight"]:hover, QPushButton[type = "highlight"]:focus {
+    QPushButton[type = "highlight"]:hover {
         color: #FFFFFF;
         background-color: #E0A526;    
     }  
+    QPushButton[type = "dimmed"], QPushButton[type = "dimmed"]:focus {
+        color: #FFFFFF;
+    }  
+    QPushButton[type = "dimmed"]:hover {
+        background-color: rgba(66, 77, 118, 80); 
+    }      
+    QPushButton[type = "toolbar"], QPushButton[type = "toolbar"]:focus {
+        background-color: rgba(255, 255, 255, 10); 
+    }  
+    QPushButton[type = "toolbar"]:hover {
+        background-color: #E0A526;
+    }      
     QGroupBox::title {
         background-color: transparent;
         color: #E0A526;    
@@ -91,9 +103,7 @@ def run():
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     ui_runtime.app = QApplication(sys.argv)
-    ui_runtime.app.setWindowIcon(
-        QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png")
-    )
+    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
     set_MRI4ALL_style(ui_runtime.app)
 
     ui_runtime.stacked_widget = QStackedWidget()

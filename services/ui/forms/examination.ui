@@ -68,7 +68,7 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>24</height>
+        <height>28</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -83,6 +83,87 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="timerFrame">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="leftMargin">
+           <number>14</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="patientLabel">
+            <property name="text">
+             <string>Patient: </string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>24</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
@@ -94,8 +175,14 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QFrame" name="seqQueueFrame">
            <property name="maximumSize">
@@ -131,7 +218,13 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>32</height>
+                <height>29</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>29</height>
                </size>
               </property>
               <property name="frameShape">
@@ -159,16 +252,21 @@
                 <height>16777215</height>
                </size>
               </property>
-              <item>
-               <property name="text">
-                <string>3D TSE - COR</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Radial 2D TSE - AX</string>
-               </property>
-              </item>
+              <property name="editTriggers">
+               <set>QAbstractItemView::EditKeyPressed</set>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>false</bool>
+              </property>
+              <property name="viewMode">
+               <enum>QListView::ListMode</enum>
+              </property>
+              <property name="selectionRectVisible">
+               <bool>false</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -176,7 +274,13 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>80</height>
+                <height>56</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>56</height>
                </size>
               </property>
               <property name="frameShape">
@@ -189,11 +293,14 @@
                <number>0</number>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>8</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>8</number>
                </property>
                <property name="rightMargin">
                 <number>0</number>
@@ -205,21 +312,78 @@
                 <widget class="QPushButton" name="startScanButton">
                  <property name="minimumSize">
                   <size>
-                   <width>64</width>
-                   <height>64</height>
+                   <width>48</width>
+                   <height>48</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>64</width>
-                   <height>64</height>
+                   <width>48</width>
+                   <height>48</height>
                   </size>
                  </property>
                  <property name="text">
                   <string>PushButton</string>
                  </property>
                  <property name="flat">
-                  <bool>true</bool>
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="stopScanButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="editScanButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="deleteScanButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>PushButton</string>
                  </property>
                 </widget>
                </item>
@@ -228,6 +392,9 @@
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::MinimumExpanding</enum>
+                 </property>
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>309</width>
@@ -235,6 +402,25 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="addScanButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -261,7 +447,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <property name="leftMargin">
-             <number>12</number>
+             <number>20</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -323,7 +509,7 @@
              <number>0</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>29</number>
             </property>
             <property name="rightMargin">
              <number>0</number>
@@ -426,7 +612,7 @@
      <x>0</x>
      <y>0</y>
      <width>1228</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuControl">
@@ -448,7 +634,7 @@
    </widget>
    <widget class="QMenu" name="menuExamination">
     <property name="title">
-     <string>Examination</string>
+     <string>Exam</string>
     </property>
     <addaction name="actionProtocol_Browser"/>
     <addaction name="separator"/>
@@ -459,13 +645,19 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>32</height>
+    </size>
+   </property>
    <property name="sizeGripEnabled">
     <bool>false</bool>
    </property>
   </widget>
   <action name="actionClose_Examination">
    <property name="text">
-    <string>Close Examination...</string>
+    <string>Close...</string>
    </property>
   </action>
   <action name="actionSystem_Status">
