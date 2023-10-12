@@ -16,6 +16,26 @@ class SequenceTSE(SequenceBase, registry_key=Path(__file__).stem):
         """
         Returns the user inteface of the sequence.
         """
-
-        # widget.addWidget(QPushButton("TSE"))
+        layout = QVBoxLayout()
+        layout.addSpacing(4)
+        label = QLabel("Resolution")
+        layout.addWidget(label)
+        item = QSlider()
+        item.setOrientation(Qt.Horizontal)
+        item.setMaximumWidth(500)
+        layout.addWidget(item)
+        layout.addSpacing(30)
+        label = QLabel("Bandwidth")
+        layout.addWidget(label)
+        item = QDial()
+        item.setMaximumHeight(80)
+        item.setMaximumWidth(80)
+        item.setNotchesVisible(True)
+        item.setStyleSheet("QDial { background-color: #FFF; color: #E0A526; }")
+        layout.addWidget(item)
+        value_label = QLabel("0 Hz/px")
+        layout.addWidget(value_label)
+        item.valueChanged.connect(lambda value: value_label.setText(str(value) + " Hz/px"))
+        layout.addStretch()
+        widget.setLayout(layout)
         return True

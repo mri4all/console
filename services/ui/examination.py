@@ -115,17 +115,18 @@ class ExaminationWindow(QMainWindow):
                 }  
                 QTabBar::tab {
                     margin-left:0px;
-                    margin-right:16px;                
+                    margin-right:16px;          
+                    border-bottom: 3px solid transparent;
                 }
                QTabBar::tab:selected {
                     border-bottom: 3px solid #E0A526;
                 }                
                 QTabBar::tab:selected:disabled {
-                    border-bottom: none;
+                    border-bottom: 3px solid transparent;
                 }                
                QTabBar::tab:disabled {
                     color: #515669;
-                    border-bottom: none;
+                    border-bottom: 3px solid transparent;
                 }                    
             """
         )
@@ -229,7 +230,7 @@ class ExaminationWindow(QMainWindow):
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #444;} ")
+        widget.setStyleSheet("QWidget { background-color: transparent; color: #444;} QLabel { padding-left: 6px; }")
         widgetText = QLabel("1. 3D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -251,7 +252,7 @@ class ExaminationWindow(QMainWindow):
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #444;} ")
+        widget.setStyleSheet("QWidget { background-color: transparent; color: #444; } QLabel { padding-left: 6px; }")
         widgetText = QLabel("2. 3D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -273,14 +274,14 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor("#FFF"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #000;}  ")
+        widget.setStyleSheet("QWidget { background-color: transparent; color: #000;} QLabel { padding-left: 6px; } ")
         widgetText = QLabel("3. Radial 2D TSE - AX")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
         widgetButton.setContentsMargins(0, 0, 0, 0)
         widgetButton.setMaximumWidth(48)
         widgetButton.setFlat(True)
-        widgetButton.setIcon(qta.icon("fa5s.play", color="#000"))
+        widgetButton.setIcon(qta.icon("fa5s.circle-notch", color="#000", animation=qta.Spin(widgetButton)))
         widgetButton.setIconSize(QSize(24, 24))
         widgetButton.setStyleSheet("background-color: transparent;")
         widgetLayout = QHBoxLayout()
@@ -295,7 +296,7 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor(58, 66, 102))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;}  ")
+        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
         widgetText = QLabel("4. Radial 2D TSE - AX")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -317,7 +318,7 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor(58, 66, 102))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;}  ")
+        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
         widgetText = QLabel("5. Radial 2D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -346,9 +347,7 @@ class ExaminationWindow(QMainWindow):
 
         # Make the selected item bold
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.currentItem())
-        selected_widget.layout().itemAt(0).widget().setStyleSheet(
-            "font-weight: bold; text-decoration: underline; border-left: 16px solid #000;"
-        )
+        selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: bold; border-left: 16px solid #000;")
         self.queueWidget.currentItem().setSelected(False)
 
         self.start_scan_edit("flash_demo", read_only)
@@ -367,6 +366,11 @@ class ExaminationWindow(QMainWindow):
 
     def start_scan_edit(self, id, read_only=False):
         sequence_id = "flash_demo"
+
+        index = self.queueWidget.currentRow()
+        if index % 2:
+            sequence_id = "tse3d_demo"
+
         if not sequence_id in SequenceBase.installed_sequences():
             log.error(f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed")
             return

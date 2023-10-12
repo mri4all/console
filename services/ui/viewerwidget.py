@@ -21,13 +21,6 @@ class ViewerWidget(QWidget):
     def __init__(self):
         super(ViewerWidget, self).__init__()
 
-        if self.property("id") == "3":
-            sc = MplCanvas(self, width=5, height=4, dpi=100)
-            sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
-            layout = QVBoxLayout(self)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.addWidget(sc)
-
     def configure(self):
         if self.property("id") == "3":
             sc = MplCanvas(self, width=5, height=4, dpi=100)

@@ -28,7 +28,12 @@ def get_logger():
         logger_setup_complete = True
         logger.setLevel(get_loglevel())
         logger.addFilter(TaskIDFilter())
-
+        logging.addLevelName(logging.NOTSET, "NOT")
+        logging.addLevelName(logging.DEBUG, "DBG")
+        logging.addLevelName(logging.INFO, "INF")
+        logging.addLevelName(logging.WARNING, "WRN")
+        logging.addLevelName(logging.ERROR, "ERR")
+        logging.addLevelName(logging.CRITICAL, "CTL")
         formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(taskID)s | %(message)s")
 
         # Create console handler
