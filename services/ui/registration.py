@@ -10,7 +10,7 @@ import qtawesome as qta  # type: ignore
 import common.runtime as rt
 from common.version import mri4all_version
 from common.helper import generate_uid
-import services.ui.runtime as ui_runtime
+import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.systemstatus as systemstatus

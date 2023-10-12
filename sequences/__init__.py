@@ -26,11 +26,11 @@ class SequenceBase(Generic[SequenceVar]):
         pass
 
     @classmethod
-    def registered_sequence(cls, registry_key):
+    def get_sequence(cls, registry_key):
         return cls._REGISTRY[registry_key]
 
     @classmethod
-    def registered_sequences(cls):
+    def installed_sequences(cls):
         return list(cls._REGISTRY.keys())
 
     ## Sequence API functions

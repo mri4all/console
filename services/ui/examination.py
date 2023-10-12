@@ -6,7 +6,7 @@ import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
 import common.runtime as rt
-import services.ui.runtime as ui_runtime
+import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.configuration as configuration
@@ -99,7 +99,10 @@ class ExaminationWindow(QMainWindow):
                     font-weight: bold;
                 }  
                 QTabBar::tab {
-                }"""
+                    margin-left:0px;
+                    margin-right:16px;                
+                }
+            """
         )
         self.scanParametersWidget.insertTab(0, QWidget(), "Sequence")
         self.scanParametersWidget.setCurrentIndex(0)
@@ -141,10 +144,10 @@ class ExaminationWindow(QMainWindow):
         # TODO: Should be filled with protocol manager in the future
         self.add_sequence_menu.clear()
 
-        sequence_list = SequenceBase.registered_sequences()
+        sequence_list = SequenceBase.installed_sequences()
         for seq in sequence_list:
             my_action = QAction(self)
-            my_action.setText(SequenceBase.registered_sequence(seq).get_readable_name())
+            my_action.setText(SequenceBase.get_sequence(seq).get_readable_name())
             my_action.triggered.connect(self.insert_sequence)
             my_action.setProperty("sequence_class", seq)
             self.add_sequence_menu.addAction(my_action)
@@ -152,7 +155,10 @@ class ExaminationWindow(QMainWindow):
     def insert_sequence(self):
         # Dummy implementation for demo
         sequence_class = self.sender().property("sequence_class")
-        sequence_instance = SequenceBase.registered_sequence(sequence_class)()
+
+        # Create an instance of the sequence class
+        sequence_instance = SequenceBase.get_sequence(sequence_class)()
+        # Ask the sequence to insert its UI into the first tab
         widget_to_delete = self.scanParametersWidget.widget(0)
         sip.delete(widget_to_delete)
         new_widget = QWidget()

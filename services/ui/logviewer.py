@@ -6,7 +6,7 @@ import qtawesome as qta  # type: ignore
 
 import common.runtime as rt
 import common.logger as logger
-import services.ui.runtime as ui_runtime
+import services.ui.ui_runtime as ui_runtime
 
 log = logger.get_logger()
 
@@ -42,7 +42,7 @@ class LogViewerWindow(QDialog):
         log_font.setStyleHint(QFont.TypeWriter)
         self.logEdit.setFont(log_font)
 
-        self.update_log()
+        QTimer.singleShot(10, self.update_log)
 
     def close_clicked(self):
         self.close()
@@ -60,9 +60,10 @@ class LogViewerWindow(QDialog):
         try:
             with open(log_filename, "r") as file:
                 for line in file.readlines():
-                    log_content = line + log_content
+                    log_content += line
         except:
             log.exception("Unable to load log")
             log_content = "- Unable to load log -"
 
         self.logEdit.setPlainText(log_content)
+        self.logEdit.verticalScrollBar().setValue(self.logEdit.verticalScrollBar().maximum())

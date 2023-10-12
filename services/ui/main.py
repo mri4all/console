@@ -17,7 +17,7 @@ log = logger.get_logger()
 from common.version import mri4all_version
 from services.ui import registration
 from services.ui import examination
-import services.ui.runtime as ui_runtime
+import services.ui.ui_runtime as ui_runtime
 
 
 def set_MRI4ALL_style(app):
