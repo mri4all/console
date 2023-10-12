@@ -97,7 +97,7 @@ def prepare_system() -> bool:
     # TODO: Make sure that all needed folders are available
     # TODO: Start the acquisition and reconstruction services
     # TODO: Check if the acquisition and reconstruction services are running
-    return False
+    return True
 
 
 def shutdown_system():
