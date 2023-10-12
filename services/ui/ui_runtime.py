@@ -18,6 +18,7 @@ exam_information = ExamInformation
 
 scan_list: List[SequenceBase] = []
 editor_sequence_instance = None
+editor_active = False
 
 
 def shutdown():
@@ -33,6 +34,8 @@ def shutdown():
     )
 
     if ret == msg.Yes:
+        registration_widget.clear_form()
+        examination_widget.clear_examination_ui()
         if app is not None:
             app.quit()
             app = None

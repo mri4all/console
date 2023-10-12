@@ -93,6 +93,18 @@ def set_MRI4ALL_style(app):
     )
 
 
+def prepare_system() -> bool:
+    # TODO: Make sure that all needed folders are available
+    # TODO: Start the acquisition and reconstruction services
+    # TODO: Check if the acquisition and reconstruction services are running
+    return False
+
+
+def shutdown_system():
+    # TODO: Stop the acquisition and reconstruction services
+    return True
+
+
 def run():
     log.info(f"-- MRI4ALL {mri4all_version.get_version_string()} --")
     log.info("UI service started")
@@ -106,6 +118,16 @@ def run():
     ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
     set_MRI4ALL_style(ui_runtime.app)
 
+    if not prepare_system():
+        log.error("Failed to prepare system. Unable to start UI service.")
+        msg = QMessageBox()
+        msg.critical(
+            None,
+            "Error during startup",
+            "A major error occurred during preparation of the system. The scanner software cannot be started. Review the log files for details.",
+        )
+        sys.exit(1)
+
     ui_runtime.stacked_widget = QStackedWidget()
     ui_runtime.stacked_widget.setWindowTitle("MRI4ALL")
     ui_runtime.registration_widget = registration.RegistrationWindow()
@@ -117,6 +139,8 @@ def run():
     ui_runtime.stacked_widget.showFullScreen()
 
     return_value = ui_runtime.app.exec_()
+
+    shutdown_system()
 
     log.info("UI service terminated")
     log.info("-------------")

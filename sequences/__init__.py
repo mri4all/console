@@ -85,6 +85,14 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
+    def is_adjustment_sequence(self) -> bool:
+        """
+        Returns True if the sequence is an adjustment sequence.
+        """
+        if self.seq_name.startswith("adj_"):
+            return True
+        return False
+
 
 # Automatically import all sequence classes existing in the /sequences directory.
 # Sequence classes must provide only one Python file in the sequences directory,

@@ -4,7 +4,8 @@ import common.logger as logger
 
 log = logger.get_logger()
 
-def check_data_folders() -> bool:
+
+def check_and_create_data_folders() -> bool:
     # Check if data folders exist
     if not os.path.isdir(rt.base_path + "/data"):
         log.error(f"Data folder not found at {rt.base_path}/data")
@@ -12,4 +13,9 @@ def check_data_folders() -> bool:
 
     # TODO: Incomplete
 
+    return True
+
+
+def move_task(task_path, target) -> bool:
+    # TODO: Incomplete
     return True

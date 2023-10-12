@@ -176,7 +176,8 @@ class ExaminationWindow(QMainWindow):
         self.statusBar().showMessage("Scanner ready", 0)
 
     def clear_examination_ui(self):
-        pass
+        if ui_runtime.editor_active:
+            self.stop_scan_edit()
 
     def close_examination_clicked(self):
         ui_runtime.close_patient()
@@ -382,6 +383,7 @@ class ExaminationWindow(QMainWindow):
 
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(True)
+        ui_runtime.editor_active = True
 
     def stop_scan_edit(self):
         # Remove the bold font from the selected item
@@ -396,6 +398,8 @@ class ExaminationWindow(QMainWindow):
         if ui_runtime.editor_sequence_instance is not None:
             del ui_runtime.editor_sequence_instance
             ui_runtime.editor_sequence_instance = None
+
+        ui_runtime.editor_active = False
 
     def clear_seq_tab_and_return_empty(self):
         old_widget_to_delete = self.scanParametersWidget.widget(0)
