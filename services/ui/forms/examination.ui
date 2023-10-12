@@ -665,7 +665,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="settingsButton">
+             <widget class="QPushButton" name="resultsViewerButton">
               <property name="minimumSize">
                <size>
                 <width>64</width>
