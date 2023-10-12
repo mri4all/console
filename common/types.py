@@ -1,4 +1,7 @@
+from typing_extensions import Literal
+from pathlib import Path
 from pydantic import BaseModel
+
 import common.helper as helper
 
 
@@ -32,3 +35,20 @@ class ExamInformation(BaseModel):
     def clear(cls):
         cls.id = ""
         cls.scan_counter = 0
+
+
+class ScanQueueEntry(BaseModel):
+    sequence: str
+    protocol_name: str
+    scan_counter: int
+    folder: Path
+    state: Literal[
+        "created",
+        "scheduled_acq",
+        "acq",
+        "scheduled_recon",
+        "recon",
+        "complete",
+        "failure",
+    ] = "created"
+    has_results: bool
