@@ -21,6 +21,7 @@ class SequenceBase(Generic[SequenceVar]):
         cls.seq_name = registry_key
 
     seq_name = "INVALID"
+    parameters = {}
 
     def __init__(self):
         pass
@@ -48,9 +49,39 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return "INVALID"
 
+    def set_parameters(self, parameters) -> bool:
+        """
+        Reads the sequence parameters from a JSON dictionary.
+        """
+        return True
+
+    def get_settings(self) -> dict:
+        """
+        Returns the current sequence parameters as JSON dict.
+        """
+        return {}
+
     def setup_ui(self, widget) -> bool:
         """
-        Returns the user inteface of the sequence.
+        Creates the user interface of the sequence.
+        """
+        return True
+
+    def write_parameters_to_ui(self, widget) -> bool:
+        """
+        Write the internal settings to the UI, which lives inside the widget.
+        """
+        return True
+
+    def read_parameters_from_ui(self) -> bool:
+        """
+        Reads the settings from the UI into the sequence.
+        """
+        return True
+
+    def calculate_sequence(self) -> bool:
+        """
+        Calculates the sequence instructions.
         """
         return True
 
