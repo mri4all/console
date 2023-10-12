@@ -112,7 +112,7 @@ def run():
     ui_runtime.stacked_widget.addWidget(ui_runtime.registration_widget)
     ui_runtime.examination_widget = examination.ExaminationWindow()
     ui_runtime.stacked_widget.addWidget(ui_runtime.examination_widget)
-
+    ui_runtime.stacked_widget.setCurrentIndex(0)
     ui_runtime.stacked_widget.show()
     ui_runtime.stacked_widget.showFullScreen()
 

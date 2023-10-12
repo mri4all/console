@@ -21,7 +21,7 @@ class SequenceBase(Generic[SequenceVar]):
         cls.seq_name = registry_key
 
     seq_name = "INVALID"
-    parameters = {}
+    parameters: Dict = {}
 
     def __init__(self):
         pass

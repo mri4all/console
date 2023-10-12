@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-from typing import Tuple
+from typing import Tuple, Dict, List
+from sequences import SequenceBase
 
 from common.types import PatientInformation, ExamInformation
 import common.logger as logger
@@ -14,6 +15,9 @@ examination_widget = None
 
 patient_information = PatientInformation
 exam_information = ExamInformation
+
+scan_list: List[SequenceBase] = []
+editor_sequence_instance = None
 
 
 def shutdown():

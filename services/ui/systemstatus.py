@@ -31,7 +31,7 @@ class SystemStatusWindow(QDialog):
         self.pingButton.setIcon(qta.icon("fa5s.satellite-dish"))
         self.pingButton.setText(" Ping")
         self.pingLabel.setText(
-            '<span style="color: #40C1AC; font-size: 20px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Responding"
+            '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Responding"
         )
         self.pingLabel.setFont(qta.font("fa", 16))
 
