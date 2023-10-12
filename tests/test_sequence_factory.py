@@ -6,7 +6,10 @@ sys.path.append("../")
 from sequences import SequenceBase
 
 if __name__ == "__main__":
-    print(SequenceBase.registered_sequences())
+    sequence_list = SequenceBase.registered_sequences()
+    print("Installed sequences:")
+    for seq in sequence_list:
+        print(" - " + SequenceBase.registered_sequence(seq).get_readable_name())
 
     currentSequence = SequenceBase.registered_sequence("flash")()
     print(currentSequence.get_name())

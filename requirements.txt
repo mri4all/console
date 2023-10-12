@@ -44,6 +44,7 @@ imageio~=2.19.3
 PyQt5
 qtawesome
 pyqtdarktheme
+sip
 
 # Global dependencies
 rpyc

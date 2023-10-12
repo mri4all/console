@@ -2,7 +2,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 from typing import Tuple
 
-from common.types import PatientInformation
+from common.types import PatientInformation, ExamInformation
+import common.logger as logger
+
+log = logger.get_logger()
 
 app = None
 stacked_widget = None
@@ -10,6 +13,7 @@ registration_widget = None
 examination_widget = None
 
 patient_information = PatientInformation
+exam_information = ExamInformation
 
 
 def shutdown():
@@ -31,8 +35,11 @@ def shutdown():
 
 
 def register_patient():
-    examination_widget.prepare_examination()
+    exam_information.initialize()
+    examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)
+    log.info(f"Registered patient {patient_information.get_full_name()}")
+    log.info(f"Started exam {exam_information.id}")
 
 
 def close_patient():
@@ -47,6 +54,10 @@ def close_patient():
     if ret == msg.Yes:
         registration_widget.clear_form()
         stacked_widget.setCurrentIndex(0)
+        examination_widget.clear_examination_ui()
+        log.info(f"Closed patient {patient_information.get_full_name()}")
+        patient_information.clear()
+        exam_information.clear()
 
 
 def get_screen_size() -> Tuple[int, int]:

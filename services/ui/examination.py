@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 import qtawesome as qta  # type: ignore
+import sip  # type: ignore
 
 import common.runtime as rt
 import services.ui.runtime as ui_runtime
@@ -10,13 +11,14 @@ import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
+from sequences import SequenceBase
 
 
 class ExaminationWindow(QMainWindow):
     def __init__(self):
         super(ExaminationWindow, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/examination.ui", self)
-        self.actionClose_Examination.triggered.connect(self.close_examination)
+        self.actionClose_Examination.triggered.connect(self.close_examination_clicked)
         self.viewer1Frame.setStyleSheet("background-color: #000000;")
         self.viewer2Frame.setStyleSheet("background-color: #000000;")
         self.viewer3Frame.setStyleSheet("background-color: #000000;")
@@ -35,7 +37,7 @@ class ExaminationWindow(QMainWindow):
         self.closePatientButton.setText("")
         self.closePatientButton.setIcon(qta.icon("fa5s.sign-out-alt"))
         self.closePatientButton.setIconSize(QSize(32, 32))
-        self.closePatientButton.clicked.connect(self.close_examination)
+        self.closePatientButton.clicked.connect(self.close_examination_clicked)
 
         self.startScanButton.setText("")
         self.startScanButton.setIcon(qta.icon("fa5s.play", color="#40C1AC"))
@@ -51,6 +53,7 @@ class ExaminationWindow(QMainWindow):
         self.editScanButton.setIcon(qta.icon("fa5s.pen"))
         self.editScanButton.setIconSize(QSize(24, 24))
         self.editScanButton.setProperty("type", "toolbar")
+        self.editScanButton.clicked.connect(self.edit_sequence_clicked)
 
         self.deleteScanButton.setText("")
         self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt"))
@@ -73,12 +76,7 @@ class ExaminationWindow(QMainWindow):
             }                                            
             """
         )
-
         self.add_sequence_menu = QMenu(self)
-        action1 = self.add_sequence_menu.addAction("Action 1")
-        action2 = self.add_sequence_menu.addAction("Action 2")
-        action3 = self.add_sequence_menu.addAction("Action 3")
-        self.addScanButton.setMenu(self.add_sequence_menu)
         self.add_sequence_menu.setStyleSheet(
             """
             QMenu::item:selected {
@@ -87,13 +85,15 @@ class ExaminationWindow(QMainWindow):
             }                                            
             """
         )
+        self.addScanButton.setMenu(self.add_sequence_menu)
+        self.update_sequence_list()
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
         )
-        self.tabWidget.setStyleSheet(
+        self.scanParametersWidget.setStyleSheet(
             """ QTabBar { 
                     font-size: 16px;
                     font-weight: bold;
@@ -101,19 +101,25 @@ class ExaminationWindow(QMainWindow):
                 QTabBar::tab {
                 }"""
         )
+        self.scanParametersWidget.insertTab(0, QWidget(), "Sequence")
+        self.scanParametersWidget.setCurrentIndex(0)
+        self.scanParametersWidget.setEnabled(False)
 
         self.update_size()
         self.update_scanlist()
 
-    def prepare_examination(self):
-        self.statusBar().showMessage("Scanner ready", 0)
-
+    def prepare_examination_ui(self):
         patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
         patient_text += chr(0xA0) + chr(0xA0)
-        patient_text += f"(MRN: {ui_runtime.patient_information.mrn})</span>"
+        patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
         self.patientLabel.setText(patient_text)
 
-    def close_examination(self):
+        self.statusBar().showMessage("Scanner ready", 0)
+
+    def clear_examination_ui(self):
+        pass
+
+    def close_examination_clicked(self):
         ui_runtime.close_patient()
 
     def shutdown_clicked(self):
@@ -130,8 +136,33 @@ class ExaminationWindow(QMainWindow):
         self.timerFrame.setMaximumWidth(int(screen_width * 0.25))
         self.timerFrame.setMinimumWidth(int(screen_width * 0.25))
 
+    def update_sequence_list(self):
+        # Dummy implementation for demo
+        # TODO: Should be filled with protocol manager in the future
+        self.add_sequence_menu.clear()
+
+        sequence_list = SequenceBase.registered_sequences()
+        for seq in sequence_list:
+            my_action = QAction(self)
+            my_action.setText(SequenceBase.registered_sequence(seq).get_readable_name())
+            my_action.triggered.connect(self.insert_sequence)
+            my_action.setProperty("sequence_class", seq)
+            self.add_sequence_menu.addAction(my_action)
+
+    def insert_sequence(self):
+        # Dummy implementation for demo
+        sequence_class = self.sender().property("sequence_class")
+        sequence_instance = SequenceBase.registered_sequence(sequence_class)()
+        widget_to_delete = self.scanParametersWidget.widget(0)
+        sip.delete(widget_to_delete)
+        new_widget = QWidget()
+        self.scanParametersWidget.insertTab(0, new_widget, "Sequence")
+        sequence_instance.setup_ui(new_widget)
+        self.scanParametersWidget.setCurrentIndex(0)
+        self.scanParametersWidget.setEnabled(True)
+
     def update_scanlist(self):
-        # Dummy items for seq list
+        # Dummy implementation for demo
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
         widget = QWidget()
@@ -219,3 +250,6 @@ class ExaminationWindow(QMainWindow):
         item2.setSizeHint(widget.sizeHint())
         self.queueWidget.addItem(item2)
         self.queueWidget.setItemWidget(item2, widget)
+
+    def edit_sequence_clicked(self):
+        self.scanParametersWidget.setEnabled(False)

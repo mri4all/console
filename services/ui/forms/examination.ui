@@ -459,7 +459,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QTabWidget" name="tabWidget">
+             <widget class="QTabWidget" name="scanParametersWidget">
               <property name="tabPosition">
                <enum>QTabWidget::North</enum>
               </property>
@@ -469,14 +469,14 @@
               <property name="currentIndex">
                <number>0</number>
               </property>
-              <widget class="QWidget" name="tab">
+              <widget class="QWidget" name="adjustmentsTab">
                <attribute name="title">
-                <string>General</string>
+                <string>Adjustments</string>
                </attribute>
               </widget>
-              <widget class="QWidget" name="tab_2">
+              <widget class="QWidget" name="processingTab">
                <attribute name="title">
-                <string>Resolution</string>
+                <string>Processing</string>
                </attribute>
               </widget>
              </widget>

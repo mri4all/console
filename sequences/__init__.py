@@ -48,6 +48,12 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return "INVALID"
 
+    def setup_ui(self, widget) -> bool:
+        """
+        Returns the user inteface of the sequence.
+        """
+        return True
+
 
 # Automatically import all sequence classes existing in the /sequences directory.
 # Sequence classes must provide only one Python file in the sequences directory,
