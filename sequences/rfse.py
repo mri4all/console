@@ -1,21 +1,23 @@
 import os
 from pathlib import Path
-from PyQt5 import uic
 import math
-import sys
-sys.path.insert(0, '.')
-import os
-from sequences import SequenceBase
-import pypulseq as pp
-from external.seq.adjustments_acq.scripts import run_pulseq
-import external.seq.adjustments_acq.config as cfg
 import numpy as np
-import uuid 
+
+from PyQt5 import uic
+
+import pypulseq as pp
+
+from sequences import PulseqSequence
+
+import external.seq.adjustments_acq.config as cfg
+from external.seq.adjustments_acq.scripts import run_pulseq
+
 import common.logger as logger
+
 log = logger.get_logger()
 
 
-class SequenceRFSE(SequenceBase, registry_key=Path(__file__).stem):
+class SequenceRFSE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
         return "Radio Frequency Spin Echo"
@@ -28,8 +30,7 @@ class SequenceRFSE(SequenceBase, registry_key=Path(__file__).stem):
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
-
+    def pypulseq_rfse(self, ui_inputs=None, check_timing=True) -> bool:
         if len(ui_inputs) == 0:
             # ======
             # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
@@ -77,10 +78,16 @@ class SequenceRFSE(SequenceBase, registry_key=Path(__file__).stem):
         # ======
         # CREATE EVENTS
         # ======
-        rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6,
-                                  system=system)
-        rf2 = pp.make_block_pulse(flip_angle=alpha2 * math.pi / 180, duration=alpha2_duration, delay=100e-6,
-                                  phase_offset=math.pi / 2, system=system)
+        rf1 = pp.make_block_pulse(
+            flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system
+        )
+        rf2 = pp.make_block_pulse(
+            flip_angle=alpha2 * math.pi / 180,
+            duration=alpha2_duration,
+            delay=100e-6,
+            phase_offset=math.pi / 2,
+            system=system,
+        )
 
         # ======
         # CALCULATE DELAYS
@@ -111,25 +118,34 @@ class SequenceRFSE(SequenceBase, registry_key=Path(__file__).stem):
             else:
                 log.info("Timing check failed. Error listing follows:")
                 [print(e) for e in error_report]
-        
-        # seq.write('rfse.seq')
-        seq_file_path = SequenceBase.store_seq_file(file_name='rfse.seq', seq=seq)
-        log.info('Seq file stored')
-        return  seq_file_path
 
-    def run() -> bool:
-        log.info('Starting to build sequence Radio Frequency Spin Echo')
-        ui_inputs = SequenceBase.read_parameters_from_ui('rfse')
-        seq_file_path = SequenceRFSE.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
-        rxd, rx_t = run_pulseq(seq_file=seq_file_path, rf_center=cfg.LARMOR_FREQ,
-                               tx_t=1, grad_t=10, tx_warmup=100,
-                               shim_x=0, shim_y=0, shim_z=0,
-                               grad_cal=False, save_np=True, save_mat=False, save_msgs=False,
-                               gui_test=False)
+        # seq.write('rfse.seq')
+        seq_file_path = self.store_seq_file(file_name="rfse.seq", seq=seq)
+        log.info("Seq file stored")
+        return seq_file_path
+
+    def run(self) -> bool:
+        log.info("Starting to build sequence Radio Frequency Spin Echo")
+        seq_file_path = self.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+        rxd, rx_t = run_pulseq(
+            seq_file=seq_file_path,
+            rf_center=cfg.LARMOR_FREQ,
+            tx_t=1,
+            grad_t=10,
+            tx_warmup=100,
+            shim_x=0,
+            shim_y=0,
+            shim_z=0,
+            grad_cal=False,
+            save_np=True,
+            save_mat=False,
+            save_msgs=False,
+            gui_test=False,
+        )
         log.info("Completed executing sequence: RFSE")
         return True
-        
 
 
 if __name__ == "__main__":
-    SequenceRFSE.run()
+    test_instance = SequenceRFSE()
+    test_instance.run()

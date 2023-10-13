@@ -31,21 +31,14 @@ async def terminate_process(signalNumber, frame) -> None:
     helper.trigger_terminate()
 
 
-def run(test_all_sequences:bool = False):
+def run(test_all_sequences: bool = False):
     log.info(f"-- MRI4ALL {mri4all_version.get_version_string()} --")
     log.info("Acquisition service started")
-    if test_all_sequences is True:
-        # rfse.SequenceRFSE.run()
-        #rftse.SequenceRFTSE.run()
-        adj_frequency.AdjFrequency.run()
-        
-        
+
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:
-        helper.loop.add_signal_handler(
-            s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop))
-        )
+        helper.loop.add_signal_handler(s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop)))
 
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop
@@ -66,4 +59,4 @@ def run(test_all_sequences:bool = False):
 
 
 if __name__ == "__main__":
-    run(test_all_sequences=True) # TODO: Write unit tests for each sequence later
+    run()

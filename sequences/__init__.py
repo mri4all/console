@@ -19,8 +19,9 @@ class SequenceBase(Generic[SequenceVar]):
 
     def __init_subclass__(cls, registry_key, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls._REGISTRY[registry_key] = cls
-        cls.seq_name = registry_key
+        if registry_key:
+            cls._REGISTRY[registry_key] = cls
+            cls.seq_name = registry_key
 
     seq_name = "INVALID"
     parameters: Dict = {}
@@ -94,20 +95,23 @@ class SequenceBase(Generic[SequenceVar]):
         if self.seq_name.startswith("adj_"):
             return True
         return False
-    
-    def store_seq_file(file_name: str = '', seq = None) -> str:
+
+
+class PulseqSequence(SequenceBase[SequenceVar], registry_key=""):
+    def store_seq_file(self, file_name: str = "", seq=None) -> str:
         """
         Store the seq file in the randomly generated folder
         """
+        # TODO: Folders should not be created by the sequence. Needs to be moved to framework code.
+
         dirname_seq = str(uuid4())
         if (os.path.isdir(constants.DATA_PATH_ACQ)) is False:
-            os.mkdir('./data')
-            os.mkdir('./data/acq')
+            os.mkdir("/opt/mri4all/data")
+            os.mkdir("/opt/mri4all/data")
         os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
         path_to_save = os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name)
         seq.write(os.path.join(path_to_save))
-        
-        
+
         return path_to_save
 
 
