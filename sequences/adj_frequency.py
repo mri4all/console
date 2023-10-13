@@ -1,13 +1,10 @@
 from pathlib import Path
 from sequences import PulseqSequence
-import pypulseq as pp
-from external.seq.adjustments_acq.scripts import run_pulseq
 import external.seq.adjustments_acq.config as cfg
-import numpy as np
 import common.logger as logger
 
 from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
-from sequences.rfse import SequenceRFSE
+from sequences.rfse import pypulseq_rfse
 
 
 log = logger.get_logger()
@@ -20,7 +17,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run(self) -> bool:
         log.info("Starting to find Larmor frequency in coarse and fine modes")
-        seq_file_path = self.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+        seq_file_path = pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
 
         # Using external packages now: TODO: convert to classes later
         larmor_cal(

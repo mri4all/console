@@ -30,103 +30,9 @@ class SequenceRFSE(PulseqSequence, registry_key=Path(__file__).stem):
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def pypulseq_rfse(self, ui_inputs=None, check_timing=True) -> bool:
-        if len(ui_inputs) == 0:
-            # ======
-            # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
-            # ======
-            LARMOR_FREQ = cfg.LARMOR_FREQ
-            RF_MAX = cfg.RF_MAX
-            RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-            alpha1 = 90  # flip angle
-            alpha1_duration = 100e-6  # pulse duration
-            alpha2 = 180  # refocusing flip angle
-            alpha2_duration = 100e-6  # pulse duration
-            TE = 70e-3
-            TR = 250e-3
-            num_averages = 1
-            adc_num_samples = 4096
-            adc_duration = 6.4e-3
-        else:
-            LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
-            RF_MAX = ui_inputs["RF_MAX"]
-            RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
-            TR = ui_inputs["TR"]
-            TE = ui_inputs["TE"]
-
-        # ======
-        # INITIATE SEQUENCE
-        # ======
-
-        seq = pp.Sequence()
-
-        # ======
-        # SET SYSTEM CONFIG TODO --> ?
-        # ======
-
-        system = pp.Opts(
-            # max_grad=28,
-            # grad_unit="mT/m",
-            # max_slew=150,
-            # slew_unit="T/m/s",
-            rf_ringdown_time=20e-6,
-            rf_dead_time=100e-6,
-            rf_raster_time=1e-6,
-            adc_dead_time=20e-6,
-        )
-
-        # ======
-        # CREATE EVENTS
-        # ======
-        rf1 = pp.make_block_pulse(
-            flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system
-        )
-        rf2 = pp.make_block_pulse(
-            flip_angle=alpha2 * math.pi / 180,
-            duration=alpha2_duration,
-            delay=100e-6,
-            phase_offset=math.pi / 2,
-            system=system,
-        )
-
-        # ======
-        # CALCULATE DELAYS
-        # ======
-        tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
-        tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
-        delay_TR = TR - (pp.calc_duration(rf1) + tau1 + pp.calc_duration(rf2))
-        assert np.all(tau1 >= 0)
-
-        # Define ADC events
-        adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
-
-        # ======
-        # CONSTRUCT SEQUENCE
-        # ======
-        # Loop over phase encodes and define sequence blocks
-        for avg in range(num_averages):
-            seq.add_block(rf1)
-            seq.add_block(pp.make_delay(tau1))
-            seq.add_block(rf2)
-            seq.add_block(adc, pp.make_delay(delay_TR))
-
-        # Check whether the timing of the sequence is correct
-        if check_timing:
-            ok, error_report = seq.check_timing()
-            if ok:
-                log.info("Timing check passed successfully")
-            else:
-                log.info("Timing check failed. Error listing follows:")
-                [print(e) for e in error_report]
-
-        # seq.write('rfse.seq')
-        seq_file_path = self.store_seq_file(file_name="rfse.seq", seq=seq)
-        log.info("Seq file stored")
-        return seq_file_path
-
     def run(self) -> bool:
         log.info("Starting to build sequence Radio Frequency Spin Echo")
-        seq_file_path = self.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+        seq_file_path = pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
         rxd, rx_t = run_pulseq(
             seq_file=seq_file_path,
             rf_center=cfg.LARMOR_FREQ,
@@ -144,6 +50,99 @@ class SequenceRFSE(PulseqSequence, registry_key=Path(__file__).stem):
         )
         log.info("Completed executing sequence: RFSE")
         return True
+
+
+def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
+    if len(ui_inputs) == 0:
+        # ======
+        # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
+        # ======
+        LARMOR_FREQ = cfg.LARMOR_FREQ
+        RF_MAX = cfg.RF_MAX
+        RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
+        alpha1 = 90  # flip angle
+        alpha1_duration = 100e-6  # pulse duration
+        alpha2 = 180  # refocusing flip angle
+        alpha2_duration = 100e-6  # pulse duration
+        TE = 70e-3
+        TR = 250e-3
+        num_averages = 1
+        adc_num_samples = 4096
+        adc_duration = 6.4e-3
+    else:
+        LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
+        RF_MAX = ui_inputs["RF_MAX"]
+        RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
+        TR = ui_inputs["TR"]
+        TE = ui_inputs["TE"]
+
+    # ======
+    # INITIATE SEQUENCE
+    # ======
+
+    seq = pp.Sequence()
+
+    # ======
+    # SET SYSTEM CONFIG TODO --> ?
+    # ======
+
+    system = pp.Opts(
+        # max_grad=28,
+        # grad_unit="mT/m",
+        # max_slew=150,
+        # slew_unit="T/m/s",
+        rf_ringdown_time=20e-6,
+        rf_dead_time=100e-6,
+        rf_raster_time=1e-6,
+        adc_dead_time=20e-6,
+    )
+
+    # ======
+    # CREATE EVENTS
+    # ======
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf2 = pp.make_block_pulse(
+        flip_angle=alpha2 * math.pi / 180,
+        duration=alpha2_duration,
+        delay=100e-6,
+        phase_offset=math.pi / 2,
+        system=system,
+    )
+
+    # ======
+    # CALCULATE DELAYS
+    # ======
+    tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
+    tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
+    delay_TR = TR - (pp.calc_duration(rf1) + tau1 + pp.calc_duration(rf2))
+    assert np.all(tau1 >= 0)
+
+    # Define ADC events
+    adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+
+    # ======
+    # CONSTRUCT SEQUENCE
+    # ======
+    # Loop over phase encodes and define sequence blocks
+    for avg in range(num_averages):
+        seq.add_block(rf1)
+        seq.add_block(pp.make_delay(tau1))
+        seq.add_block(rf2)
+        seq.add_block(adc, pp.make_delay(delay_TR))
+
+    # Check whether the timing of the sequence is correct
+    if check_timing:
+        ok, error_report = seq.check_timing()
+        if ok:
+            log.info("Timing check passed successfully")
+        else:
+            log.info("Timing check failed. Error listing follows:")
+            [print(e) for e in error_report]
+
+    # seq.write('rfse.seq')
+    seq_file_path = self.store_seq_file(file_name="rfse.seq", seq=seq)
+    log.info("Seq file stored")
+    return seq_file_path
 
 
 if __name__ == "__main__":
