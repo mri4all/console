@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 from typing import Tuple, Dict, List
-from sequences import SequenceBase
 
-from common.types import PatientInformation, ExamInformation
+from common.types import PatientInformation, ExamInformation, ScanQueueEntry
 import common.logger as logger
 
 log = logger.get_logger()
@@ -16,7 +15,7 @@ examination_widget = None
 patient_information = PatientInformation
 exam_information = ExamInformation
 
-scan_list: List[SequenceBase] = []
+scan_queue_list: List[ScanQueueEntry] = []
 editor_sequence_instance = None
 editor_active = False
 
@@ -70,3 +69,10 @@ def close_patient():
 def get_screen_size() -> Tuple[int, int]:
     screen = QDesktopWidget().screenGeometry()
     return screen.width(), screen.height()
+
+
+def update_scan_queue_list() -> bool:
+    global scan_queue_list
+    scan_queue_list = []
+
+    return True

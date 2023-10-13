@@ -3,7 +3,7 @@
 
 import numpy as np
 import warnings
-from marcos_client.marmachine import *
+from external.marcos_client.marmachine import *
 try:
     from local_config import grad_board
 except ModuleNotFoundError:

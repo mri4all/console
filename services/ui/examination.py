@@ -7,6 +7,7 @@ import sip  # type: ignore
 
 import common.runtime as rt
 import common.logger as logger
+from common.types import ScanQueueEntry
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -68,6 +69,7 @@ class ExaminationWindow(QMainWindow):
         self.stopScanButton.setIcon(qta.icon("fa5s.stop"))
         self.stopScanButton.setIconSize(QSize(24, 24))
         self.stopScanButton.setProperty("type", "toolbar")
+        self.stopScanButton.clicked.connect(self.stop_scan_clicked)
 
         self.editScanButton.setText("")
         self.editScanButton.setToolTip("Edit selected sequence")
@@ -240,7 +242,9 @@ class ExaminationWindow(QMainWindow):
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #444;} QLabel { padding-left: 6px; }")
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: #444;} QLabel { padding-left: 6px; }"
+        )
         widgetText = QLabel("1. 3D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -262,7 +266,9 @@ class ExaminationWindow(QMainWindow):
         itemN = QListWidgetItem()
         itemN.setBackground(QColor("#777"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #444; } QLabel { padding-left: 6px; }")
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: #444; } QLabel { padding-left: 6px; }"
+        )
         widgetText = QLabel("2. 3D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -284,14 +290,20 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor("#FFF"))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #000;} QLabel { padding-left: 6px; } ")
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: #000;} QLabel { padding-left: 6px; } "
+        )
         widgetText = QLabel("3. Radial 2D TSE - AX")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
         widgetButton.setContentsMargins(0, 0, 0, 0)
         widgetButton.setMaximumWidth(48)
         widgetButton.setFlat(True)
-        widgetButton.setIcon(qta.icon("fa5s.circle-notch", color="#000", animation=qta.Spin(widgetButton)))
+        widgetButton.setIcon(
+            qta.icon(
+                "fa5s.circle-notch", color="#000", animation=qta.Spin(widgetButton)
+            )
+        )
         widgetButton.setIconSize(QSize(24, 24))
         widgetButton.setStyleSheet("background-color: transparent;")
         widgetLayout = QHBoxLayout()
@@ -306,7 +318,9 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor(58, 66, 102))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }"
+        )
         widgetText = QLabel("4. Radial 2D TSE - AX")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -328,7 +342,9 @@ class ExaminationWindow(QMainWindow):
         item2 = QListWidgetItem()
         item2.setBackground(QColor(58, 66, 102))
         widget = QWidget()
-        widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }"
+        )
         widgetText = QLabel("5. Radial 2D TSE - COR")
         widgetText.setStyleSheet("background-color: transparent;")
         widgetButton = QPushButton("")
@@ -347,6 +363,69 @@ class ExaminationWindow(QMainWindow):
         self.queueWidget.addItem(item2)
         self.queueWidget.setItemWidget(item2, widget)
 
+    def add_item_to_queue_widget(self, entry: ScanQueueEntry):
+        widget_font_color = "#F00"
+        widget_background_color = "#F00"
+        widget_icon = ""
+        if entry.state in ["scheduled_recon", "recon", "complete", "failure"]:
+            widget_font_color = "#444"
+            widget_background_color = "#777"
+        if entry.state in ["created", "scheduled_acq"]:
+            widget_font_color = "#FFF"
+            widget_background_color = "#3a4266"
+        if entry.state == "acq":
+            widget_font_color = "#000"
+            widget_background_color = "#FFF"
+            widget_icon = "circle-notch"
+        if entry.state == "complete":
+            widget_icon = "check"
+        if entry.state == "failure":
+            widget_icon = "bolt"
+        if entry.state == "scheduled_recon" or entry.state == "recon":
+            widget_icon = "hourglass-half"
+        if entry.state == "scheduled_acq":
+            widget_icon = ""
+        if entry.state == "created":
+            widget_icon = "wrench"
+
+        item = QListWidgetItem()
+        item.setBackground(QColor(widget_background_color))
+        widget = QWidget()
+        widget.setStyleSheet(
+            "QWidget { background-color: transparent; color: "
+            + widget_font_color
+            + ";} QLabel { padding-left: 6px; }"
+        )
+        widgetText = QLabel(f"{entry.scan_counter}. {entry.protocol_name}")
+        widgetText.setStyleSheet("background-color: transparent;")
+        widgetButton = QPushButton("")
+        widgetButton.setContentsMargins(0, 0, 0, 0)
+        widgetButton.setMaximumWidth(48)
+        widgetButton.setFlat(True)
+        if widget_icon:
+            if entry.state != "acq":
+                widgetButton.setIcon(
+                    qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
+                )
+            else:
+                widgetButton.setIcon(
+                    qta.icon(
+                        f"fa5s.{widget_icon}",
+                        color=widget_font_color,
+                        animation=qta.Spin(widgetButton),
+                    )
+                )
+        widgetButton.setIconSize(QSize(24, 24))
+        widgetButton.setStyleSheet("background-color: transparent;")
+        widgetLayout = QHBoxLayout()
+        widgetLayout.addWidget(widgetText)
+        widgetLayout.addWidget(widgetButton)
+        widgetLayout.setContentsMargins(0, 0, 0, 0)
+        widget.setLayout(widgetLayout)
+        item.setSizeHint(widget.sizeHint())
+        self.queueWidget.addItem(item)  # type: ignore
+        self.queueWidget.setItemWidget(item, widget)  # type: ignore
+
     def edit_sequence_clicked(self):
         index = self.queueWidget.currentRow()
         read_only = True
@@ -357,7 +436,9 @@ class ExaminationWindow(QMainWindow):
 
         # Make the selected item bold
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.currentItem())
-        selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: bold; border-left: 16px solid #000;")
+        selected_widget.layout().itemAt(0).widget().setStyleSheet(
+            "font-weight: bold; border-left: 16px solid #000;"
+        )
         self.queueWidget.currentItem().setSelected(False)
 
         self.start_scan_edit("flash_demo", read_only)
@@ -382,7 +463,9 @@ class ExaminationWindow(QMainWindow):
             sequence_id = "tse3d_demo"
 
         if not sequence_id in SequenceBase.installed_sequences():
-            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed")
+            log.error(
+                f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed"
+            )
             return
 
         # Create an instance of the sequence class and buffer it
@@ -403,7 +486,9 @@ class ExaminationWindow(QMainWindow):
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
-            selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: normal;")
+            selected_widget.layout().itemAt(0).widget().setStyleSheet(
+                "font-weight: normal;"
+            )
 
         self.clear_seq_tab_and_return_empty()
         self.scanParametersWidget.setCurrentIndex(0)
@@ -429,3 +514,13 @@ class ExaminationWindow(QMainWindow):
         # if index > 2:
 
         # else:
+
+    def stop_scan_clicked(self):
+        # TODO: Dummy content
+        self.update_queue_widget()
+
+    def update_queue_widget(self):
+        ui_runtime.update_scan_queue_list()
+        # TODO: Instead of clearing the whole widget, only update the changed items
+        self.queueWidget.clear()
+        # self.add_item_to_queue_widget(ui_runtime.scan_queue_list[0])
