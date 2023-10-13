@@ -113,15 +113,15 @@ class SequenceRFSE(SequenceBase, registry_key=Path(__file__).stem):
                 [print(e) for e in error_report]
         
         # seq.write('rfse.seq')
-        SequenceBase.store_seq_file(file_name='rfse.seq', seq=seq)
+        seq_file_path = SequenceBase.store_seq_file(file_name='rfse.seq', seq=seq)
         log.info('Seq file stored')
-        return seq
+        return  seq_file_path
 
     def run() -> bool:
-        log.info('Starting to build sequence')
+        log.info('Starting to build sequence Radio Frequency Spin Echo')
         ui_inputs = SequenceBase.read_parameters_from_ui('rfse')
-        SequenceRFSE.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
-        rxd, rx_t = run_pulseq(seq_file='rfse.seq', rf_center=cfg.LARMOR_FREQ,
+        seq_file_path = SequenceRFSE.pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+        rxd, rx_t = run_pulseq(seq_file=seq_file_path, rf_center=cfg.LARMOR_FREQ,
                                tx_t=1, grad_t=10, tx_warmup=100,
                                shim_x=0, shim_y=0, shim_z=0,
                                grad_cal=False, save_np=True, save_mat=False, save_msgs=False,

@@ -75,19 +75,6 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
-    # def store_seq_file(file_name: str = '', seq = None) -> bool:
-    #     """
-    #     Store the seq file in the randomly generated folder
-    #     """
-    #     dirname_seq = str(uuid4())
-    #     if (os.path.isdir(constants.DATA_PATH_ACQ)) is False:
-    #         os.mkdir('./data')
-    #         os.mkdir('./data/acq')
-    #     os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
-    #     seq.write(os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name))
-
-    #     return True
-
     def read_parameters_from_ui(self) -> bool:
         """
         Reads the settings from the UI into the sequence.
@@ -108,7 +95,7 @@ class SequenceBase(Generic[SequenceVar]):
             return True
         return False
     
-    def store_seq_file(file_name: str = '', seq = None) -> bool:
+    def store_seq_file(file_name: str = '', seq = None) -> str:
         """
         Store the seq file in the randomly generated folder
         """
@@ -117,9 +104,11 @@ class SequenceBase(Generic[SequenceVar]):
             os.mkdir('./data')
             os.mkdir('./data/acq')
         os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
-        seq.write(os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name))
+        path_to_save = os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name)
+        seq.write(os.path.join(path_to_save))
         
-        return True
+        
+        return path_to_save
 
 
 # Automatically import all sequence classes existing in the /sequences directory.

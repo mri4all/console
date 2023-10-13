@@ -5,7 +5,7 @@ import asyncio
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
-from sequences import *
+from sequences import rfse, rftse
 
 rt.set_service_name("acq")
 log = logger.get_logger()

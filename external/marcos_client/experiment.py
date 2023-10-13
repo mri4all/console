@@ -10,6 +10,8 @@ from external.marcos_client.local_config import ip_address, port, fpga_clk_freq_
 import external.marcos_client.grad_board as gb
 import external.marcos_client.server_comms as sc
 import external.marcos_client.marcompile as fc
+import common.logger as logger
+log = logger.get_logger()
 
 import pdb
 st = pdb.set_trace
@@ -81,8 +83,14 @@ class Experiment:
         # create socket early so that destructor works
         self._close_socket = True
         if prev_socket is None:
-            self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._s.connect( (ip_address, port) )
+            try:
+                self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._s.connect( (ip_address, port) )
+            except:
+                pass
+                log.error("Connection has timed out, may be the RedPitaya is not connected")
+                
+                
         else:
             self._s = prev_socket
             self._close_socket = False # do not close previous socket
