@@ -2,8 +2,9 @@ from importlib import import_module
 from pathlib import Path
 from typing import Dict, TypeVar, Generic
 from utils import constants
-from uuid import uuid4 
+from uuid import uuid4
 import os
+
 SequenceVar = TypeVar("SequenceVar")
 
 
@@ -74,18 +75,18 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
-    def store_seq_file(file_name: str = '', seq = None) -> bool:
-        """
-        Store the seq file in the randomly generated folder
-        """
-        dirname_seq = str(uuid4())
-        if (os.path.isdir(constants.DATA_PATH_ACQ)) is False:
-            os.mkdir('./data')
-            os.mkdir('./data/acq')
-        os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
-        seq.write(os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name))
-        
-        return True
+    # def store_seq_file(file_name: str = '', seq = None) -> bool:
+    #     """
+    #     Store the seq file in the randomly generated folder
+    #     """
+    #     dirname_seq = str(uuid4())
+    #     if (os.path.isdir(constants.DATA_PATH_ACQ)) is False:
+    #         os.mkdir('./data')
+    #         os.mkdir('./data/acq')
+    #     os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
+    #     seq.write(os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name))
+
+    #     return True
 
     def read_parameters_from_ui(self) -> bool:
         """
