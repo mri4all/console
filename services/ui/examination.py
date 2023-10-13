@@ -178,7 +178,7 @@ class ExaminationWindow(QMainWindow):
         viewer3.configure()
 
         self.update_size()
-        self.update_scanlist()
+        self.update_queue_widget()
 
     def prepare_examination_ui(self):
         patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
@@ -237,133 +237,7 @@ class ExaminationWindow(QMainWindow):
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(True)
 
-    def update_scanlist(self):
-        # Dummy implementation for demo
-        itemN = QListWidgetItem()
-        itemN.setBackground(QColor("#777"))
-        widget = QWidget()
-        widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: #444;} QLabel { padding-left: 6px; }"
-        )
-        widgetText = QLabel("1. 3D TSE - COR")
-        widgetText.setStyleSheet("background-color: transparent;")
-        widgetButton = QPushButton("")
-        widgetButton.setContentsMargins(0, 0, 0, 0)
-        widgetButton.setMaximumWidth(48)
-        widgetButton.setFlat(True)
-        widgetButton.setIcon(qta.icon("fa5s.bolt", color="#444"))
-        widgetButton.setIconSize(QSize(24, 24))
-        widgetButton.setStyleSheet("background-color: transparent;")
-        widgetLayout = QHBoxLayout()
-        widgetLayout.addWidget(widgetText)
-        widgetLayout.addWidget(widgetButton)
-        widgetLayout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(widgetLayout)
-        itemN.setSizeHint(widget.sizeHint())
-        self.queueWidget.addItem(itemN)
-        self.queueWidget.setItemWidget(itemN, widget)
-
-        itemN = QListWidgetItem()
-        itemN.setBackground(QColor("#777"))
-        widget = QWidget()
-        widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: #444; } QLabel { padding-left: 6px; }"
-        )
-        widgetText = QLabel("2. 3D TSE - COR")
-        widgetText.setStyleSheet("background-color: transparent;")
-        widgetButton = QPushButton("")
-        widgetButton.setContentsMargins(0, 0, 0, 0)
-        widgetButton.setMaximumWidth(48)
-        widgetButton.setFlat(True)
-        widgetButton.setIcon(qta.icon("fa5s.check", color="#444"))
-        widgetButton.setIconSize(QSize(24, 24))
-        widgetButton.setStyleSheet("background-color: transparent;")
-        widgetLayout = QHBoxLayout()
-        widgetLayout.addWidget(widgetText)
-        widgetLayout.addWidget(widgetButton)
-        widgetLayout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(widgetLayout)
-        itemN.setSizeHint(widget.sizeHint())
-        self.queueWidget.addItem(itemN)
-        self.queueWidget.setItemWidget(itemN, widget)
-
-        item2 = QListWidgetItem()
-        item2.setBackground(QColor("#FFF"))
-        widget = QWidget()
-        widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: #000;} QLabel { padding-left: 6px; } "
-        )
-        widgetText = QLabel("3. Radial 2D TSE - AX")
-        widgetText.setStyleSheet("background-color: transparent;")
-        widgetButton = QPushButton("")
-        widgetButton.setContentsMargins(0, 0, 0, 0)
-        widgetButton.setMaximumWidth(48)
-        widgetButton.setFlat(True)
-        widgetButton.setIcon(
-            qta.icon(
-                "fa5s.circle-notch", color="#000", animation=qta.Spin(widgetButton)
-            )
-        )
-        widgetButton.setIconSize(QSize(24, 24))
-        widgetButton.setStyleSheet("background-color: transparent;")
-        widgetLayout = QHBoxLayout()
-        widgetLayout.addWidget(widgetText)
-        widgetLayout.addWidget(widgetButton)
-        widgetLayout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(widgetLayout)
-        item2.setSizeHint(widget.sizeHint())
-        self.queueWidget.addItem(item2)
-        self.queueWidget.setItemWidget(item2, widget)
-
-        item2 = QListWidgetItem()
-        item2.setBackground(QColor(58, 66, 102))
-        widget = QWidget()
-        widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }"
-        )
-        widgetText = QLabel("4. Radial 2D TSE - AX")
-        widgetText.setStyleSheet("background-color: transparent;")
-        widgetButton = QPushButton("")
-        widgetButton.setContentsMargins(0, 0, 0, 0)
-        widgetButton.setMaximumWidth(48)
-        widgetButton.setFlat(True)
-        # widgetButton.setIcon(qta.icon("fa5s.wrench", color="#fff"))
-        widgetButton.setIconSize(QSize(24, 24))
-        widgetButton.setStyleSheet("background-color: transparent;")
-        widgetLayout = QHBoxLayout()
-        widgetLayout.addWidget(widgetText)
-        widgetLayout.addWidget(widgetButton)
-        widgetLayout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(widgetLayout)
-        item2.setSizeHint(widget.sizeHint())
-        self.queueWidget.addItem(item2)
-        self.queueWidget.setItemWidget(item2, widget)
-
-        item2 = QListWidgetItem()
-        item2.setBackground(QColor(58, 66, 102))
-        widget = QWidget()
-        widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }"
-        )
-        widgetText = QLabel("5. Radial 2D TSE - COR")
-        widgetText.setStyleSheet("background-color: transparent;")
-        widgetButton = QPushButton("")
-        widgetButton.setContentsMargins(0, 0, 0, 0)
-        widgetButton.setMaximumWidth(48)
-        widgetButton.setFlat(True)
-        widgetButton.setIcon(qta.icon("fa5s.wrench", color="#fff"))
-        widgetButton.setIconSize(QSize(24, 24))
-        widgetButton.setStyleSheet("background-color: transparent;")
-        widgetLayout = QHBoxLayout()
-        widgetLayout.addWidget(widgetText)
-        widgetLayout.addWidget(widgetButton)
-        widgetLayout.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(widgetLayout)
-        item2.setSizeHint(widget.sizeHint())
-        self.queueWidget.addItem(item2)
-        self.queueWidget.setItemWidget(item2, widget)
-
-    def add_item_to_queue_widget(self, entry: ScanQueueEntry):
+    def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
         widget_font_color = "#F00"
         widget_background_color = "#F00"
         widget_icon = ""
@@ -392,9 +266,7 @@ class ExaminationWindow(QMainWindow):
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
         widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: "
-            + widget_font_color
-            + ";} QLabel { padding-left: 6px; }"
+            "QWidget { background-color: transparent; color: " + widget_font_color + ";} QLabel { padding-left: 6px; }"
         )
         widgetText = QLabel(f"{entry.scan_counter}. {entry.protocol_name}")
         widgetText.setStyleSheet("background-color: transparent;")
@@ -404,9 +276,7 @@ class ExaminationWindow(QMainWindow):
         widgetButton.setFlat(True)
         if widget_icon:
             if entry.state != "acq":
-                widgetButton.setIcon(
-                    qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
-                )
+                widgetButton.setIcon(qta.icon(f"fa5s.{widget_icon}", color=widget_font_color))
             else:
                 widgetButton.setIcon(
                     qta.icon(
@@ -436,9 +306,7 @@ class ExaminationWindow(QMainWindow):
 
         # Make the selected item bold
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.currentItem())
-        selected_widget.layout().itemAt(0).widget().setStyleSheet(
-            "font-weight: bold; border-left: 16px solid #000;"
-        )
+        selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: bold; border-left: 16px solid #000;")
         self.queueWidget.currentItem().setSelected(False)
 
         self.start_scan_edit("flash_demo", read_only)
@@ -463,9 +331,7 @@ class ExaminationWindow(QMainWindow):
             sequence_id = "tse3d_demo"
 
         if not sequence_id in SequenceBase.installed_sequences():
-            log.error(
-                f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed"
-            )
+            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed")
             return
 
         # Create an instance of the sequence class and buffer it
@@ -486,9 +352,7 @@ class ExaminationWindow(QMainWindow):
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
-            selected_widget.layout().itemAt(0).widget().setStyleSheet(
-                "font-weight: normal;"
-            )
+            selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: normal;")
 
         self.clear_seq_tab_and_return_empty()
         self.scanParametersWidget.setCurrentIndex(0)
@@ -522,5 +386,124 @@ class ExaminationWindow(QMainWindow):
     def update_queue_widget(self):
         ui_runtime.update_scan_queue_list()
         # TODO: Instead of clearing the whole widget, only update the changed items
-        self.queueWidget.clear()
-        # self.add_item_to_queue_widget(ui_runtime.scan_queue_list[0])
+        # self.queueWidget.clear()
+
+        test = ScanQueueEntry()
+        ui_runtime.exam_information.scan_counter += 1
+        test.scan_counter = ui_runtime.exam_information.scan_counter
+        test.protocol_name = "Test"
+        test.state = "created"
+        test.has_results = False
+        self.insert_entry_to_queue_widget(test)
+
+    # def update_scanlist(self):
+    # # Dummy implementation for demo
+    # itemN = QListWidgetItem()
+    # itemN.setBackground(QColor("#777"))
+    # widget = QWidget()
+    # widget.setStyleSheet("QWidget { background-color: transparent; color: #444;} QLabel { padding-left: 6px; }")
+    # widgetText = QLabel("1. 3D TSE - COR")
+    # widgetText.setStyleSheet("background-color: transparent;")
+    # widgetButton = QPushButton("")
+    # widgetButton.setContentsMargins(0, 0, 0, 0)
+    # widgetButton.setMaximumWidth(48)
+    # widgetButton.setFlat(True)
+    # widgetButton.setIcon(qta.icon("fa5s.bolt", color="#444"))
+    # widgetButton.setIconSize(QSize(24, 24))
+    # widgetButton.setStyleSheet("background-color: transparent;")
+    # widgetLayout = QHBoxLayout()
+    # widgetLayout.addWidget(widgetText)
+    # widgetLayout.addWidget(widgetButton)
+    # widgetLayout.setContentsMargins(0, 0, 0, 0)
+    # widget.setLayout(widgetLayout)
+    # itemN.setSizeHint(widget.sizeHint())
+    # self.queueWidget.addItem(itemN)
+    # self.queueWidget.setItemWidget(itemN, widget)
+
+    # itemN = QListWidgetItem()
+    # itemN.setBackground(QColor("#777"))
+    # widget = QWidget()
+    # widget.setStyleSheet("QWidget { background-color: transparent; color: #444; } QLabel { padding-left: 6px; }")
+    # widgetText = QLabel("2. 3D TSE - COR")
+    # widgetText.setStyleSheet("background-color: transparent;")
+    # widgetButton = QPushButton("")
+    # widgetButton.setContentsMargins(0, 0, 0, 0)
+    # widgetButton.setMaximumWidth(48)
+    # widgetButton.setFlat(True)
+    # widgetButton.setIcon(qta.icon("fa5s.check", color="#444"))
+    # widgetButton.setIconSize(QSize(24, 24))
+    # widgetButton.setStyleSheet("background-color: transparent;")
+    # widgetLayout = QHBoxLayout()
+    # widgetLayout.addWidget(widgetText)
+    # widgetLayout.addWidget(widgetButton)
+    # widgetLayout.setContentsMargins(0, 0, 0, 0)
+    # widget.setLayout(widgetLayout)
+    # itemN.setSizeHint(widget.sizeHint())
+    # self.queueWidget.addItem(itemN)
+    # self.queueWidget.setItemWidget(itemN, widget)
+
+    # item2 = QListWidgetItem()
+    # item2.setBackground(QColor("#FFF"))
+    # widget = QWidget()
+    # widget.setStyleSheet("QWidget { background-color: transparent; color: #000;} QLabel { padding-left: 6px; } ")
+    # widgetText = QLabel("3. Radial 2D TSE - AX")
+    # widgetText.setStyleSheet("background-color: transparent;")
+    # widgetButton = QPushButton("")
+    # widgetButton.setContentsMargins(0, 0, 0, 0)
+    # widgetButton.setMaximumWidth(48)
+    # widgetButton.setFlat(True)
+    # widgetButton.setIcon(qta.icon("fa5s.circle-notch", color="#000", animation=qta.Spin(widgetButton)))
+    # widgetButton.setIconSize(QSize(24, 24))
+    # widgetButton.setStyleSheet("background-color: transparent;")
+    # widgetLayout = QHBoxLayout()
+    # widgetLayout.addWidget(widgetText)
+    # widgetLayout.addWidget(widgetButton)
+    # widgetLayout.setContentsMargins(0, 0, 0, 0)
+    # widget.setLayout(widgetLayout)
+    # item2.setSizeHint(widget.sizeHint())
+    # self.queueWidget.addItem(item2)
+    # self.queueWidget.setItemWidget(item2, widget)
+
+    # item2 = QListWidgetItem()
+    # item2.setBackground(QColor(58, 66, 102))
+    # widget = QWidget()
+    # widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
+    # widgetText = QLabel("4. Radial 2D TSE - AX")
+    # widgetText.setStyleSheet("background-color: transparent;")
+    # widgetButton = QPushButton("")
+    # widgetButton.setContentsMargins(0, 0, 0, 0)
+    # widgetButton.setMaximumWidth(48)
+    # widgetButton.setFlat(True)
+    # # widgetButton.setIcon(qta.icon("fa5s.wrench", color="#fff"))
+    # widgetButton.setIconSize(QSize(24, 24))
+    # widgetButton.setStyleSheet("background-color: transparent;")
+    # widgetLayout = QHBoxLayout()
+    # widgetLayout.addWidget(widgetText)
+    # widgetLayout.addWidget(widgetButton)
+    # widgetLayout.setContentsMargins(0, 0, 0, 0)
+    # widget.setLayout(widgetLayout)
+    # item2.setSizeHint(widget.sizeHint())
+    # self.queueWidget.addItem(item2)
+    # self.queueWidget.setItemWidget(item2, widget)
+
+    # item2 = QListWidgetItem()
+    # item2.setBackground(QColor(58, 66, 102))
+    # widget = QWidget()
+    # widget.setStyleSheet("QWidget { background-color: transparent; color: #fff;} QLabel { padding-left: 6px; }")
+    # widgetText = QLabel("5. Radial 2D TSE - COR")
+    # widgetText.setStyleSheet("background-color: transparent;")
+    # widgetButton = QPushButton("")
+    # widgetButton.setContentsMargins(0, 0, 0, 0)
+    # widgetButton.setMaximumWidth(48)
+    # widgetButton.setFlat(True)
+    # widgetButton.setIcon(qta.icon("fa5s.wrench", color="#fff"))
+    # widgetButton.setIconSize(QSize(24, 24))
+    # widgetButton.setStyleSheet("background-color: transparent;")
+    # widgetLayout = QHBoxLayout()
+    # widgetLayout.addWidget(widgetText)
+    # widgetLayout.addWidget(widgetButton)
+    # widgetLayout.setContentsMargins(0, 0, 0, 0)
+    # widget.setLayout(widgetLayout)
+    # item2.setSizeHint(widget.sizeHint())
+    # self.queueWidget.addItem(item2)
+    # self.queueWidget.setItemWidget(item2, widget)

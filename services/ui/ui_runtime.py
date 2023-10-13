@@ -12,8 +12,8 @@ stacked_widget = None
 registration_widget = None
 examination_widget = None
 
-patient_information = PatientInformation
-exam_information = ExamInformation
+patient_information = PatientInformation()
+exam_information = ExamInformation()
 
 scan_queue_list: List[ScanQueueEntry] = []
 editor_sequence_instance = None
@@ -41,6 +41,7 @@ def shutdown():
 
 
 def register_patient():
+    global exam_information
     exam_information.initialize()
     examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)

@@ -1,3 +1,4 @@
+from typing import Any
 from typing_extensions import Literal
 from pathlib import Path
 from pydantic import BaseModel
@@ -7,24 +8,24 @@ import common.helper as helper
 
 class PatientInformation(BaseModel):
     # TODO: Add missing entries from registration form
-    first_name: str
-    last_name: str
-    mrn: str
+    first_name: str = ""
+    last_name: str = ""
+    mrn: str = ""
 
-    @classmethod
-    def get_full_name(cls):
-        return f"{cls.last_name}, {cls.first_name}"
+    # @classmethod
+    def get_full_name(self):
+        return f"{self.last_name}, {self.first_name}"
 
-    @classmethod
-    def clear(cls):
-        cls.first_name = ""
-        cls.last_name = ""
-        cls.mrn = ""
+    # @classmethod
+    def clear(self):
+        self.first_name = ""
+        self.last_name = ""
+        self.mrn = ""
 
 
 class ExamInformation(BaseModel):
-    id: str
-    scan_counter: int
+    id: str = ""
+    scan_counter: int = 0
 
     @classmethod
     def initialize(cls):
@@ -38,10 +39,10 @@ class ExamInformation(BaseModel):
 
 
 class ScanQueueEntry(BaseModel):
-    sequence: str
-    protocol_name: str
-    scan_counter: int
-    folder: Path
+    sequence: str = ""
+    protocol_name: str = "unknown"
+    scan_counter: int = -1
+    folder: Path = Path("")
     state: Literal[
         "created",
         "scheduled_acq",
@@ -51,4 +52,4 @@ class ScanQueueEntry(BaseModel):
         "complete",
         "failure",
     ] = "created"
-    has_results: bool
+    has_results: bool = False
