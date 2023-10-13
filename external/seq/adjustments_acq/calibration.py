@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-
 from os import device_encoding
+import sys
+sys.path.insert(0, '.')
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sig
 import time
 import os
 import sys
-import seq.adjustments_acq.config as cfg  # pylint: disable=import-error
-import marcos_client.experiment as ex  # pylint: disable=import-error
-from marcos_client.examples import trap_cent  # pylint: disable=import-error
-import seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
-# from console.utils import constants
+import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-error
+import external.marcos_client.experiment as ex  # pylint: disable=import-error
+from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
+import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
+from utils import constants
 
-def larmor_step_search(step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
+def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
@@ -38,7 +39,7 @@ def larmor_step_search(step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz
                               step_search_center + ((steps - 1) / 2 * step_bw_MHz), num=steps)
     larmor_freq = swept_freqs[0]
     # Set the sequence file for a single spin echo
-    seq_file = constants.SCANNER_CONTROL_CAL_SEQ_FILES/'se_6.seq' # TODO: Seq file should be loadable or new sequence should be made
+    # seq_file = constants.SCANNER_CONTROL_CAL_SEQ_FILES/'se_6.seq' # TODO: Seq file should be loadable or new sequence should be made
 
     # Run the experiment once to prep array
     rxd, rx_t = scr.run_pulseq(seq_file, rf_center=larmor_freq,
@@ -90,7 +91,7 @@ def larmor_step_search(step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz
     return max_freq, data_dict
 
 
-def larmor_cal(larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
+def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
                step_size=0.6, plot=False, shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, gui_test=False):
     """
     Run a gradient descent search from a starting larmor frequency, optimizing to find the frequency
@@ -121,12 +122,12 @@ def larmor_cal(larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_coun
 
     # Load saved spin echo train seq file that has the right number of echoes
     print(os.getcwd())
-    seq_file = cfg.MGH_PATH + f'/cal_seq_files/se_{echo_count}.seq'
+    # seq_file = cfg.MGH_PATH + f'/cal_seq_files/se_{echo_count}.seq'
 
     # Search for the right number of iterations
     for i in range(iterations):
         print(f'Iteration {i + 1}/{iterations}: {larmor_freq:.5f} MHz')
-
+        print(seq_file)
         # Run the experiment from seq file
         rxd, rx_t = scr.run_pulseq(seq_file, rf_center=larmor_freq,
                                    tx_t=1, grad_t=10, tx_warmup=100,
@@ -225,7 +226,7 @@ def larmor_cal(larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_coun
     return larmor_freq, data_dict
 
 
-def rf_max_cal(larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
+def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
                shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
                tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
@@ -248,7 +249,6 @@ def rf_max_cal(larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor
         dict: Dictionary of data
     """
     # Select seq file for 2 spin echoes
-    seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq'
     RF_PI2_DURATION = 50  # us, hardcoded from sequence
 
     # Make sure the TR units are right (in case someone puts in us rather than s)

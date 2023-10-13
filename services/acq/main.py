@@ -1,11 +1,10 @@
 import sys
 import signal
 import asyncio
-
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
-from sequences import rfse, rftse
+from sequences import rfse, rftse, adj_frequency
 
 rt.set_service_name("acq")
 log = logger.get_logger()
@@ -37,7 +36,9 @@ def run(test_all_sequences:bool = False):
     log.info("Acquisition service started")
     if test_all_sequences is True:
         # rfse.SequenceRFSE.run()
-        rftse.SequenceRFTSE.run()
+        #rftse.SequenceRFTSE.run()
+        adj_frequency.AdjFrequency.run()
+        
         
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)

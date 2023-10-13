@@ -2,8 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import marcos_client.experiment as ex
-from marcos_client.local_config import grad_board
+import external.marcos_client.experiment as ex
+from external.marcos_client.local_config import grad_board
 
 import pdb
 st = pdb.set_trace
