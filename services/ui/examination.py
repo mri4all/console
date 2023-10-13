@@ -35,48 +35,57 @@ class ExaminationWindow(QMainWindow):
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
 
         self.protocolBrowserButton.setText("")
+        self.protocolBrowserButton.setToolTip("Open protocol browser")
         self.protocolBrowserButton.setIcon(qta.icon("fa5s.list"))
         self.protocolBrowserButton.setIconSize(QSize(32, 32))
 
-        self.settingsButton.setText("")
-        self.settingsButton.setIcon(qta.icon("fa5s.images"))
-        self.settingsButton.setIconSize(QSize(32, 32))
+        self.resultsViewerButton.setText("")
+        self.resultsViewerButton.setToolTip("Open results viewer")
+        self.resultsViewerButton.setIcon(qta.icon("fa5s.images"))
+        self.resultsViewerButton.setIconSize(QSize(32, 32))
 
         self.closePatientButton.setText("")
+        self.closePatientButton.setToolTip("End the exam")
         self.closePatientButton.setIcon(qta.icon("fa5s.sign-out-alt"))
         self.closePatientButton.setIconSize(QSize(32, 32))
         self.closePatientButton.clicked.connect(self.close_examination_clicked)
 
         self.acceptScanEditButton.setText("")
+        self.acceptScanEditButton.setToolTip("Accept changes")
         self.acceptScanEditButton.setIcon(qta.icon("fa5s.check"))
         self.acceptScanEditButton.setIconSize(QSize(24, 24))
         self.acceptScanEditButton.setProperty("type", "toolbar")
         self.acceptScanEditButton.clicked.connect(self.accept_scan_edit_clicked)
 
         self.discardScanEditButton.setText("")
+        self.discardScanEditButton.setToolTip("Discard changes")
         self.discardScanEditButton.setIcon(qta.icon("fa5s.times"))
         self.discardScanEditButton.setIconSize(QSize(24, 24))
         self.discardScanEditButton.setProperty("type", "toolbar")
         self.discardScanEditButton.clicked.connect(self.discard_scan_edit_clicked)
 
         self.stopScanButton.setText("")
+        self.stopScanButton.setToolTip("Stop running sequence")
         self.stopScanButton.setIcon(qta.icon("fa5s.stop"))
         self.stopScanButton.setIconSize(QSize(24, 24))
         self.stopScanButton.setProperty("type", "toolbar")
         self.stopScanButton.clicked.connect(self.stop_scan_clicked)
 
         self.editScanButton.setText("")
+        self.editScanButton.setToolTip("Edit selected sequence")
         self.editScanButton.setIcon(qta.icon("fa5s.pen"))
         self.editScanButton.setIconSize(QSize(24, 24))
         self.editScanButton.setProperty("type", "toolbar")
         self.editScanButton.clicked.connect(self.edit_sequence_clicked)
 
         self.deleteScanButton.setText("")
+        self.deleteScanButton.setToolTip("Delete selected sequence")
         self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt"))
         self.deleteScanButton.setIconSize(QSize(24, 24))
         self.deleteScanButton.setProperty("type", "toolbar")
 
         self.addScanButton.setText("")
+        self.addScanButton.setToolTip("Insert new sequence")
         self.addScanButton.setIcon(qta.icon("fa5s.plus-square"))
         self.addScanButton.setIconSize(QSize(24, 24))
         self.addScanButton.setProperty("type", "toolbar")
@@ -106,6 +115,7 @@ class ExaminationWindow(QMainWindow):
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemSelectionChanged.connect(self.queue_item_clicked)
+        self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
