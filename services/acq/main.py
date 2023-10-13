@@ -5,7 +5,7 @@ import asyncio
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
-from sequences import rfse
+from sequences import *
 
 rt.set_service_name("acq")
 log = logger.get_logger()
@@ -32,10 +32,13 @@ async def terminate_process(signalNumber, frame) -> None:
     helper.trigger_terminate()
 
 
-def run():
+def run(test_all_sequences:bool = False):
     log.info(f"-- MRI4ALL {mri4all_version.get_version_string()} --")
     log.info("Acquisition service started")
-    rfse.SequenceRFSE.run()
+    if test_all_sequences is True:
+        # rfse.SequenceRFSE.run()
+        rftse.SequenceRFTSE.run()
+        
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:
@@ -62,4 +65,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    run(test_all_sequences=True) # TODO: Write unit tests for each sequence later
