@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import msgpack, warnings
-from marcos_client.marmachine import MarServerWarning
+from external.marcos_client.marmachine import MarServerWarning
 
 version_major = 1
 version_minor = 0

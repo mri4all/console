@@ -18,4 +18,4 @@ SHIM_Z = 0
 MGH_PATH = '/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq'
 LOG_PATH = './server/log/'
 SEQ_PATH = './server/scanner_control/seq/'
-DATA_PATH = './server/scanner_control/data/'
+DATA_PATH = '../data/scanner_control/data/'

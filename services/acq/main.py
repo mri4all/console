@@ -5,6 +5,7 @@ import asyncio
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
+from sequences import rfse
 
 rt.set_service_name("acq")
 log = logger.get_logger()
@@ -34,7 +35,7 @@ async def terminate_process(signalNumber, frame) -> None:
 def run():
     log.info(f"-- MRI4ALL {mri4all_version.get_version_string()} --")
     log.info("Acquisition service started")
-
+    rfse.SequenceRFSE.run()
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:

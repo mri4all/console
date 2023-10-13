@@ -11,9 +11,10 @@ import scipy.signal as sig
 from operator import itemgetter
 import sys
 import os
-import seq.adjustments_acq.config as cfg  # pylint: disable=import-error
-import marcos_client.experiment as ex  # pylint: disable=import-error
-from flocra_pulseq.interpreter import PSInterpreter  # pylint: disable=import-error
+import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-error
+import external.marcos_client.experiment as ex  # pylint: disable=import-error
+from external.flocra_pulseq.interpreter import PSInterpreter  # pylint: disable=import-error
+from utils import constants
 # from console.utils import constants
 
 def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
@@ -60,7 +61,7 @@ def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
                         gx_max=gx_max,
                         gy_max=gy_max,
                         gz_max=gz_max,
-                        log_file='/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq/log/ps-interpreter.log')
+                        log_file='test.log')
     instructions, param_dict = psi.interpret(seq_file)
 
     # Shim
@@ -111,7 +112,7 @@ def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
         from datetime import datetime
         now = datetime.now()
         current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = cfg.DATA_PATH + f"/{current_time}.npy"
+        filename = constants.DATA_PATH_RECON + f"/{current_time}.npy"
         if os.path.exists(filename):
             os.remove(filename)
         np.save(filename, rxd['rx0'])
@@ -121,7 +122,7 @@ def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
         from datetime import datetime
         now = datetime.now()
         current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = cfg.DATA_PATH + f"/{current_time}.mat"
+        filename = constants.DATA_PATH_RECON + f"/{current_time}.mat"
         if os.path.exists(filename):
             os.remove(filename)
         sio.savemat(filename, {'flocra_data': rxd['rx0']})
