@@ -1,3 +1,6 @@
+from datetime import datetime
+import time
+
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -18,6 +21,34 @@ from sequences import SequenceBase
 from services.ui.viewerwidget import ViewerWidget
 
 log = logger.get_logger()
+
+scanParameters_stylesheet = """ 
+                QTabBar { 
+                    font-size: 16px;
+                    font-weight: bold;
+                }  
+                QTabBar::tab {
+                    margin-left:0px;
+                    margin-right:16px;          
+                    border-bottom: 3px solid transparent;
+                }
+               QTabBar::tab:selected {
+                    border-bottom: 3px solid #E0A526;
+                }                
+                QTabBar::tab:selected:disabled {
+                    border-bottom: 3px solid transparent;
+                }                
+               QTabBar::tab:disabled {
+                    color: #515669;
+                    border-bottom: 3px solid transparent;
+                }                    
+           
+            """
+
+scanParameters_stylesheet_error = (
+    scanParameters_stylesheet
+    + """ QTabBar::tab:last { color: #E5554F; } QTabBar::tab:selected:last { color: #E5554F; border-bottom: 3px solid #E5554F; } """
+)
 
 
 class ExaminationWindow(QMainWindow):
@@ -119,41 +150,36 @@ class ExaminationWindow(QMainWindow):
         self.prepare_sequence_list()
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
-        self.queueWidget.itemSelectionChanged.connect(self.queue_item_clicked)
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
         self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
         )
-        self.scanParametersWidget.setStyleSheet(
-            """ QTabBar { 
-                    font-size: 16px;
-                    font-weight: bold;
-                }  
-                QTabBar::tab {
-                    margin-left:0px;
-                    margin-right:16px;          
-                    border-bottom: 3px solid transparent;
-                }
-               QTabBar::tab:selected {
-                    border-bottom: 3px solid #E0A526;
-                }                
-                QTabBar::tab:selected:disabled {
-                    border-bottom: 3px solid transparent;
-                }                
-               QTabBar::tab:disabled {
-                    color: #515669;
-                    border-bottom: 3px solid transparent;
-                }                    
-            """
-        )
+        self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
         self.scanParametersWidget.insertTab(0, QWidget(), "SEQUENCE")
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(False)
         self.scanParametersWidget.widget(1).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(2).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(3).setStyleSheet("background-color: #0C1123;")
+        self.scanParametersWidget.widget(4).setStyleSheet("background-color: #0C1123;")
+        self.scanParametersWidget.widget(5).setStyleSheet("background-color: #0C1123;")
+        self.scanParametersWidget.tabBar().setTabIcon(5, qta.icon("fa5s.exclamation-circle", color="#E5554F"))
+        self.scanParametersWidget.setTabVisible(5, False)
+
+        self.problemsWidget.setStyleSheet(
+            """
+            QListView::item
+            {
+                margin-bottom: 14px;
+                padding-left: 8px;
+                padding-top: 6px;
+                padding-bottom: 6px;
+                border-left: 5px solid #E5554F;
+            }
+            """
+        )
 
         self.viewer1Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
         self.viewer2Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
@@ -183,7 +209,20 @@ class ExaminationWindow(QMainWindow):
         self.viewer3Frame.setLayout(viewer3Layout)
         viewer3.configure()
 
+        self.statusLabel = QLabel()
+        self.statusbar.addPermanentWidget(self.statusLabel, 100)
+        self.statusLabel.setStyleSheet("QLabel:hover { background-color: none; }")
+
         self.update_size()
+
+        # self.monitorTimer = QTimer(self)
+        # self.monitorTimer.timeout.connect(self.update_monitor_status)
+        # self.monitorTimer.start(1000)
+
+    # def update_monitor_status(self):
+    #     now = datetime.now()
+    #     current_time = now.strftime("%H:%M:%S")
+    #     ui_runtime.examination_widget.statusBar().showMessage(f"Last update {current_time}", 0)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -223,8 +262,7 @@ class ExaminationWindow(QMainWindow):
         patient_text += chr(0xA0) + chr(0xA0)
         patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
         self.patientLabel.setText(patient_text)
-
-        self.statusBar().showMessage("Scanner ready", 0)
+        self.statusLabel.setText("Scanner ready")
         self.sync_queue_widget()
 
     def clear_examination_ui(self):
@@ -338,6 +376,9 @@ class ExaminationWindow(QMainWindow):
     def edit_sequence_clicked(self):
         index = self.queueWidget.currentRow()
 
+        if index < 0:
+            return
+
         if index >= len(ui_runtime.scan_queue_list):
             log.error("Invalid scan queue index selected")
             return
@@ -419,21 +460,29 @@ class ExaminationWindow(QMainWindow):
         return new_container_widget
 
     def accept_scan_edit_clicked(self):
-        self.scanParametersWidget.setEnabled(False)
-        self.queueToolbarFrame.setCurrentIndex(0)
-        self.stop_scan_edit()
+        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui()
+
+        if not parameters_valid:
+            self.scanParametersWidget.setTabVisible(5, True)
+            self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet_error)
+            self.scanParametersWidget.setCurrentIndex(5)
+            problems_list = ui_runtime.editor_sequence_instance.get_problems()
+            self.problemsWidget.clear()
+            for problem in problems_list:
+                self.problemsWidget.addItem(problem)
+        else:
+            self.scanParametersWidget.setTabVisible(5, False)
+            self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
+            self.scanParametersWidget.setEnabled(False)
+            self.queueToolbarFrame.setCurrentIndex(0)
+            self.stop_scan_edit()
 
     def discard_scan_edit_clicked(self):
+        self.scanParametersWidget.setTabVisible(5, False)
+        self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
         self.scanParametersWidget.setEnabled(False)
         self.queueToolbarFrame.setCurrentIndex(0)
         self.stop_scan_edit()
-
-    def queue_item_clicked(self):
-        pass
-        # index = self.queueWidget.currentRow()
-        # if index > 2:
-
-        # else:
 
     def stop_scan_clicked(self):
         # TODO: Dummy content
