@@ -38,7 +38,11 @@ def run_sequence_test(sequence_name: str) -> bool:
 def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
+    # Comment all test sequences except one when testing without connecting RedPitaya
+    run_sequence_test("rf_se")
+    run_sequence_test("rf_tse")
     run_sequence_test("adj_frequency")
+    run_sequence_test("adj_rf_amplitude")
     return True
 
 
