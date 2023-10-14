@@ -21,7 +21,7 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -29,22 +29,23 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
-        
+
         rf_max_cal(
             seq_file=self.seq_file_path,
-            larmor_freq=cfg.LARMOR_FREQ, 
-            points=20, 
-            iterations=2, 
+            larmor_freq=cfg.LARMOR_FREQ,
+            points=20,
+            iterations=2,
             zoom_factor=2,
-            shim_x=cfg.SHIM_X, 
-            shim_y=cfg.SHIM_Y, 
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
-            tr_spacing=2, 
-            force_tr=False, 
-            first_max=False, 
-            smooth=True, 
-            plot=True, 
-            gui_test=False)
+            tr_spacing=2,
+            force_tr=False,
+            first_max=False,
+            smooth=True,
+            plot=True,
+            gui_test=False,
+        )
 
         log.info("Done running sequence " + self.get_name())
         return True

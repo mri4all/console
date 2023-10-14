@@ -423,6 +423,11 @@ class ExaminationWindow(QMainWindow):
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
         ui_runtime.editor_sequence_instance.setup_ui(sequence_ui_container)
 
+        default_settings = ui_runtime.editor_sequence_instance.get_default_parameters()
+        # TODO: Pass full scan task object
+        ui_runtime.editor_sequence_instance.set_parameters(default_settings, {})
+        ui_runtime.editor_sequence_instance.write_parameters_to_ui(sequence_ui_container)
+
         for i in range(self.scanParametersWidget.count()):
             self.scanParametersWidget.widget(i).setEnabled(read_only == False)
 
@@ -460,7 +465,9 @@ class ExaminationWindow(QMainWindow):
         return new_container_widget
 
     def accept_scan_edit_clicked(self):
-        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui()
+        ui_widget = self.scanParametersWidget.widget(0)
+        # TODO: Pass the full scan task object
+        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui(ui_widget, {})
 
         if not parameters_valid:
             self.scanParametersWidget.setTabVisible(5, True)

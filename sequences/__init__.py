@@ -8,9 +8,10 @@ log = logger.get_logger()
 
 SequenceVar = TypeVar("SequenceVar")
 
+
 class SequenceBase(Generic[SequenceVar]):
     """
-    Base class for all console sequences, including automatic registry for sequence classes.
+    Base class for all console sequences, with automatic registration of sequence classes.
     """
 
     ## Internal functions for the sequence registry
@@ -27,7 +28,7 @@ class SequenceBase(Generic[SequenceVar]):
     parameters: Dict = {}
     working_folder: str = ""
     calculated = False
-    problem_list = []
+    problem_list: list[str] = []
 
     def __init__(self):
         pass
@@ -40,7 +41,7 @@ class SequenceBase(Generic[SequenceVar]):
     def installed_sequences(cls):
         return list(cls._REGISTRY.keys())
 
-    ## Sequence API functions
+    ## Sequence API functions. Functions that must be implemented by the individual sequence are marked with **
 
     def get_name(self) -> str:
         """
@@ -52,66 +53,87 @@ class SequenceBase(Generic[SequenceVar]):
     def get_readable_name(self) -> str:
         """
         Returns a human-readable name of the sequence.
+        ** Must be implemented by the individual sequence. **
         """
         return "INVALID"
 
     def get_parameters(self) -> dict:
         """
-        Returns the current sequence parameters as JSON dict.
+        Returns the current sequence parameters as dictionary.
+        ** Must be implemented by the individual sequence. **
         """
         return {}
 
     def get_default_parameters(self) -> dict:
         """
-        Returns a dict with default values, used to initialize the protocol.
+        Returns a dictionary with default values, used to initialize the protocol.
+        ** Must be implemented by the individual sequence. **
         """
         return {}
 
-    def set_parameters(self, parameters) -> bool:
+    def set_parameters(self, parameters, scan_task) -> bool:
         """
-        Reads the sequence parameters from a JSON dictionary.
+        Reads the sequence parameters from the provided dictionary. The sequence must
+        validate if the provided parameters can be used to run the sequence. If the
+        parameter set is invalid, False is returned. Detected problems should be stored as
+        strings in self.problem_list. The scan_task object can be used to access additional
+        information about the scan, such as the hardware capabilities.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
     def setup_ui(self, widget) -> bool:
         """
-        Creates the user interface of the sequence.
+        Creates the user interface of the sequence. The UI can be created with Qt Creator
+        and loaded with uic.loadUi, or it can be created manually. The UI controls must
+        be inserted into the provided widget.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
     def write_parameters_to_ui(self, widget) -> bool:
         """
-        Write the internal settings to the UI, which lives inside the widget.
+        Loads the internal parameters into the sequence-specific UI controls inside the widget.
+        This function is called when a scan protocol is opened in the UI editor.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
-    def read_parameters_from_ui(self) -> bool:
+    def read_parameters_from_ui(self, widget, scan_task) -> bool:
         """
-        Reads the settings from the UI into the sequence.
+        Reads the settings from the UI into the sequence and checks that the parameters are valid.
+        If invalid, False is returned. The detected problems should be stored as strings in
+        self.problem_list. The scan_task object can be used to access additional information about
+        the scan, such as the hardware capabilities.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
     def get_problems(self) -> list[str]:
         """
-        Returns a list of problems with the current parameters.
+        Returns the list of problems that were detected by the sequence. These are shown in the UI.
         """
         return self.problem_list
 
     def calculate_sequence(self) -> bool:
         """
-        Calculates the sequence instructions.
+        Calculates the sequence instructions using the parameters previously provided to the
+        sequence instance.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
     def run_sequence(self) -> bool:
         """
-        Executes the sequence instructions (called after calculate_sequence)
+        Executes the sequence instructions. This function is called after calculate_sequence.
+        ** Must be implemented by the individual sequence. **
         """
         return True
 
     def set_working_folder(self, folder: str) -> bool:
         """
-        Sets the working folder for the sequence.
+        Sets the working folder for the sequence. This function is called by the UI and acquisition
+        service when interacting with the sequence.
         """
         self.working_folder = folder
 
@@ -141,7 +163,7 @@ class SequenceBase(Generic[SequenceVar]):
 
     def get_working_folder(self) -> str:
         """
-        Returns the working folder for the sequence.
+        Returns the working folder for the sequence (provided by the framework)
         """
         return self.working_folder
 
@@ -155,20 +177,25 @@ class SequenceBase(Generic[SequenceVar]):
 
     def is_calculated(self) -> bool:
         """
-        Returns True if the sequence is calculated.
+        Returns True if the sequence is calculated and ready to be executed.
         """
         return self.calculated
+
+    def is_valid(self) -> bool:
+        """
+        Returns True if the sequence parameters are valid. If not, the problems can be
+        retrieved with get_problems().
+        """
+        return len(self.problem_list) == 0
 
 
 class PulseqSequence(SequenceBase[SequenceVar], registry_key=""):
     """
-    Sublayer for all Pulseq-based sequences.
+    Subclass for Pulseq-based sequences, which adds Pulseq-specific functions.
     """
 
     # Path and name of the .seq for simple sequence that only use one file
     seq_file_path = ""
-
-    pass
 
 
 # Automatically import all sequence classes existing in the /sequences directory.
