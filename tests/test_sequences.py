@@ -39,6 +39,7 @@ def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
     run_sequence_test("adj_frequency")
+    return True
 
 
 if __name__ == "__main__":

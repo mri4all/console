@@ -7,7 +7,6 @@ import asyncio
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
-from sequences import rfse, rftse, adj_frequency
 
 rt.set_service_name("acq")
 log = logger.get_logger()

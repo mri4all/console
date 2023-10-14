@@ -7,6 +7,7 @@ import sip  # type: ignore
 
 import common.runtime as rt
 import common.logger as logger
+import common.helper as helper
 from common.types import ScanQueueEntry
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
@@ -25,6 +26,9 @@ class ExaminationWindow(QMainWindow):
     viewer3 = None
 
     def __init__(self):
+        """
+        Loads the user interface, applies styling, and configures the event handling.
+        """
         super(ExaminationWindow, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/examination.ui", self)
         self.actionClose_Examination.triggered.connect(self.close_examination_clicked)
@@ -65,7 +69,7 @@ class ExaminationWindow(QMainWindow):
         self.discardScanEditButton.clicked.connect(self.discard_scan_edit_clicked)
 
         self.stopScanButton.setText("")
-        self.stopScanButton.setToolTip("Stop running sequence")
+        self.stopScanButton.setToolTip("Halt selected sequence")
         self.stopScanButton.setIcon(qta.icon("fa5s.stop"))
         self.stopScanButton.setIconSize(QSize(24, 24))
         self.stopScanButton.setProperty("type", "toolbar")
@@ -83,6 +87,7 @@ class ExaminationWindow(QMainWindow):
         self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt"))
         self.deleteScanButton.setIconSize(QSize(24, 24))
         self.deleteScanButton.setProperty("type", "toolbar")
+        self.deleteScanButton.clicked.connect(self.delete_sequence_clicked)
 
         self.addScanButton.setText("")
         self.addScanButton.setToolTip("Insert new sequence")
@@ -111,11 +116,12 @@ class ExaminationWindow(QMainWindow):
             """
         )
         self.addScanButton.setMenu(self.add_sequence_menu)
-        self.update_sequence_list()
+        self.prepare_sequence_list()
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemSelectionChanged.connect(self.queue_item_clicked)
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
+        self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
@@ -179,7 +185,24 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu and source is self.queueWidget:
+            if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
+                menu = QMenu()
+                menu.addAction("Rename...")
+                menu.addAction("Duplicate...")
+                menu.addSeparator()
+                menu.addAction("Save to browser...")
+                menu.addSeparator()
+                menu.addAction("Show definition...")
+                menu.exec_(event.globalPos())
+
+        return super(QMainWindow, self).eventFilter(source, event)
+
     def update_size(self):
+        """
+        Scales certain UI elements to fit the current screen size.
+        """
         screen_width, screen_height = ui_runtime.get_screen_size()
 
         self.inlineViewerFrame.setMaximumHeight(int(screen_height * 0.45))
@@ -191,13 +214,17 @@ class ExaminationWindow(QMainWindow):
         self.timerFrame.setMinimumWidth(int(screen_width * 0.25))
 
     def prepare_examination_ui(self):
+        """
+        Prepare the exam UI screen for a new patient. Note that the UI is not destroyed when
+        closing a patient (it is just moved to the background). Hence, all UI elements need to be
+        reset to their initial state.
+        """
         patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
         patient_text += chr(0xA0) + chr(0xA0)
         patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
         self.patientLabel.setText(patient_text)
 
         self.statusBar().showMessage("Scanner ready", 0)
-        self.fake_scan_entry()
         self.sync_queue_widget()
 
     def clear_examination_ui(self):
@@ -210,35 +237,45 @@ class ExaminationWindow(QMainWindow):
     def shutdown_clicked(self):
         ui_runtime.shutdown()
 
-    def update_sequence_list(self):
-        # Dummy implementation for demo
-        # TODO: Should be filled with protocol manager in the future
+    def prepare_sequence_list(self):
+        """
+        Insert entries for the installed sequences to the "Add sequence" menu.
+        """
+        # TODO: Should be replaced with protocol manager in the future
         self.add_sequence_menu.clear()
 
-        sequence_list = SequenceBase.installed_sequences()
+        sequence_list = sorted(
+            SequenceBase.installed_sequences(), key=lambda d: SequenceBase.get_sequence(d).get_readable_name()
+        )
         for seq in sequence_list:
-            my_action = QAction(self)
-            my_action.setText(SequenceBase.get_sequence(seq).get_readable_name())
-            my_action.triggered.connect(self.insert_sequence)
-            my_action.setProperty("sequence_class", seq)
-            self.add_sequence_menu.addAction(my_action)
+            # Adjustment sequences should not be shown here
+            if not seq.startswith("adj_"):
+                add_sequence_action = QAction(self)
+                add_sequence_action.setText(SequenceBase.get_sequence(seq).get_readable_name())
+                add_sequence_action.setProperty("sequence_class", seq)
+                add_sequence_action.triggered.connect(self.add_sequence)
+                self.add_sequence_menu.addAction(add_sequence_action)
 
-    def insert_sequence(self):
-        # Dummy implementation for demo
+    def add_sequence(self):
+        # TODO: Delegate creation of ScanQueueEntry to UI runtime
         sequence_class = self.sender().property("sequence_class")
+        ui_runtime.exam_information.scan_counter += 1
 
-        # Create an instance of the sequence class
-        sequence_instance = SequenceBase.get_sequence(sequence_class)()
-        # Ask the sequence to insert its UI into the first tab
-        widget_to_delete = self.scanParametersWidget.widget(0)
-        sip.delete(widget_to_delete)
-        new_widget = QWidget()
-        self.scanParametersWidget.insertTab(0, new_widget, "Sequence")
-        sequence_instance.setup_ui(new_widget)
-        self.scanParametersWidget.setCurrentIndex(0)
-        self.scanParametersWidget.setEnabled(True)
+        new_scan = ScanQueueEntry()
+        new_scan.sequence = helper.generate_uid()
+        new_scan.sequence = sequence_class
+        new_scan.scan_counter = ui_runtime.exam_information.scan_counter
+        new_scan.protocol_name = SequenceBase.get_sequence(sequence_class).get_readable_name()
+        new_scan.state = "created"
+        new_scan.has_results = False
+        ui_runtime.scan_queue_list.append(new_scan)
+        self.sync_queue_widget()
 
     def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
+        """
+        Create a new UI entry to the queue widget and colors it according the the state of the
+        scan task.
+        """
         widget_font_color = "#F00"
         widget_background_color = "#F00"
         widget_icon = ""
@@ -264,6 +301,7 @@ class ExaminationWindow(QMainWindow):
             widget_icon = "wrench"
 
         item = QListWidgetItem()
+        item.setToolTip(f"Sequence class = {entry.sequence}")
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
         widget.setStyleSheet(
@@ -299,10 +337,17 @@ class ExaminationWindow(QMainWindow):
 
     def edit_sequence_clicked(self):
         index = self.queueWidget.currentRow()
-        read_only = True
 
-        # Dummy code
-        if index > 2:
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Protocols can only be edited if they have not been scanned yet
+        read_only = True
+        if (
+            ui_runtime.scan_queue_list[index].state == "created"
+            or ui_runtime.scan_queue_list[index].state == "scheduled_acq"
+        ):
             read_only = False
 
         # Make the selected item bold
@@ -310,23 +355,28 @@ class ExaminationWindow(QMainWindow):
         selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: bold; border-left: 16px solid #000;")
         self.queueWidget.currentItem().setSelected(False)
 
-        self.start_scan_edit("flash_demo", read_only)
+        sequence_type = ui_runtime.scan_queue_list[index].sequence
+        scan_id = ui_runtime.scan_queue_list[index].id
+        self.start_scan_edit(scan_id, sequence_type, read_only)
         self.scanParametersWidget.setEnabled(True)
         self.queueToolbarFrame.setCurrentIndex(1)
 
-    def start_scan_edit(self, id, read_only=False):
-        sequence_id = "flash_demo"
+    def start_scan_edit(self, id, sequence_type, read_only=False):
+        """
+        Edits the selected scan protocol. To that end, the sequence class is instantiated and
+        asked to render the sequence parameter UI to the editor. Also, the buttons below the
+        queue widget are switched to the editing state.
+        """
+        # TODO: Read the settings from the selected protocol
 
-        index = self.queueWidget.currentRow()
-        if index % 2:
-            sequence_id = "tse3d_demo"
+        log.info(f"Editing scan {id} of type {sequence_type}")
 
-        if not sequence_id in SequenceBase.installed_sequences():
-            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_id} not installed")
+        if not sequence_type in SequenceBase.installed_sequences():
+            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed")
             return
 
         # Create an instance of the sequence class and buffer it
-        ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(sequence_id)()
+        ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(sequence_type)()
 
         # Ask the sequence to insert its UI into the first tab of the parameter widget
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
@@ -340,6 +390,10 @@ class ExaminationWindow(QMainWindow):
         ui_runtime.editor_active = True
 
     def stop_scan_edit(self):
+        """
+        Ends the protocol editing mode and switches the buttons below the queue widget back
+        to their default state.
+        """
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
@@ -349,6 +403,7 @@ class ExaminationWindow(QMainWindow):
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(False)
 
+        # Delete the sequence instance created for the editor
         if ui_runtime.editor_sequence_instance is not None:
             del ui_runtime.editor_sequence_instance
             ui_runtime.editor_sequence_instance = None
@@ -382,10 +437,14 @@ class ExaminationWindow(QMainWindow):
 
     def stop_scan_clicked(self):
         # TODO: Dummy content
-        self.fake_scan_entry()
         self.sync_queue_widget()
 
     def sync_queue_widget(self):
+        """
+        Update/sync the displayed scan queue list according to the list kept by the runtime
+        environment (which is synced with the folders and contains information about the
+        sequence types and state)
+        """
         ui_runtime.update_scan_queue_list()
         # TODO: Instead of clearing the whole widget, only update the changed items
         self.queueWidget.clear()
@@ -393,11 +452,16 @@ class ExaminationWindow(QMainWindow):
         for entry in ui_runtime.scan_queue_list:
             self.insert_entry_to_queue_widget(entry)
 
-    def fake_scan_entry(self):
-        test = ScanQueueEntry()
-        ui_runtime.exam_information.scan_counter += 1
-        test.scan_counter = ui_runtime.exam_information.scan_counter
-        test.protocol_name = "Test"
-        test.state = "created"
-        test.has_results = False
-        ui_runtime.scan_queue_list.append(test)
+    def delete_sequence_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # TODO: Properly delete case
+        ui_runtime.scan_queue_list.pop(index)
+        self.sync_queue_widget()
