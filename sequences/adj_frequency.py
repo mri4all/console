@@ -18,11 +18,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         return "Adjust Frequency"
 
     def calculate_sequence(self) -> bool:
-<<<<<<< HEAD
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
-=======
-        self.seq_file_path = self.get_working_folder() + "/seq/main.seq"
->>>>>>> 21bcf2ddcc52e3b185f4993a2f2b5467aae839dd
         log.info("Calculating sequence " + self.get_name())
 
         pypulseq_rfse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
