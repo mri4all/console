@@ -87,6 +87,7 @@ class ExaminationWindow(QMainWindow):
         self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt"))
         self.deleteScanButton.setIconSize(QSize(24, 24))
         self.deleteScanButton.setProperty("type", "toolbar")
+        self.deleteScanButton.clicked.connect(self.delete_sequence_clicked)
 
         self.addScanButton.setText("")
         self.addScanButton.setToolTip("Insert new sequence")
@@ -120,6 +121,7 @@ class ExaminationWindow(QMainWindow):
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemSelectionChanged.connect(self.queue_item_clicked)
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
+        self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
             "QListView::item:selected, QListView::item:hover:selected  { background-color: #E0A526; } QListView::item:hover { background-color: none; } "
@@ -182,6 +184,20 @@ class ExaminationWindow(QMainWindow):
         viewer3.configure()
 
         self.update_size()
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu and source is self.queueWidget:
+            if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
+                menu = QMenu()
+                menu.addAction("Rename...")
+                menu.addAction("Duplicate...")
+                menu.addSeparator()
+                menu.addAction("Save to browser...")
+                menu.addSeparator()
+                menu.addAction("Show definition...")
+                menu.exec_(event.globalPos())
+
+        return super(QMainWindow, self).eventFilter(source, event)
 
     def update_size(self):
         """
@@ -435,3 +451,17 @@ class ExaminationWindow(QMainWindow):
 
         for entry in ui_runtime.scan_queue_list:
             self.insert_entry_to_queue_widget(entry)
+
+    def delete_sequence_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # TODO: Properly delete case
+        ui_runtime.scan_queue_list.pop(index)
+        self.sync_queue_widget()

@@ -21,7 +21,7 @@ class SequenceTSE(SequenceBase, registry_key=Path(__file__).stem):
         label = QLabel("Resolution")
         layout.addWidget(label)
         item = QSlider()
-        item.setOrientation(Qt.Horizontal)
+        item.setOrientation(Qt.Orientation.Horizontal)
         item.setMaximumWidth(500)
         layout.addWidget(item)
         layout.addSpacing(30)

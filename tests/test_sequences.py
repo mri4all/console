@@ -39,6 +39,7 @@ def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
     run_sequence_test("rf_se")
+    return True
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import numpy as np
 
 from PyQt5 import uic
 
-import pypulseq as pp
+import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
@@ -35,7 +35,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         pypulseq_rfse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
-        self.is_calculated = True
+        self.calculated = True
         return True
 
     def run_sequence(self) -> bool:
