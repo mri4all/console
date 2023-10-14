@@ -563,11 +563,16 @@
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="adjustmentsTab">
                <attribute name="title">
                 <string>ADJUSTMENTS</string>
+               </attribute>
+              </widget>
+              <widget class="QWidget" name="systemTab">
+               <attribute name="title">
+                <string>SYSTEM</string>
                </attribute>
               </widget>
               <widget class="QWidget" name="processingTab">

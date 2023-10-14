@@ -43,7 +43,6 @@ class ScanQueueEntry(BaseModel):
     sequence: str = ""
     protocol_name: str = "unknown"
     scan_counter: int = -1
-    folder: Path = Path("")
     state: Literal[
         "created",
         "scheduled_acq",
@@ -54,3 +53,4 @@ class ScanQueueEntry(BaseModel):
         "failure",
     ] = "created"
     has_results: bool = False
+    folder: Path = Path("")

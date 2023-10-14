@@ -62,9 +62,15 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
-    def get_settings(self) -> dict:
+    def get_parameters(self) -> dict:
         """
         Returns the current sequence parameters as JSON dict.
+        """
+        return {}
+
+    def get_default_parameters(self) -> dict:
+        """
+        Returns a dict with default values, used to initialize the protocol.
         """
         return {}
 
