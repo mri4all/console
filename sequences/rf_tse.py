@@ -34,7 +34,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rftse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rftse(inputs={}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -63,8 +63,8 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rftse(ui_inputs=None, check_timing=True, output_file="") -> bool:
-    if len(ui_inputs) == 0:
+def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
+    if len(inputs) == 0:
         # ======
         # DEFAULTS              TODO: MOVE DEFAULTS TO UI
         # ======
@@ -82,11 +82,11 @@ def pypulseq_rftse(ui_inputs=None, check_timing=True, output_file="") -> bool:
         adc_duration = 6.4e-3
         ETL = 8
     else:
-        LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
-        RF_MAX = ui_inputs["RF_MAX"]
-        RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
-        TR = ui_inputs["TR"]
-        TE = ui_inputs["TE"]
+        LARMOR_FREQ = inputs["LARMOR_FREQ"]
+        RF_MAX = inputs["RF_MAX"]
+        RF_PI2_FRACTION = inputs["RF_PI2_FRACTION"]
+        TR = inputs["TR"]
+        TE = inputs["TE"]
 
     # ======
     # INITIATE SEQUENCE

@@ -2,6 +2,7 @@ import sys
 
 # setting path
 sys.path.append("../")
+sys.path.append("/opt/mri4all/console/external/")
 
 from sequences import SequenceBase
 

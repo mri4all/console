@@ -16,23 +16,61 @@ log = logger.get_logger()
 
 
 class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
+    # Sequence parameters
+    param_TE: int = 70
+    param_TR: int = 250
+
     @classmethod
     def get_readable_name(self) -> str:
         return "RF Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
-        """
-        Returns the user inteface of the sequence.
-        """
         seq_path = os.path.dirname(os.path.abspath(__file__))
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
+
+    def get_parameters(self) -> dict:
+        return {"TE": self.param_TE, "TR": self.param_TR}
+
+    def get_default_parameters(
+        self,
+    ) -> dict:
+        return {"TE": 70, "TR": 250}
+
+    def set_parameters(self, parameters) -> bool:
+        self.problem_list = []
+        try:
+            self.param_TE = parameters["TE"]
+            self.param_TR = parameters["TR"]
+        except:
+            self.problem_list.append("Invalid parameters provided")
+            return False
+        return self.validate_parameters()
+
+    def write_parameters_to_ui(self, widget) -> bool:
+        widget.TESpinBox.setValue(self.param_TE)
+        widget.TRSpinBox.setValue(self.param_TR)
+        return True
+
+    def read_parameters_from_ui(self, widget) -> bool:
+        self.problem_list = []
+        self.param_TE = widget.TESpinBox.value()
+        self.param_TR = widget.TRSpinBox.value()
+        self.validate_parameters()
+        return self.is_valid()
+
+    def validate_parameters(self) -> bool:
+        if self.param_TE > self.param_TR:
+            self.problem_list.append("TE cannot be longer than TR")
+        return self.is_valid()
 
     def calculate_sequence(self) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rfse(
+            inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
+        )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -61,33 +99,33 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(ui_inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_rfse(inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
 
-    if len(ui_inputs) == 0:
-        # ======
-        # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
-        # ======
-        LARMOR_FREQ = cfg.LARMOR_FREQ
-        RF_MAX = cfg.RF_MAX
-        RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-        alpha1 = 90  # flip angle
-        alpha1_duration = 100e-6  # pulse duration
-        alpha2 = 180  # refocusing flip angle
-        alpha2_duration = 100e-6  # pulse duration
-        TE = 70e-3
-        TR = 250e-3
-        num_averages = 1
-        adc_num_samples = 4096
-        adc_duration = 6.4e-3
-    else:
-        LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
-        RF_MAX = ui_inputs["RF_MAX"]
-        RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
-        TR = ui_inputs["TR"]
-        TE = ui_inputs["TE"]
+    # ======
+    # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
+    # ======
+    LARMOR_FREQ = cfg.LARMOR_FREQ
+    RF_MAX = cfg.RF_MAX
+    RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
+    alpha1 = 90  # flip angle
+    alpha1_duration = 100e-6  # pulse duration
+    alpha2 = 180  # refocusing flip angle
+    alpha2_duration = 100e-6  # pulse duration
+    TE = 70e-3
+    TR = 250e-3
+    num_averages = 1
+    adc_num_samples = 4096
+    adc_duration = 6.4e-3
+
+    # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
+    # RF_MAX = ui_inputs["RF_MAX"]
+    # RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
+
+    TR = inputs["TR"] / 1000
+    TE = inputs["TE"] / 1000
 
     # ======
     # INITIATE SEQUENCE

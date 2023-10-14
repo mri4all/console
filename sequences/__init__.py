@@ -29,7 +29,7 @@ class SequenceBase(Generic[SequenceVar]):
     parameters: Dict = {}
     working_folder: str = ""
     calculated = False
-    problem_list = []
+    problem_list: list[str] = []
 
     def __init__(self):
         pass
@@ -87,7 +87,7 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
-    def read_parameters_from_ui(self) -> bool:
+    def read_parameters_from_ui(self, widget) -> bool:
         """
         Reads the settings from the UI into the sequence.
         """
@@ -160,6 +160,12 @@ class SequenceBase(Generic[SequenceVar]):
         Returns True if the sequence is calculated.
         """
         return self.calculated
+
+    def is_valid(self) -> bool:
+        """
+        Returns True if the sequence parameters are valid.
+        """
+        return len(self.problem_list) == 0
 
 
 class PulseqSequence(SequenceBase[SequenceVar], registry_key=""):

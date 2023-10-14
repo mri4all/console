@@ -28,6 +28,10 @@ def run_sequence_test(sequence_name: str) -> bool:
         return False
 
     sequence_instance = SequenceBase.get_sequence(sequence_name)()
+    # Get the default parameters from the sequence as an example
+    default_parameters = sequence_instance.get_default_parameters()
+    # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+    sequence_instance.set_parameters(default_parameters)
     sequence_instance.set_working_folder(temp_folder)
     sequence_instance.calculate_sequence()
     sequence_instance.run_sequence()
