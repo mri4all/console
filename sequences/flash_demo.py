@@ -18,7 +18,7 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def read_parameters_from_ui(self, widget) -> bool:
+    def read_parameters_from_ui(self, widget, scan_task) -> bool:
         """
         Reads the settings from the UI into the sequence.
         """

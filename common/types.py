@@ -54,3 +54,17 @@ class ScanQueueEntry(BaseModel):
     ] = "created"
     has_results: bool = False
     folder: Path = Path("")
+
+
+class ScanTask(BaseModel):
+    id: str = ""
+    sequence: str = ""
+    flags: dict = {}
+    exam: dict = {}
+    patient: PatientInformation = PatientInformation()
+    parameters: dict = {}
+    adjustment: dict = {}
+    system: dict = {}
+    processing: dict = {}
+    other: dict = {}
+    results: dict = {}

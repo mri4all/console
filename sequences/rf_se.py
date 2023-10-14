@@ -37,7 +37,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     ) -> dict:
         return {"TE": 70, "TR": 250}
 
-    def set_parameters(self, parameters) -> bool:
+    def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
@@ -45,21 +45,21 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
-        return self.validate_parameters()
+        return self.validate_parameters(scan_task)
 
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
         return True
 
-    def read_parameters_from_ui(self, widget) -> bool:
+    def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
-        self.validate_parameters()
+        self.validate_parameters(scan_task)
         return self.is_valid()
 
-    def validate_parameters(self) -> bool:
+    def validate_parameters(self, scan_task) -> bool:
         if self.param_TE > self.param_TR:
             self.problem_list.append("TE cannot be longer than TR")
         return self.is_valid()
