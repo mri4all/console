@@ -27,6 +27,7 @@ class SequenceBase(Generic[SequenceVar]):
     parameters: Dict = {}
     working_folder: str = ""
     calculated = False
+    problem_list = []
 
     def __init__(self):
         pass
@@ -54,12 +55,6 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return "INVALID"
 
-    def set_parameters(self, parameters) -> bool:
-        """
-        Reads the sequence parameters from a JSON dictionary.
-        """
-        return True
-
     def get_parameters(self) -> dict:
         """
         Returns the current sequence parameters as JSON dict.
@@ -71,6 +66,12 @@ class SequenceBase(Generic[SequenceVar]):
         Returns a dict with default values, used to initialize the protocol.
         """
         return {}
+
+    def set_parameters(self, parameters) -> bool:
+        """
+        Reads the sequence parameters from a JSON dictionary.
+        """
+        return True
 
     def setup_ui(self, widget) -> bool:
         """
@@ -89,6 +90,12 @@ class SequenceBase(Generic[SequenceVar]):
         Reads the settings from the UI into the sequence.
         """
         return True
+
+    def get_problems(self) -> list[str]:
+        """
+        Returns a list of problems with the current parameters.
+        """
+        return self.problem_list
 
     def calculate_sequence(self) -> bool:
         """

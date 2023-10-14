@@ -563,7 +563,7 @@
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>4</number>
               </property>
               <widget class="QWidget" name="adjustmentsTab">
                <attribute name="title">
@@ -605,7 +605,45 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPlainTextEdit" name="plainTextEdit"/>
+                 <widget class="QPlainTextEdit" name="otherParametersTextEdit"/>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="problemsTab">
+               <attribute name="title">
+                <string>PROBLEMS</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_9">
+                <property name="leftMargin">
+                 <number>13</number>
+                </property>
+                <property name="topMargin">
+                 <number>13</number>
+                </property>
+                <property name="rightMargin">
+                 <number>13</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>13</number>
+                </property>
+                <item>
+                 <widget class="QListWidget" name="problemsWidget">
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::NoEditTriggers</set>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>false</bool>
+                  </property>
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>

@@ -1,4 +1,3 @@
-from random import seed
 from random import random
 
 from PyQt5 import uic
