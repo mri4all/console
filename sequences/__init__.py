@@ -2,13 +2,11 @@ from importlib import import_module
 from pathlib import Path
 from typing import Dict, TypeVar, Generic
 import os
-
 import common.logger as logger
 
 log = logger.get_logger()
 
 SequenceVar = TypeVar("SequenceVar")
-
 
 class SequenceBase(Generic[SequenceVar]):
     """
