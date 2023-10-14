@@ -1,40 +1,50 @@
 import os
 from pathlib import Path
 import math
-import numpy as np
 
 from PyQt5 import uic
 
+import numpy as np
+
 import pypulseq as pp
+from external.seq.adjustments_acq.scripts import run_pulseq
+import external.seq.adjustments_acq.config as cfg
 
 from sequences import PulseqSequence
-
-import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.scripts import run_pulseq
 
 import common.logger as logger
 
 log = logger.get_logger()
 
 
-class SequenceRFSE(PulseqSequence, registry_key=Path(__file__).stem):
+class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Radio Frequency Spin Echo"
+        return "RF Turbo-Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
         """
-        Returns the user inteface of the sequence.
+        Returns the user interface of the sequence.
         """
         seq_path = os.path.dirname(os.path.abspath(__file__))
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def run(self) -> bool:
-        log.info("Starting to build sequence Radio Frequency Spin Echo")
-        seq_file_path = pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+    def calculate_sequence(self) -> bool:
+        self.seq_file_path = self.get_working_folder() + "/seq/main.seq"
+        log.info("Calculating sequence " + self.get_name())
+
+        pypulseq_rftse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
+
+        log.info("Done calculating sequence " + self.get_name())
+        self.is_calculated = True
+        return True
+
+    def run_sequence(self) -> bool:
+        log.info("Running sequence " + self.get_name())
+
         rxd, rx_t = run_pulseq(
-            seq_file=seq_file_path,
+            seq_file=self.seq_file_path,
             rf_center=cfg.LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
@@ -48,14 +58,15 @@ class SequenceRFSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-        log.info("Completed executing sequence: RFSE")
+
+        log.info("Done running sequence " + self.get_name())
         return True
 
 
-def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
+def pypulseq_rftse(ui_inputs=None, check_timing=True, output_file="") -> bool:
     if len(ui_inputs) == 0:
         # ======
-        # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
+        # DEFAULTS              TODO: MOVE DEFAULTS TO UI
         # ======
         LARMOR_FREQ = cfg.LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
@@ -64,11 +75,12 @@ def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
         alpha1_duration = 100e-6  # pulse duration
         alpha2 = 180  # refocusing flip angle
         alpha2_duration = 100e-6  # pulse duration
-        TE = 70e-3
-        TR = 250e-3
+        TE = 54e-3
+        TR = 2000e-3
         num_averages = 1
         adc_num_samples = 4096
         adc_duration = 6.4e-3
+        ETL = 8
     else:
         LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
         RF_MAX = ui_inputs["RF_MAX"]
@@ -113,13 +125,16 @@ def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
     # CALCULATE DELAYS
     # ======
     tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
-    tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
-    delay_TR = TR - (pp.calc_duration(rf1) + tau1 + pp.calc_duration(rf2))
+    tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + adc_duration)
+    print(tau2)
+    delay_TR = TR - (ETL * TE) - (0.5 * TE)
     assert np.all(tau1 >= 0)
+    assert np.all(delay_TR > 0)
 
     # Define ADC events
     adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
 
+    # ======
     # ======
     # CONSTRUCT SEQUENCE
     # ======
@@ -127,8 +142,11 @@ def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
     for avg in range(num_averages):
         seq.add_block(rf1)
         seq.add_block(pp.make_delay(tau1))
-        seq.add_block(rf2)
-        seq.add_block(adc, pp.make_delay(delay_TR))
+        for echo_num in range(ETL):
+            seq.add_block(rf2)
+            seq.add_block(adc)  # Has a delay of tau2 in built
+            seq.add_block(pp.make_delay(tau2))
+        seq.add_block(pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct
     if check_timing:
@@ -139,12 +157,11 @@ def pypulseq_rfse(ui_inputs=None, check_timing=True) -> bool:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
-    # seq.write('rfse.seq')
-    seq_file_path = self.store_seq_file(file_name="rfse.seq", seq=seq)
-    log.info("Seq file stored")
-    return seq_file_path
+    try:
+        seq.write(output_file)
+        log.debug("Seq file stored")
+    except:
+        log.error("Could not write sequence file")
+        return False
 
-
-if __name__ == "__main__":
-    test_instance = SequenceRFSE()
-    test_instance.run()
+    return True

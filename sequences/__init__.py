@@ -1,9 +1,11 @@
 from importlib import import_module
 from pathlib import Path
 from typing import Dict, TypeVar, Generic
-from utils import constants
-from uuid import uuid4
 import os
+
+import common.logger as logger
+
+log = logger.get_logger()
 
 SequenceVar = TypeVar("SequenceVar")
 
@@ -25,6 +27,8 @@ class SequenceBase(Generic[SequenceVar]):
 
     seq_name = "INVALID"
     parameters: Dict = {}
+    working_folder: str = ""
+    is_calculated = False
 
     def __init__(self):
         pass
@@ -88,6 +92,48 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
+    def run_sequence(self) -> bool:
+        """
+        Executes the sequence instructions (called after calculate_sequence)
+        """
+        return True
+
+    def set_working_folder(self, folder: str) -> bool:
+        """
+        Sets the working folder for the sequence.
+        """
+        self.working_folder = folder
+
+        if not os.path.isdir(folder):
+            log.error(f"Sequence working folder {folder} does not exist.")
+            return False
+
+        # Check if file named scan.json exists in working_folder
+        if not os.path.isfile(folder + "/scan.json"):
+            log.warning(f"Could not find scan definition file scan.json in {folder}.")
+
+        try:
+            if not os.path.isdir(folder + "/seq"):
+                os.mkdir(folder + "/seq")
+        except:
+            log.error(f"Could not create seq folder in {folder}.")
+            return False
+
+        try:
+            if not os.path.isdir(folder + "/rawdata"):
+                os.mkdir(folder + "/rawdata")
+        except:
+            log.error(f"Could not create rawdata folder in {folder}.")
+            return False
+
+        return True
+
+    def get_working_folder(self) -> str:
+        """
+        Returns the working folder for the sequence.
+        """
+        return self.working_folder
+
     def is_adjustment_sequence(self) -> bool:
         """
         Returns True if the sequence is an adjustment sequence.
@@ -96,23 +142,22 @@ class SequenceBase(Generic[SequenceVar]):
             return True
         return False
 
+    def is_calculated(self) -> bool:
+        """
+        Returns True if the sequence is calculated.
+        """
+        return self.is_calculated
+
 
 class PulseqSequence(SequenceBase[SequenceVar], registry_key=""):
-    def store_seq_file(self, file_name: str = "", seq=None) -> str:
-        """
-        Store the seq file in the randomly generated folder
-        """
-        # TODO: Folders should not be created by the sequence. Needs to be moved to framework code.
+    """
+    Sublayer for all Pulseq-based sequences.
+    """
 
-        dirname_seq = str(uuid4())
-        if (os.path.isdir(constants.DATA_PATH_ACQ)) is False:
-            os.mkdir("/opt/mri4all/data")
-            os.mkdir("/opt/mri4all/data")
-        os.mkdir(os.path.join(constants.DATA_PATH_ACQ, dirname_seq))
-        path_to_save = os.path.join(constants.DATA_PATH_ACQ, dirname_seq, file_name)
-        seq.write(os.path.join(path_to_save))
+    # Path and name of the .seq for simple sequence that only use one file
+    seq_file_path = ""
 
-        return path_to_save
+    pass
 
 
 # Automatically import all sequence classes existing in the /sequences directory.

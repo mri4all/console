@@ -1,4 +1,7 @@
 import sys
+
+sys.path.append("/opt/mri4all/console/external/")
+
 import signal
 import asyncio
 
@@ -38,9 +41,7 @@ def run():
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:
-        helper.loop.add_signal_handler(
-            s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop))
-        )
+        helper.loop.add_signal_handler(s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop)))
 
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop

@@ -1,12 +1,10 @@
 import sys
-import os
 
-from PyQt5 import uic
+sys.path.append("/opt/mri4all/console/external/")
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 import qdarktheme  # type: ignore
-import qtawesome as qta  # type: ignore
 
 import common.logger as logger
 import common.runtime as rt

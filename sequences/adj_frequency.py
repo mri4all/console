@@ -1,10 +1,12 @@
 from pathlib import Path
-from sequences import PulseqSequence
+
 import external.seq.adjustments_acq.config as cfg
+from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
+
 import common.logger as logger
 
-from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
-from sequences.rfse import pypulseq_rfse
+from sequences import PulseqSequence
+from sequences.rf_se import pypulseq_rfse
 
 
 log = logger.get_logger()
@@ -15,13 +17,22 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     def get_readable_name(self) -> str:
         return "Adjust Frequency"
 
-    def run(self) -> bool:
-        log.info("Starting to find Larmor frequency in coarse and fine modes")
-        seq_file_path = pypulseq_rfse(ui_inputs={}, check_timing=True)  # Change when UI is ready
+    def calculate_sequence(self) -> bool:
+        self.seq_file_path = self.get_working_folder() / "seq/main.seq"
+        log.info("Calculating sequence " + self.get_name())
+
+        pypulseq_rfse(ui_inputs={}, check_timing=True, output_file=self.seq_file_path)
+
+        log.info("Done calculating sequence " + self.get_name())
+        self.is_calculated = True
+        return True
+
+    def run_sequence(self) -> bool:
+        log.info("Running sequence " + self.get_name())
 
         # Using external packages now: TODO: convert to classes later
         larmor_cal(
-            seq_file=seq_file_path,
+            seq_file=self.seq_file_path,
             larmor_start=cfg.LARMOR_FREQ,
             iterations=10,
             delay_s=1,
@@ -34,7 +45,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
         larmor_step_search(
-            seq_file=seq_file_path,
+            seq_file=self.seq_file_path,
             step_search_center=cfg.LARMOR_FREQ,
             steps=30,
             step_bw_MHz=5e-3,
@@ -45,10 +56,6 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             gui_test=False,
         )
-        log.info("Completed executing adjustment: Larmor Frequency")
+
+        log.info("Done running sequence " + self.get_name())
         return True
-
-
-if __name__ == "__main__":
-    test_instance = AdjFrequency()
-    test_instance.run()

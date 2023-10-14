@@ -1,4 +1,7 @@
 import sys
+
+sys.path.append("/opt/mri4all/console/external/")
+
 import signal
 import asyncio
 import common.logger as logger
