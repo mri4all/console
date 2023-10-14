@@ -127,7 +127,7 @@ def pypulseq_rftse(ui_inputs=None, check_timing=True, output_file="") -> bool:
     tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
     tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + adc_duration)
     print(tau2)
-    delay_TR = TR - (ETL * TE) - (0.5 * TE)
+    delay_TR = TR - (ETL * TE) - (0.5 * (TE + adc_duration))
     assert np.all(tau1 >= 0)
     assert np.all(delay_TR > 0)
 
@@ -145,7 +145,7 @@ def pypulseq_rftse(ui_inputs=None, check_timing=True, output_file="") -> bool:
         for echo_num in range(ETL):
             seq.add_block(rf2)
             seq.add_block(adc)  # Has a delay of tau2 in built
-            seq.add_block(pp.make_delay(tau2))
+            seq.add_block(pp.make_delay(tau2))  # Delay before next refocusing pulse
         seq.add_block(pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct

@@ -127,7 +127,7 @@ def pypulseq_rfse(ui_inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
     tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
-    delay_TR = TR - (pp.calc_duration(rf1) + tau1 + pp.calc_duration(rf2))
+    delay_TR = TR - TE - (0.5 * adc_duration)
     assert np.all(tau1 >= 0)
 
     # Define ADC events
