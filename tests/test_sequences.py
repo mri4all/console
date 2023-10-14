@@ -1,6 +1,6 @@
 import os
 import sys
-
+sys.path.insert(0, '.')
 # setting path
 sys.path.append("../")
 sys.path.append("/opt/mri4all/console/external/")
@@ -38,7 +38,7 @@ def run_sequence_test(sequence_name: str) -> bool:
 def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
-    run_sequence_test("rf_se")
+    run_sequence_test("adj_frequency")
 
 
 if __name__ == "__main__":
