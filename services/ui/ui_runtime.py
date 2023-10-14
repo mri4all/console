@@ -74,6 +74,6 @@ def get_screen_size() -> Tuple[int, int]:
 
 def update_scan_queue_list() -> bool:
     global scan_queue_list
-    scan_queue_list = []
+    # scan_queue_list = []
 
     return True

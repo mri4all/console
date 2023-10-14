@@ -28,7 +28,7 @@ def run_sequence_test(sequence_name: str) -> bool:
         return False
 
     sequence_instance = SequenceBase.get_sequence(sequence_name)()
-    sequence_instance.set_working_folder("/tmp/test")
+    sequence_instance.set_working_folder(temp_folder)
     sequence_instance.calculate_sequence()
     sequence_instance.run_sequence()
 
@@ -38,7 +38,7 @@ def run_sequence_test(sequence_name: str) -> bool:
 def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
-    run_sequence_test("rf_tse")
+    run_sequence_test("rf_se")
 
 
 if __name__ == "__main__":

@@ -39,6 +39,7 @@ class ExamInformation(BaseModel):
 
 
 class ScanQueueEntry(BaseModel):
+    id: str = ""
     sequence: str = ""
     protocol_name: str = "unknown"
     scan_counter: int = -1
