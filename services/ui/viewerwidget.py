@@ -21,6 +21,12 @@ class ViewerWidget(QWidget):
     def __init__(self):
         super(ViewerWidget, self).__init__()
 
+    series_name = ""
+
+    def set_series_name(self, name: str):
+        self.series_name = name
+        self.update()
+
     def configure(self):
         if self.property("id") == "3":
             sc = MplCanvas(self, width=5, height=4, dpi=100)
@@ -42,4 +48,20 @@ class ViewerWidget(QWidget):
         painter.setFont(font)
         painter.setPen(QColor("#999"))
         painter.drawText(8, 8 + 10, "Viewer " + self.property("id"))
+
+        # Dummy code
+        if self.series_name:
+            width = self.frameGeometry().width()
+            height = self.frameGeometry().height()
+
+            if width >= height:
+                image_size = height
+            else:
+                image_size = width
+            offset_x = int((width - image_size) / 2)
+
+            dummy_image = QPixmap("/opt/mri4all/console/services/ui/assets/dummy_scan.jpg")
+            painter.drawPixmap(offset_x, 0, image_size, image_size, dummy_image)
+            painter.drawText(8, 8 + 28, "Scan " + self.series_name)
+
         painter.end()

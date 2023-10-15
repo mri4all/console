@@ -8,6 +8,9 @@ base_path = "/opt/mri4all"
 service_name = "unknown"
 current_task_id = ""
 
+# Debugging function can be enabled by setting the environment variable MRI4ALL_DEBUG to "true"
+debugging_enabled = os.getenv("MRI4ALL_DEBUG", "").lower() == "true"
+
 
 def set_service_name(name):
     """Set the service name. This is used across the framework to identify the current service."""
@@ -46,3 +49,8 @@ def clear_current_task_id():
     """Clear the currently processed task ID."""
     global current_task_id
     current_task_id = ""
+
+
+def is_debugging_enabled():
+    """Returns True if debugging is enabled."""
+    return debugging_enabled

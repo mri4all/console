@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+import json
 
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -10,12 +11,15 @@ import sip  # type: ignore
 
 import common.runtime as rt
 import common.logger as logger
-from common.types import ScanQueueEntry
+import common.task as task
+from common.constants import *
+from common.types import ScanQueueEntry, ScanTask
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
+import services.ui.taskviewer as taskviewer
 from sequences import SequenceBase
 from services.ui.viewerwidget import ViewerWidget
 
@@ -55,6 +59,8 @@ class ExaminationWindow(QMainWindow):
     viewer2 = None
     viewer3 = None
 
+    updating_queue_widget = False
+
     def __init__(self):
         """
         Loads the user interface, applies styling, and configures the event handling.
@@ -67,6 +73,9 @@ class ExaminationWindow(QMainWindow):
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionConfiguration.triggered.connect(configuration.show_configuration)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
+
+        self.menuDebug.menuAction().setVisible(rt.is_debugging_enabled())
+        self.actionDebug_update_scan_list.triggered.connect(self.debug_update_scan_list)
 
         self.protocolBrowserButton.setText("")
         self.protocolBrowserButton.setToolTip("Open protocol browser")
@@ -150,6 +159,7 @@ class ExaminationWindow(QMainWindow):
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
+        self.queueWidget.itemClicked.connect(self.edit_queue_clicked)
         self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
@@ -186,27 +196,27 @@ class ExaminationWindow(QMainWindow):
 
         viewer1Layout = QHBoxLayout(self.viewer1Frame)
         viewer1Layout.setContentsMargins(0, 0, 0, 0)
-        viewer1 = ViewerWidget()
-        viewer1.setProperty("id", "1")
-        viewer1Layout.addWidget(viewer1)
+        self.viewer1 = ViewerWidget()
+        self.viewer1.setProperty("id", "1")
+        viewer1Layout.addWidget(self.viewer1)
         self.viewer1Frame.setLayout(viewer1Layout)
-        viewer1.configure()
+        self.viewer1.configure()
 
         viewer2Layout = QHBoxLayout(self.viewer2Frame)
         viewer2Layout.setContentsMargins(0, 0, 0, 0)
-        viewer2 = ViewerWidget()
-        viewer2.setProperty("id", "2")
-        viewer2Layout.addWidget(viewer2)
+        self.viewer2 = ViewerWidget()
+        self.viewer2.setProperty("id", "2")
+        viewer2Layout.addWidget(self.viewer2)
         self.viewer2Frame.setLayout(viewer2Layout)
-        viewer2.configure()
+        self.viewer2.configure()
 
         viewer3Layout = QHBoxLayout(self.viewer3Frame)
         viewer3Layout.setContentsMargins(0, 0, 0, 0)
-        viewer3 = ViewerWidget()
-        viewer3.setProperty("id", "3")
-        viewer3Layout.addWidget(viewer3)
+        self.viewer3 = ViewerWidget()
+        self.viewer3.setProperty("id", "3")
+        viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
-        viewer3.configure()
+        self.viewer3.configure()
 
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
@@ -214,25 +224,34 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
-        # self.monitorTimer = QTimer(self)
-        # self.monitorTimer.timeout.connect(self.update_monitor_status)
-        # self.monitorTimer.start(1000)
+        self.monitorTimer = QTimer(self)
+        self.monitorTimer.timeout.connect(self.update_monitor_status)
+        self.monitorTimer.start(1000)
 
-    # def update_monitor_status(self):
-    #     now = datetime.now()
-    #     current_time = now.strftime("%H:%M:%S")
-    #     ui_runtime.examination_widget.statusBar().showMessage(f"Last update {current_time}", 0)
+    def update_monitor_status(self):
+        self.sync_queue_widget(False)
+        if ui_runtime.status_acq_active:
+            self.set_status_message("Running scan...")
+        elif ui_runtime.status_recon_active:
+            self.set_status_message("Reconstruction data...")
+        else:
+            self.set_status_message("Scanner ready")
+
+        if ui_runtime.status_last_completed_scan != ui_runtime.status_viewer_last_autoload_scan:
+            # TODO: Trigger autoload of the last case
+            self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
+            ui_runtime.status_viewer_last_autoload_scan = ui_runtime.status_last_completed_scan
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
             if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
                 menu = QMenu()
-                menu.addAction("Rename...")
-                menu.addAction("Duplicate...")
+                menu.addAction("Duplicate")
+                menu.addAction("Rename...", self.rename_scan_clicked)
                 menu.addSeparator()
                 menu.addAction("Save to browser...")
                 menu.addSeparator()
-                menu.addAction("Show definition...")
+                menu.addAction("Show definition...", self.show_definition_clicked)
                 menu.exec_(event.globalPos())
 
         return super(QMainWindow, self).eventFilter(source, event)
@@ -265,11 +284,11 @@ class ExaminationWindow(QMainWindow):
         patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
         self.patientLabel.setText(patient_text)
         self.set_status_message("Scanner ready")
-        self.sync_queue_widget()
+        self.sync_queue_widget(True)
 
     def clear_examination_ui(self):
         if ui_runtime.editor_active:
-            self.stop_scan_edit()
+            self.stop_scan_edit(False)
 
     def close_examination_clicked(self):
         ui_runtime.close_patient()
@@ -303,7 +322,7 @@ class ExaminationWindow(QMainWindow):
             log.error("Failed to create new scan")
             self.set_status_message("Failed to insert new scan. Check log file.")
 
-        self.sync_queue_widget()
+        self.sync_queue_widget(False)
 
     def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
         """
@@ -327,8 +346,10 @@ class ExaminationWindow(QMainWindow):
             widget_icon = "check"
         if entry.state == "failure":
             widget_icon = "bolt"
-        if entry.state == "scheduled_recon" or entry.state == "recon":
+        if entry.state == "scheduled_recon":
             widget_icon = "hourglass-half"
+        if entry.state == "recon":
+            widget_icon = "cog"
         if entry.state == "scheduled_acq":
             widget_icon = ""
         if entry.state == "created":
@@ -349,8 +370,9 @@ class ExaminationWindow(QMainWindow):
         widgetButton.setContentsMargins(0, 0, 0, 0)
         widgetButton.setMaximumWidth(48)
         widgetButton.setFlat(True)
+        widgetButton.setProperty("state", str(entry.state))
         if widget_icon:
-            if entry.state != "acq":
+            if (entry.state != "acq") and (entry.state != "recon"):
                 widgetButton.setIcon(qta.icon(f"fa5s.{widget_icon}", color=widget_font_color))
             else:
                 widgetButton.setIcon(
@@ -371,44 +393,126 @@ class ExaminationWindow(QMainWindow):
         self.queueWidget.addItem(item)  # type: ignore
         self.queueWidget.setItemWidget(item, widget)  # type: ignore
 
+    def update_entry_in_queue_widget(self, index: int, entry: ScanQueueEntry):
+        widget_font_color = "#F00"
+        widget_background_color = "#F00"
+        widget_icon = ""
+        if entry.state in ["scheduled_recon", "recon", "complete", "failure"]:
+            widget_font_color = "#444"
+            widget_background_color = "#777"
+        if entry.state in ["created", "scheduled_acq"]:
+            widget_font_color = "#FFF"
+            widget_background_color = "#3a4266"
+        if entry.state == "acq":
+            widget_font_color = "#000"
+            widget_background_color = "#FFF"
+            widget_icon = "circle-notch"
+        if entry.state == "complete":
+            widget_icon = "check"
+        if entry.state == "failure":
+            widget_icon = "bolt"
+        if entry.state == "scheduled_recon":
+            widget_icon = "hourglass-half"
+        if entry.state == "recon":
+            widget_icon = "cog"
+        if entry.state == "scheduled_acq":
+            widget_icon = ""
+        if entry.state == "created":
+            widget_icon = "wrench"
+
+        selected_stylesheet = ""
+        if index == ui_runtime.editor_queue_index:
+            selected_stylesheet = "font-weight: bold; border-left: 16px solid #000;"
+        else:
+            selected_stylesheet = "font-weight: normal; border-left: 0px solid #000;"
+
+        widget_stylesheet = (
+            "QWidget { background-color: transparent; color: "
+            + widget_font_color
+            + "; padding-top: 12px; padding-bottom: 12px; "
+            + selected_stylesheet
+            + " } QLabel { padding-left: 7px; color: "
+            + widget_font_color
+            + "; } "
+        )
+
+        self.queueWidget.item(index).setBackground(QColor(widget_background_color))
+        selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(index))
+        selected_widget.layout().itemAt(0).widget().setText(f"{entry.scan_counter}. {entry.protocol_name}")
+        selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
+
+        if widget_icon:
+            # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
+            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property("state"):
+                if (entry.state != "acq") and (entry.state != "recon"):
+                    selected_widget.layout().itemAt(1).widget().setIcon(
+                        qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
+                    )
+                else:
+                    selected_widget.layout().itemAt(1).widget().setIcon(
+                        qta.icon(
+                            f"fa5s.{widget_icon}",
+                            color=widget_font_color,
+                            animation=qta.Spin(selected_widget.layout().itemAt(1).widget()),
+                        )
+                    )
+        else:
+            selected_widget.layout().itemAt(1).widget().setIcon(QIcon())
+        selected_widget.layout().itemAt(1).widget().setProperty("state", entry.state)
+
+    last_item_clicked = -1
+
+    def edit_queue_clicked(self):
+        if (self.queueWidget.currentRow() > -1) and (self.last_item_clicked == self.queueWidget.currentRow()):
+            self.queueWidget.clearSelection()
+            self.last_item_clicked = -1
+        else:
+            self.last_item_clicked = self.queueWidget.currentRow()
+
     def edit_sequence_clicked(self):
+        self.last_item_clicked = -1
         index = self.queueWidget.currentRow()
 
         if index < 0:
             return
-
         if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
             log.error("Invalid scan queue index selected")
             return
 
         # Protocols can only be edited if they have not been scanned yet
         read_only = True
-        if (
-            ui_runtime.scan_queue_list[index].state == "created"
-            or ui_runtime.scan_queue_list[index].state == "scheduled_acq"
-        ):
+        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
             read_only = False
 
         # Make the selected item bold
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.currentItem())
-        selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: bold; border-left: 16px solid #000;")
+        selected_widget.layout().itemAt(0).widget().setStyleSheet(
+            "QWidget {font-weight: bold; border-left: 16px solid #000; }"
+        )
         self.queueWidget.currentItem().setSelected(False)
 
-        sequence_type = ui_runtime.scan_queue_list[index].sequence
-        scan_id = ui_runtime.scan_queue_list[index].id
-        self.start_scan_edit(scan_id, sequence_type, read_only)
+        self.start_scan_edit(index, read_only)
         self.scanParametersWidget.setEnabled(True)
         self.queueToolbarFrame.setCurrentIndex(1)
+        self.sync_queue_widget(False)
 
-    def start_scan_edit(self, id, sequence_type, read_only=False):
+    def start_scan_edit(self, index, read_only=False):
         """
         Edits the selected scan protocol. To that end, the sequence class is instantiated and
         asked to render the sequence parameter UI to the editor. Also, the buttons below the
         queue widget are switched to the editing state.
         """
-        # TODO: Read the settings from the selected protocol
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        sequence_type = scan_entry.sequence
 
-        log.info(f"Editing scan {id} of type {sequence_type}")
+        log.info(f"Editing protocol {scan_entry.protocol_name} of type {sequence_type}")
 
         if not sequence_type in SequenceBase.installed_sequences():
             log.error(f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed")
@@ -420,24 +524,51 @@ class ExaminationWindow(QMainWindow):
         # Ask the sequence to insert its UI into the first tab of the parameter widget
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
         ui_runtime.editor_sequence_instance.setup_ui(sequence_ui_container)
+        scan_path = ui_runtime.get_scan_location(index)
+        if not scan_path:
+            log.error("Case has invalid state. Cannot read scan parameters")
+            # Needs handling
+            pass
 
-        default_settings = ui_runtime.editor_sequence_instance.get_default_parameters()
-        # TODO: Pass full scan task object
-        ui_runtime.editor_sequence_instance.set_parameters(default_settings, {})
+        if not read_only:
+            task.set_task_state(scan_path, mri4all_files.EDITING, True)
+            task.set_task_state(scan_path, mri4all_files.PREPARED, False)
+
+        scan_task = task.read_task(scan_path)
+
+        if not ui_runtime.editor_sequence_instance.set_parameters(scan_task.parameters, scan_task):
+            # TODO: Parameters from task file are invalid. Needs error handling.
+            pass
+
+        self.otherParametersTextEdit.setPlainText(json.dumps(scan_task.other, indent=4))
+
+        ui_runtime.editor_scantask = scan_task
         ui_runtime.editor_sequence_instance.write_parameters_to_ui(sequence_ui_container)
 
+        # Configure UI for editing
         for i in range(self.scanParametersWidget.count()):
             self.scanParametersWidget.widget(i).setEnabled(read_only == False)
 
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(True)
         ui_runtime.editor_active = True
+        ui_runtime.editor_readonly = read_only
+        ui_runtime.editor_queue_index = index
 
-    def stop_scan_edit(self):
+    def stop_scan_edit(self, update_job: bool):
         """
         Ends the protocol editing mode and switches the buttons below the queue widget back
         to their default state.
         """
+        if update_job:
+            # Update the scan job with the new settings
+            scan_path = ui_runtime.get_scan_location(ui_runtime.editor_queue_index)
+            ui_runtime.editor_scantask.parameters = ui_runtime.editor_sequence_instance.get_parameters()
+            ui_runtime.editor_scantask.other = json.loads(self.otherParametersTextEdit.toPlainText())
+            task.write_task(scan_path, ui_runtime.editor_scantask)
+            task.set_task_state(scan_path, mri4all_files.EDITING, False)
+            task.set_task_state(scan_path, mri4all_files.PREPARED, True)
+
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
@@ -450,9 +581,13 @@ class ExaminationWindow(QMainWindow):
         # Delete the sequence instance created for the editor
         if ui_runtime.editor_sequence_instance is not None:
             del ui_runtime.editor_sequence_instance
-            ui_runtime.editor_sequence_instance = None
+            ui_runtime.editor_sequence_instance = SequenceBase()
 
         ui_runtime.editor_active = False
+        ui_runtime.editor_readonly = False
+        ui_runtime.editor_queue_index = -1
+        ui_runtime.editor_scantask = ScanTask()
+        self.sync_queue_widget(False)
 
     def clear_seq_tab_and_return_empty(self):
         old_widget_to_delete = self.scanParametersWidget.widget(0)
@@ -463,59 +598,183 @@ class ExaminationWindow(QMainWindow):
         return new_container_widget
 
     def accept_scan_edit_clicked(self):
+        problems_list = []
+
         ui_widget = self.scanParametersWidget.widget(0)
         # TODO: Pass the full scan task object
-        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui(ui_widget, {})
+        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui(
+            ui_widget, ui_runtime.editor_scantask
+        )
+        try:
+            json.loads(self.otherParametersTextEdit.toPlainText())
+        except:
+            parameters_valid = False
+            problems_list.append("Other additional parameters have invalid format. Please validate JSON syntax.")
 
         if not parameters_valid:
             self.scanParametersWidget.setTabVisible(5, True)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet_error)
             self.scanParametersWidget.setCurrentIndex(5)
-            problems_list = ui_runtime.editor_sequence_instance.get_problems()
+            problems_list = ui_runtime.editor_sequence_instance.get_problems() + problems_list
             self.problemsWidget.clear()
             for problem in problems_list:
-                self.problemsWidget.addItem(problem)
+                self.problemsWidget.addItem(str(problem))
         else:
             self.scanParametersWidget.setTabVisible(5, False)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
             self.scanParametersWidget.setEnabled(False)
             self.queueToolbarFrame.setCurrentIndex(0)
-            self.stop_scan_edit()
+            # Update the task file, but only if the case has not been opened in read-only mode
+            self.stop_scan_edit(ui_runtime.editor_readonly == False)
 
     def discard_scan_edit_clicked(self):
         self.scanParametersWidget.setTabVisible(5, False)
         self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
         self.scanParametersWidget.setEnabled(False)
         self.queueToolbarFrame.setCurrentIndex(0)
-        self.stop_scan_edit()
+        self.stop_scan_edit(False)
 
     def stop_scan_clicked(self):
-        # TODO: Dummy content
-        self.sync_queue_widget()
+        index = self.queueWidget.currentRow()
 
-    def sync_queue_widget(self):
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be stopped at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.error("Invalid scan queue index selected")
+            return
+
+        if scan_entry.state == "scheduled_acq":
+            # TODO: Revert the case to the "created" state
+            pass
+        if scan_entry.state == "acq":
+            # TODO: Tell the acq service to terminate the job
+            pass
+
+        self.sync_queue_widget(False)
+
+    def sync_queue_widget(self, reset: bool):
         """
         Update/sync the displayed scan queue list according to the list kept by the runtime
         environment (which is synced with the folders and contains information about the
         sequence types and state)
         """
-        ui_runtime.update_scan_queue_list()
-        # TODO: Instead of clearing the whole widget, only update the changed items
-        self.queueWidget.clear()
+        # Avoid running updates in parallel
+        if self.updating_queue_widget:
+            return
+        self.updating_queue_widget = True
 
-        for entry in ui_runtime.scan_queue_list:
-            self.insert_entry_to_queue_widget(entry)
+        reset_list = reset
+        ui_runtime.update_scan_queue_list()
+        if len(ui_runtime.scan_queue_list) != self.queueWidget.count():
+            reset_list = True
+
+        if reset_list:
+            self.queueWidget.clear()
+            for entry in ui_runtime.scan_queue_list:
+                self.insert_entry_to_queue_widget(entry)
+        else:
+            for i in range(len(ui_runtime.scan_queue_list)):
+                entry = ui_runtime.get_scan_queue_entry(i)
+                if not entry:
+                    log.error("Invalid scan queue index while updating widget")
+                    continue
+                self.update_entry_in_queue_widget(i, entry)
+
+        self.updating_queue_widget = False
 
     def delete_sequence_clicked(self):
         index = self.queueWidget.currentRow()
 
         if index < 0:
             return
-
         if index >= len(ui_runtime.scan_queue_list):
             log.error("Invalid scan queue index selected")
             return
 
-        # TODO: Properly delete case
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.error("Invalid scan queue index selected")
+            return
+
+        if not (scan_entry.state == "created" or scan_entry.state == "scheduled_acq"):
+            # Jobs can only be deleted if they have not been scanned yet
+            return
+
+        # TODO: Delete case the corresponding task folder
+
         ui_runtime.scan_queue_list.pop(index)
-        self.sync_queue_widget()
+        self.sync_queue_widget(True)
+
+    def debug_update_scan_list(self):
+        self.sync_queue_widget(False)
+
+    def show_definition_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        taskviewer.show_taskviewer(ui_runtime.get_scan_location(index))
+
+    def rename_scan_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        dlg = QInputDialog(self)
+        dlg.setInputMode(QInputDialog.TextInput)
+        dlg.setLabelText("Enter protocol name")
+        dlg.setWindowTitle("Protocol Name")
+        dlg.resize(500, 100)
+        dlg.setTextValue(scan_entry.protocol_name)
+        ok = dlg.exec_()
+        new_name = dlg.textValue()
+
+        if ok:
+            scan_path = ui_runtime.get_scan_location(index)
+            if not scan_path:
+                log.error("Case has invalid state. Cannot read scan parameters")
+                # Needs handling
+                pass
+            scan_task = task.read_task(scan_path)
+            if scan_task == None:
+                log.error("Failed to read task file")
+                # Needs handling
+                pass
+            scan_task.protocol_name = new_name
+            ui_runtime.get_scan_queue_entry(index).protocol_name = new_name
+            if not task.write_task(scan_path, scan_task):
+                log.error("Failed to write updated task file")
+                # Needs handling
+                pass
+            self.sync_queue_widget(False)

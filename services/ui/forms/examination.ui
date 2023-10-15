@@ -808,9 +808,16 @@
     <addaction name="separator"/>
     <addaction name="actionClose_Examination"/>
    </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="actionDebug_update_scan_list"/>
+   </widget>
    <addaction name="menuExamination"/>
    <addaction name="menuControl"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="minimumSize">
@@ -862,6 +869,11 @@
   <action name="actionConfiguration">
    <property name="text">
     <string>Configuration...</string>
+   </property>
+  </action>
+  <action name="actionDebug_update_scan_list">
+   <property name="text">
+    <string>Update scan list</string>
    </property>
   </action>
  </widget>
