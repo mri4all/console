@@ -47,9 +47,9 @@ def run_tests() -> bool:
     # run_sequence_test("adj_frequency")      
     # run_sequence_test("adj_rf_amplitude")
     # run_sequence_test("rf_se")      # TODO: Test with simulations
-    # run_sequence_test("rf_tse")     # TODO: Test with simulations
+    run_sequence_test("rf_tse")     # TODO: Test with simulations
     # run_sequence_test("se_2D")      # TODO: trajectory options; Useful for testing a projection, next iteration include 1 k-space line
-    run_sequence_test("tse_2D")       # TODO: trajectory options; STE and step towards the workhorse
+    # run_sequence_test("tse_2D")       # TODO: trajectory options; STE and step towards the workhorse
     
     return True
 

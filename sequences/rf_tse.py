@@ -159,6 +159,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
 
     try:
         seq.write(output_file)
+        print(output_file) # Remove this later: for locally testing if not connected to Redpitaya
         log.debug("Seq file stored")
     except:
         log.error("Could not write sequence file")

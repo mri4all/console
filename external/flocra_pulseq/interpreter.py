@@ -680,7 +680,7 @@ class PSInterpreter:
                         x = 0
                     self._shapes[shape_id][i] = x
                     if dx == prev:
-                        r = int(self._simplify(f.readline()))
+                        r = int(float(self._simplify(f.readline())))
                         for _ in range(0, r):
                             i += 1
                             x += dx
