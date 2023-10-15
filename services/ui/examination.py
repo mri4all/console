@@ -196,27 +196,27 @@ class ExaminationWindow(QMainWindow):
 
         viewer1Layout = QHBoxLayout(self.viewer1Frame)
         viewer1Layout.setContentsMargins(0, 0, 0, 0)
-        viewer1 = ViewerWidget()
-        viewer1.setProperty("id", "1")
-        viewer1Layout.addWidget(viewer1)
+        self.viewer1 = ViewerWidget()
+        self.viewer1.setProperty("id", "1")
+        viewer1Layout.addWidget(self.viewer1)
         self.viewer1Frame.setLayout(viewer1Layout)
-        viewer1.configure()
+        self.viewer1.configure()
 
         viewer2Layout = QHBoxLayout(self.viewer2Frame)
         viewer2Layout.setContentsMargins(0, 0, 0, 0)
-        viewer2 = ViewerWidget()
-        viewer2.setProperty("id", "2")
-        viewer2Layout.addWidget(viewer2)
+        self.viewer2 = ViewerWidget()
+        self.viewer2.setProperty("id", "2")
+        viewer2Layout.addWidget(self.viewer2)
         self.viewer2Frame.setLayout(viewer2Layout)
-        viewer2.configure()
+        self.viewer2.configure()
 
         viewer3Layout = QHBoxLayout(self.viewer3Frame)
         viewer3Layout.setContentsMargins(0, 0, 0, 0)
-        viewer3 = ViewerWidget()
-        viewer3.setProperty("id", "3")
-        viewer3Layout.addWidget(viewer3)
+        self.viewer3 = ViewerWidget()
+        self.viewer3.setProperty("id", "3")
+        viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
-        viewer3.configure()
+        self.viewer3.configure()
 
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
@@ -237,12 +237,17 @@ class ExaminationWindow(QMainWindow):
         else:
             self.set_status_message("Scanner ready")
 
+        if ui_runtime.status_last_completed_scan != ui_runtime.status_viewer_last_autoload_scan:
+            # TODO: Trigger autoload of the last case
+            self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
+            ui_runtime.status_viewer_last_autoload_scan = ui_runtime.status_last_completed_scan
+
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
             if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
                 menu = QMenu()
-                menu.addAction("Rename...")
-                menu.addAction("Duplicate...")
+                menu.addAction("Duplicate")
+                menu.addAction("Rename...", self.rename_scan_clicked)
                 menu.addSeparator()
                 menu.addAction("Save to browser...")
                 menu.addSeparator()
@@ -729,3 +734,47 @@ class ExaminationWindow(QMainWindow):
             return
 
         taskviewer.show_taskviewer(ui_runtime.get_scan_location(index))
+
+    def rename_scan_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        dlg = QInputDialog(self)
+        dlg.setInputMode(QInputDialog.TextInput)
+        dlg.setLabelText("Enter protocol name")
+        dlg.setWindowTitle("Protocol Name")
+        dlg.resize(500, 100)
+        dlg.setTextValue(scan_entry.protocol_name)
+        ok = dlg.exec_()
+        new_name = dlg.textValue()
+
+        if ok:
+            scan_path = ui_runtime.get_scan_location(index)
+            if not scan_path:
+                log.error("Case has invalid state. Cannot read scan parameters")
+                # Needs handling
+                pass
+            scan_task = task.read_task(scan_path)
+            if scan_task == None:
+                log.error("Failed to read task file")
+                # Needs handling
+                pass
+            scan_task.protocol_name = new_name
+            ui_runtime.get_scan_queue_entry(index).protocol_name = new_name
+            if not task.write_task(scan_path, scan_task):
+                log.error("Failed to write updated task file")
+                # Needs handling
+                pass
+            self.sync_queue_widget(False)

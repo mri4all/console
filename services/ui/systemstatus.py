@@ -1,3 +1,5 @@
+import shutil
+
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -7,6 +9,7 @@ import qtawesome as qta  # type: ignore
 from common.version import mri4all_version
 import common.runtime as rt
 import services.ui.ui_runtime as ui_runtime
+from common.constants import *
 
 
 def show_systemstatus():
@@ -46,8 +49,13 @@ class SystemStatusWindow(QDialog):
         self.reconstructionLabel.setFont(qta.font("fa", 16))
 
         self.softwareLabel.setText(
-            f'<span style="color: #E0A526; font-size: 20px;"><b>MRI4ALL {ui_runtime.system_information.model}</b></span><br><br>Serial Number  {ui_runtime.system_information.serial_number}<p>Software Version  {mri4all_version.get_version_string()}</p>'
+            f'<span style="color: #E0A526; font-size: 22px;"><b>MRI4ALL {ui_runtime.system_information.model}</b></span><br><br>Serial Number  {ui_runtime.system_information.serial_number}<p>Software Version  {mri4all_version.get_version_string()}</p>'
         )
+
+        diskspace = shutil.disk_usage(mri4all_paths.DATA)
+        self.diskspaceBar.setValue(int(diskspace.used / diskspace.total * 100))
+        self.diskspaceFreeLabel.setText(f"{int(diskspace.free / 1024 / 1024 / 1024)} GB available")
+        self.diskspaceFreeLabel.setStyleSheet("color: #424d76;")
 
     def close_clicked(self):
         self.close()

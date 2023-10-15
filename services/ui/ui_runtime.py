@@ -43,6 +43,8 @@ editor_scantask: ScanTask = ScanTask()
 
 status_acq_active = False
 status_recon_active = False
+status_last_completed_scan = ""
+status_viewer_last_autoload_scan = ""
 
 
 def get_screen_size() -> Tuple[int, int]:
@@ -65,6 +67,8 @@ def shutdown():
     if ret == msg.Yes:
         registration_widget.clear_form()
         examination_widget.clear_examination_ui()
+        if not queue.clear_folders():
+            log.error("Error while clearing data folders.")
         if app is not None:
             app.quit()
             app = None
@@ -86,6 +90,8 @@ def register_patient():
     exam_information.initialize()
     examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)
+    status_last_completed_scan = -1
+    status_viewer_last_autoload_scan = -1
 
     log.info(f"Registered patient {patient_information.get_full_name()}")
     log.info(f"Started exam {exam_information.id}")
@@ -115,6 +121,9 @@ def close_patient():
         exam_information.clear()
         scan_queue_list.clear()
 
+        if not queue.clear_folders():
+            log.error("Error while clearing data folders.")
+
 
 def get_scan_queue_entry(index) -> Any:
     global scan_queue_list
@@ -129,11 +138,14 @@ def update_scan_queue_list() -> bool:
     global scan_queue_list
     global status_acq_active
     global status_recon_active
+    global status_last_completed_scan
 
     acq_active = False
     recon_active = False
 
     updated_list = []
+
+    status_last_completed_scan = ""
 
     for entry in scan_queue_list:
         folder = entry.folder_name
@@ -156,6 +168,7 @@ def update_scan_queue_list() -> bool:
             recon_active = True
         if os.path.isdir(mri4all_paths.DATA_COMPLETE + "/" + folder):
             current_state = mri4all_states.COMPLETE
+            status_last_completed_scan = entry.folder_name
         if os.path.isdir(mri4all_paths.DATA_FAILURE + "/" + folder):
             current_state = mri4all_states.FAILURE
 

@@ -278,7 +278,7 @@
       <item row="4" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QProgressBar" name="progressBar">
+         <widget class="QProgressBar" name="diskspaceBar">
           <property name="value">
            <number>24</number>
           </property>
@@ -288,7 +288,23 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_7">
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="diskspaceFreeLabel">
           <property name="minimumSize">
            <size>
             <width>200</width>
@@ -297,6 +313,9 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>

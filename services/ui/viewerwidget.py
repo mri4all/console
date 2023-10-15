@@ -21,6 +21,12 @@ class ViewerWidget(QWidget):
     def __init__(self):
         super(ViewerWidget, self).__init__()
 
+    series_name = ""
+
+    def set_series_name(self, name: str):
+        self.series_name = name
+        self.update()
+
     def configure(self):
         if self.property("id") == "3":
             sc = MplCanvas(self, width=5, height=4, dpi=100)
@@ -42,4 +48,9 @@ class ViewerWidget(QWidget):
         painter.setFont(font)
         painter.setPen(QColor("#999"))
         painter.drawText(8, 8 + 10, "Viewer " + self.property("id"))
+
+        # Dummy code
+        if self.series_name:
+            painter.drawText(8, 8 + 28, "Scan " + self.series_name)
+
         painter.end()

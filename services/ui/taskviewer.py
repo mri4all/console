@@ -34,6 +34,7 @@ class TaskViewerWindow(QDialog):
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setFocus()
         self.scantaskEdit.setStyleSheet("color: rgba(255, 255, 255, 220);")
+        self.fileLocationEdit.setStyleSheet("color: rgba(255, 255, 255, 220);")
 
         log_font = QFont("Monospace")
         log_font.setStyleHint(QFont.TypeWriter)
@@ -54,3 +55,4 @@ class TaskViewerWindow(QDialog):
             file_content = "- Unable to load scan task definition -"
 
         self.scantaskEdit.setPlainText(file_content)
+        self.fileLocationEdit.setText(task_filename)
