@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 import common.helper as helper
+from common.constants import *
 
 
 class PatientInformation(BaseModel):
@@ -34,22 +35,19 @@ class ExamInformation(BaseModel):
         self.scan_counter = 0
 
 
+ScanStatesType = Literal[
+    "created", "scheduled_acq", "acq", "scheduled_recon", "recon", "complete", "failure", "invalid"
+]
+
+
 class ScanQueueEntry(BaseModel):
     id: str = ""
     sequence: str = ""
     protocol_name: str = "unknown"
     scan_counter: int = -1
-    state: Literal[
-        "created",
-        "scheduled_acq",
-        "acq",
-        "scheduled_recon",
-        "recon",
-        "complete",
-        "failure",
-    ] = "created"
+    state: ScanStatesType = "created"
     has_results: bool = False
-    folder: Path = Path("")
+    folder_name: str = ""
 
 
 class ScanTask(BaseModel):

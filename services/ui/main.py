@@ -102,6 +102,7 @@ def prepare_system() -> bool:
         log.error("Clearing data folders failed. Unable to start UI service.")
         return False
 
+    # TODO: If disk space is low, clear old cases from the archive folder
     # TODO: Start the acquisition and reconstruction services
     # TODO: Check if the acquisition and reconstruction services are running
 
