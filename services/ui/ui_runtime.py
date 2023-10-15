@@ -6,7 +6,7 @@ from typing_extensions import Literal
 from pathlib import Path
 from typing import Any
 
-from common.types import PatientInformation, ExamInformation, ScanQueueEntry, ScanStatesType
+from common.types import PatientInformation, ExamInformation, ScanQueueEntry, ScanStatesType, ScanTask
 import common.runtime as rt
 import common.logger as logger
 
@@ -27,10 +27,14 @@ patient_information = PatientInformation()
 exam_information = ExamInformation()
 
 scan_queue_list: List[ScanQueueEntry] = []
-editor_sequence_instance = None
+editor_sequence_instance: SequenceBase = SequenceBase()
 editor_active: bool = False
 editor_readonly: bool = False
 editor_queue_index: int = -1
+editor_scantask: ScanTask = ScanTask()
+
+status_acq_active = False
+status_recon_active = False
 
 
 def get_screen_size() -> Tuple[int, int]:
@@ -115,6 +119,11 @@ def get_scan_queue_entry(index) -> Any:
 
 def update_scan_queue_list() -> bool:
     global scan_queue_list
+    global status_acq_active
+    global status_recon_active
+
+    acq_active = False
+    recon_active = False
 
     updated_list = []
 
@@ -130,10 +139,12 @@ def update_scan_queue_list() -> bool:
                 current_state = mri4all_states.CREATED
         if os.path.isdir(mri4all_paths.DATA_ACQ + "/" + folder):
             current_state = mri4all_states.ACQ
+            acq_active = True
         if os.path.isdir(mri4all_paths.DATA_QUEUE_RECON + "/" + folder):
             current_state = mri4all_states.SCHEDULED_RECON
         if os.path.isdir(mri4all_paths.DATA_RECON + "/" + folder):
             current_state = mri4all_states.RECON
+            recon_active = True
         if os.path.isdir(mri4all_paths.DATA_COMPLETE + "/" + folder):
             current_state = mri4all_states.COMPLETE
         if os.path.isdir(mri4all_paths.DATA_FAILURE + "/" + folder):
@@ -145,6 +156,8 @@ def update_scan_queue_list() -> bool:
             updated_list.append(entry)
 
     scan_queue_list = updated_list
+    status_acq_active = acq_active
+    status_recon_active = recon_active
     return True
 
 

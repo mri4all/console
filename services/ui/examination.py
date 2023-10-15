@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+import json
 
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -18,6 +19,7 @@ import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
+import services.ui.taskviewer as taskviewer
 from sequences import SequenceBase
 from services.ui.viewerwidget import ViewerWidget
 
@@ -56,6 +58,8 @@ class ExaminationWindow(QMainWindow):
     viewer1 = None
     viewer2 = None
     viewer3 = None
+
+    updating_queue_widget = False
 
     def __init__(self):
         """
@@ -219,14 +223,18 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
-        # self.monitorTimer = QTimer(self)
-        # self.monitorTimer.timeout.connect(self.update_monitor_status)
-        # self.monitorTimer.start(1000)
+        self.monitorTimer = QTimer(self)
+        self.monitorTimer.timeout.connect(self.update_monitor_status)
+        self.monitorTimer.start(1000)
 
-    # def update_monitor_status(self):
-    #     now = datetime.now()
-    #     current_time = now.strftime("%H:%M:%S")
-    #     ui_runtime.examination_widget.statusBar().showMessage(f"Last update {current_time}", 0)
+    def update_monitor_status(self):
+        self.sync_queue_widget(False)
+        if ui_runtime.status_acq_active:
+            self.set_status_message("Running scan...")
+        elif ui_runtime.status_recon_active:
+            self.set_status_message("Reconstruction data...")
+        else:
+            self.set_status_message("Scanner ready")
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -237,7 +245,7 @@ class ExaminationWindow(QMainWindow):
                 menu.addSeparator()
                 menu.addAction("Save to browser...")
                 menu.addSeparator()
-                menu.addAction("Show definition...")
+                menu.addAction("Show definition...", self.show_definition_clicked)
                 menu.exec_(event.globalPos())
 
         return super(QMainWindow, self).eventFilter(source, event)
@@ -512,6 +520,9 @@ class ExaminationWindow(QMainWindow):
             # TODO: Parameters from task file are invalid. Need handling
             pass
 
+        self.otherParametersTextEdit.setPlainText(json.dumps(scan_task.other, indent=4))
+
+        ui_runtime.editor_scantask = scan_task
         ui_runtime.editor_sequence_instance.write_parameters_to_ui(sequence_ui_container)
 
         # Configure UI for editing
@@ -531,6 +542,10 @@ class ExaminationWindow(QMainWindow):
         """
         if update_job:
             # TODO: Update the scan job with the new settings
+            scan_path = ui_runtime.get_scan_location(ui_runtime.editor_queue_index)
+            ui_runtime.editor_scantask.parameters = ui_runtime.editor_sequence_instance.get_parameters()
+            ui_runtime.editor_scantask.other = json.loads(self.otherParametersTextEdit.toPlainText())
+            task.write_task(scan_path, ui_runtime.editor_scantask)
             pass
 
         # Remove the bold font from the selected item
@@ -545,11 +560,12 @@ class ExaminationWindow(QMainWindow):
         # Delete the sequence instance created for the editor
         if ui_runtime.editor_sequence_instance is not None:
             del ui_runtime.editor_sequence_instance
-            ui_runtime.editor_sequence_instance = None
+            ui_runtime.editor_sequence_instance = SequenceBase()
 
         ui_runtime.editor_active = False
         ui_runtime.editor_readonly = False
         ui_runtime.editor_queue_index = -1
+        ui_runtime.editor_scantask = ScanTask()
         self.sync_queue_widget(False)
 
     def clear_seq_tab_and_return_empty(self):
@@ -561,18 +577,27 @@ class ExaminationWindow(QMainWindow):
         return new_container_widget
 
     def accept_scan_edit_clicked(self):
+        problems_list = []
+
         ui_widget = self.scanParametersWidget.widget(0)
         # TODO: Pass the full scan task object
-        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui(ui_widget, {})
+        parameters_valid = ui_runtime.editor_sequence_instance.read_parameters_from_ui(
+            ui_widget, ui_runtime.editor_scantask
+        )
+        try:
+            json.loads(self.otherParametersTextEdit.toPlainText())
+        except:
+            parameters_valid = False
+            problems_list.append("Other additional parameters have invalid format. Please validate JSON syntax.")
 
         if not parameters_valid:
             self.scanParametersWidget.setTabVisible(5, True)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet_error)
             self.scanParametersWidget.setCurrentIndex(5)
-            problems_list = ui_runtime.editor_sequence_instance.get_problems()
+            problems_list = ui_runtime.editor_sequence_instance.get_problems() + problems_list
             self.problemsWidget.clear()
             for problem in problems_list:
-                self.problemsWidget.addItem(problem)
+                self.problemsWidget.addItem(str(problem))
         else:
             self.scanParametersWidget.setTabVisible(5, False)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
@@ -619,6 +644,11 @@ class ExaminationWindow(QMainWindow):
         environment (which is synced with the folders and contains information about the
         sequence types and state)
         """
+        # Avoid running updates in parallel
+        if self.updating_queue_widget:
+            return
+        self.updating_queue_widget = True
+
         reset_list = reset
         ui_runtime.update_scan_queue_list()
         if len(ui_runtime.scan_queue_list) != self.queueWidget.count():
@@ -635,6 +665,8 @@ class ExaminationWindow(QMainWindow):
                     log.error("Invalid scan queue index while updating widget")
                     continue
                 self.update_entry_in_queue_widget(i, entry)
+
+        self.updating_queue_widget = False
 
     def delete_sequence_clicked(self):
         index = self.queueWidget.currentRow()
@@ -663,3 +695,21 @@ class ExaminationWindow(QMainWindow):
 
     def debug_update_scan_list(self):
         self.sync_queue_widget(False)
+
+    def show_definition_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        # Update the scan queue list to ensure that the job can still be deleted at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        taskviewer.show_taskviewer(ui_runtime.get_scan_location(index))
