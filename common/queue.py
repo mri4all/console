@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 from pathlib import Path
 import common.runtime as rt
 import common.logger as logger
@@ -125,3 +126,32 @@ def clear_folders() -> bool:
         return False
 
     return True
+
+
+def get_scan_ready_for_acq() -> str:
+    scanpath_ready_for_acq = ""
+
+    folders = sorted(Path(mri4all_paths.DATA_QUEUE_ACQ).iterdir(), key=os.path.getmtime)
+    for entry in folders:
+        if (
+            entry.is_dir()
+            and (entry / mri4all_files.PREPARED).exists()
+            and (not (entry / mri4all_files.EDITING).exists())
+            and (not (entry / mri4all_files.LOCK).exists())
+        ):
+            scanpath_ready_for_acq = entry.name
+            break
+
+    return scanpath_ready_for_acq
+
+
+def get_scan_ready_for_recon() -> str:
+    scanpath_ready_for_recon = ""
+
+    folders = sorted(Path(mri4all_paths.DATA_QUEUE_RECON).iterdir(), key=os.path.getmtime)
+    for entry in folders:
+        if entry.is_dir() and (not (entry / mri4all_files.LOCK).exists()):
+            scanpath_ready_for_recon = entry.name
+            break
+
+    return scanpath_ready_for_recon
