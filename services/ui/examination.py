@@ -159,6 +159,7 @@ class ExaminationWindow(QMainWindow):
 
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
+        self.queueWidget.itemClicked.connect(self.edit_queue_clicked)
         self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
@@ -364,8 +365,9 @@ class ExaminationWindow(QMainWindow):
         widgetButton.setContentsMargins(0, 0, 0, 0)
         widgetButton.setMaximumWidth(48)
         widgetButton.setFlat(True)
+        widgetButton.setProperty("state", str(entry.state))
         if widget_icon:
-            if entry.state != "acq":
+            if (entry.state != "acq") and (entry.state != "recon"):
                 widgetButton.setIcon(qta.icon(f"fa5s.{widget_icon}", color=widget_font_color))
             else:
                 widgetButton.setIcon(
@@ -435,22 +437,35 @@ class ExaminationWindow(QMainWindow):
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
         if widget_icon:
-            if entry.state != "acq":
-                selected_widget.layout().itemAt(1).widget().setIcon(
-                    qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
-                )
-            else:
-                selected_widget.layout().itemAt(1).widget().setIcon(
-                    qta.icon(
-                        f"fa5s.{widget_icon}",
-                        color=widget_font_color,
-                        animation=qta.Spin(selected_widget.layout().itemAt(1).widget()),
+            # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
+            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property("state"):
+                if (entry.state != "acq") and (entry.state != "recon"):
+                    selected_widget.layout().itemAt(1).widget().setIcon(
+                        qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
                     )
-                )
+                else:
+                    selected_widget.layout().itemAt(1).widget().setIcon(
+                        qta.icon(
+                            f"fa5s.{widget_icon}",
+                            color=widget_font_color,
+                            animation=qta.Spin(selected_widget.layout().itemAt(1).widget()),
+                        )
+                    )
         else:
             selected_widget.layout().itemAt(1).widget().setIcon(QIcon())
+        selected_widget.layout().itemAt(1).widget().setProperty("state", entry.state)
+
+    last_item_clicked = -1
+
+    def edit_queue_clicked(self):
+        if (self.queueWidget.currentRow() > -1) and (self.last_item_clicked == self.queueWidget.currentRow()):
+            self.queueWidget.clearSelection()
+            self.last_item_clicked = -1
+        else:
+            self.last_item_clicked = self.queueWidget.currentRow()
 
     def edit_sequence_clicked(self):
+        self.last_item_clicked = -1
         index = self.queueWidget.currentRow()
 
         if index < 0:
@@ -468,7 +483,7 @@ class ExaminationWindow(QMainWindow):
 
         # Protocols can only be edited if they have not been scanned yet
         read_only = True
-        if scan_entry.state == "created" or scan_entry.state == "scheduled_acq":
+        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
             read_only = False
 
         # Make the selected item bold
@@ -491,9 +506,8 @@ class ExaminationWindow(QMainWindow):
         """
         scan_entry = ui_runtime.get_scan_queue_entry(index)
         sequence_type = scan_entry.sequence
-        id = scan_entry.id
 
-        log.info(f"Editing scan {id} of type {sequence_type}")
+        log.info(f"Editing protocol {scan_entry.protocol_name} of type {sequence_type}")
 
         if not sequence_type in SequenceBase.installed_sequences():
             log.error(f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed")
@@ -513,11 +527,12 @@ class ExaminationWindow(QMainWindow):
 
         if not read_only:
             task.set_task_state(scan_path, mri4all_files.EDITING, True)
+            task.set_task_state(scan_path, mri4all_files.PREPARED, False)
 
         scan_task = task.read_task(scan_path)
 
         if not ui_runtime.editor_sequence_instance.set_parameters(scan_task.parameters, scan_task):
-            # TODO: Parameters from task file are invalid. Need handling
+            # TODO: Parameters from task file are invalid. Needs error handling.
             pass
 
         self.otherParametersTextEdit.setPlainText(json.dumps(scan_task.other, indent=4))
@@ -541,12 +556,13 @@ class ExaminationWindow(QMainWindow):
         to their default state.
         """
         if update_job:
-            # TODO: Update the scan job with the new settings
+            # Update the scan job with the new settings
             scan_path = ui_runtime.get_scan_location(ui_runtime.editor_queue_index)
             ui_runtime.editor_scantask.parameters = ui_runtime.editor_sequence_instance.get_parameters()
             ui_runtime.editor_scantask.other = json.loads(self.otherParametersTextEdit.toPlainText())
             task.write_task(scan_path, ui_runtime.editor_scantask)
-            pass
+            task.set_task_state(scan_path, mri4all_files.EDITING, False)
+            task.set_task_state(scan_path, mri4all_files.PREPARED, True)
 
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):

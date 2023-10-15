@@ -6,6 +6,7 @@ import qtawesome as qta  # type: ignore
 
 from common.version import mri4all_version
 import common.runtime as rt
+import services.ui.ui_runtime as ui_runtime
 
 
 def show_systemstatus():
@@ -45,7 +46,7 @@ class SystemStatusWindow(QDialog):
         self.reconstructionLabel.setFont(qta.font("fa", 16))
 
         self.softwareLabel.setText(
-            f'<span style="color: #E0A526; font-size: 20px;"><b>MRI4ALL H-1 Scanner</b></span><br><br>Serial Number  00001<p>Software Version  {mri4all_version.get_version_string()}</p>'
+            f'<span style="color: #E0A526; font-size: 20px;"><b>MRI4ALL {ui_runtime.system_information.model}</b></span><br><br>Serial Number  {ui_runtime.system_information.serial_number}<p>Software Version  {mri4all_version.get_version_string()}</p>'
         )
 
     def close_clicked(self):

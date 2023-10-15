@@ -44,14 +44,13 @@ class TaskViewerWindow(QDialog):
 
     def load_taskfile(self, folder):
         task_filename = f"{folder}/" + mri4all_files.TASK
-        log_content = ""
-
+        file_content = ""
         try:
             with open(task_filename, "r") as file:
                 for line in file.readlines():
-                    log_content += line
+                    file_content += line
         except:
-            log.exception("Unable to load log")
-            log_content = "- Unable to load log -"
+            log.error(f"Unable to load task file {task_filename}")
+            file_content = "- Unable to load scan task definition -"
 
-        self.scantaskEdit.setPlainText(log_content)
+        self.scantaskEdit.setPlainText(file_content)

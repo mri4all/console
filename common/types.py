@@ -35,6 +35,13 @@ class ExamInformation(BaseModel):
         self.scan_counter = 0
 
 
+class SystemInformation(BaseModel):
+    name: str = "unknown"
+    model: str = "unknown"
+    serial_number: str = ""
+    software_version: str = ""
+
+
 ScanStatesType = Literal[
     "created", "scheduled_acq", "acq", "scheduled_recon", "recon", "complete", "failure", "invalid"
 ]
@@ -59,7 +66,7 @@ class ScanTask(BaseModel):
     patient: PatientInformation = PatientInformation()
     parameters: dict = {}
     adjustment: dict = {}  # TODO
-    system: dict = {}  # TODO
+    system: SystemInformation = SystemInformation()
     processing: dict = {}  # TODO
     other: dict = {}
     results: dict = {}  # TODO

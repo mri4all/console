@@ -6,7 +6,14 @@ from typing_extensions import Literal
 from pathlib import Path
 from typing import Any
 
-from common.types import PatientInformation, ExamInformation, ScanQueueEntry, ScanStatesType, ScanTask
+from common.types import (
+    PatientInformation,
+    ExamInformation,
+    SystemInformation,
+    ScanQueueEntry,
+    ScanStatesType,
+    ScanTask,
+)
 import common.runtime as rt
 import common.logger as logger
 
@@ -25,6 +32,7 @@ examination_widget = None
 
 patient_information = PatientInformation()
 exam_information = ExamInformation()
+system_information = SystemInformation()
 
 scan_queue_list: List[ScanQueueEntry] = []
 editor_sequence_instance: SequenceBase = SequenceBase()
@@ -142,6 +150,7 @@ def update_scan_queue_list() -> bool:
             acq_active = True
         if os.path.isdir(mri4all_paths.DATA_QUEUE_RECON + "/" + folder):
             current_state = mri4all_states.SCHEDULED_RECON
+            recon_active = True
         if os.path.isdir(mri4all_paths.DATA_RECON + "/" + folder):
             current_state = mri4all_states.RECON
             recon_active = True
@@ -162,7 +171,9 @@ def update_scan_queue_list() -> bool:
 
 
 def create_new_scan(requested_sequence: str) -> bool:
+    global system_information
     global exam_information
+    global patient_information
 
     exam_information.scan_counter += 1
     scan_uid = helper.generate_uid()
@@ -177,6 +188,7 @@ def create_new_scan(requested_sequence: str) -> bool:
         patient_information,
         default_seq_parameters,
         default_protocol_name,
+        system_information,
     )
 
     if not task_folder:
