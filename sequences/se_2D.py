@@ -24,17 +24,16 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def get_readable_name(self) -> str:
         return "2D Spin-Echo"
 
-    def setup_ui(self, widget) -> bool:
-        seq_path = os.path.dirname(os.path.abspath(__file__))
-        uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
-        return True
+    # def setup_ui(self, widget) -> bool:
+    #     seq_path = os.path.dirname(os.path.abspath(__file__))
+    #     uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+    #     return True
 
     def get_parameters(self) -> dict:
         return {"TE": self.param_TE, "TR": self.param_TR}
 
-    def get_default_parameters(
-        self,
-    ) -> dict:
+    @classmethod
+    def get_default_parameters(self) -> dict:
         return {"TE": 70, "TR": 250}
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -110,7 +109,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    
+
     fov = 224e-3  # Define FOV and resolution
     Nx = 128
     Ny = Nx
@@ -138,36 +137,34 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
 
     system = pp.Opts(
-            max_grad=12,
-            grad_unit="mT/m",
-            max_slew=25,
-            slew_unit="T/m/s",
-            rf_ringdown_time=20e-6,
-            rf_dead_time=100e-6,
-            rf_raster_time=1e-6,
-            adc_dead_time=20e-6,
-        )
+        max_grad=12,
+        grad_unit="mT/m",
+        max_slew=25,
+        slew_unit="T/m/s",
+        rf_ringdown_time=20e-6,
+        rf_dead_time=100e-6,
+        rf_raster_time=1e-6,
+        adc_dead_time=20e-6,
+    )
 
     # ======
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6,
-                              system=system)
-    rf2 = pp.make_block_pulse(flip_angle=alpha2 * math.pi / 180, duration=alpha2_duration, delay=100e-6,
-                              phase_offset=math.pi / 2, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf2 = pp.make_block_pulse(
+        flip_angle=alpha2 * math.pi / 180,
+        duration=alpha2_duration,
+        delay=100e-6,
+        phase_offset=math.pi / 2,
+        system=system,
+    )
 
     # Define other gradients and ADC events
     delta_k = 1 / fov
-    gx = pp.make_trapezoid(
-        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
-    )
-    adc = pp.make_adc(
-        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
-    )
-    gx_pre = pp.make_trapezoid(
-        channel="x", area=gx.area / 2, duration=prephaser_duration, system=system
-    )
+    gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
+    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
+    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
 
     phase_areas = -(np.arange(Ny) - Ny / 2) * delta_k
 
@@ -177,18 +174,26 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # CALCULATE DELAYS
     # ======
-    tau1 = (math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
-                      / seq.grad_raster_time)) * seq.grad_raster_time
+    tau1 = (
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
+    ) * seq.grad_raster_time
 
-    tau2 = (math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
-                      / seq.grad_raster_time)) * seq.grad_raster_time
+    tau2 = (
+        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+    ) * seq.grad_raster_time
 
-    delay_TR = (math.ceil((TR - TE - pp.calc_duration(gx_pre) - np.max(pp.calc_duration(gx_spoil, gx_pre)))
-                          / seq.grad_raster_time)) * seq.grad_raster_time
+    delay_TR = (
+        math.ceil(
+            (TR - TE - pp.calc_duration(gx_pre) - np.max(pp.calc_duration(gx_spoil, gx_pre))) / seq.grad_raster_time
+        )
+    ) * seq.grad_raster_time
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
     assert np.all(delay_TR >= pp.calc_duration(gx_spoil))
-    
+
     # ======
     # CONSTRUCT SEQUENCE
     # ======

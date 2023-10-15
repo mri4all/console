@@ -16,6 +16,7 @@ from common.version import mri4all_version
 from services.ui import registration
 from services.ui import examination
 import services.ui.ui_runtime as ui_runtime
+import common.queue as queue
 
 
 def set_MRI4ALL_style(app):
@@ -92,9 +93,18 @@ def set_MRI4ALL_style(app):
 
 
 def prepare_system() -> bool:
-    # TODO: Make sure that all needed folders are available
+    # Make sure that all needed folders are available
+    if not queue.check_and_create_folders():
+        log.error("Failed to create data folders. Unable to start UI service.")
+        return False
+
+    if not queue.clear_folders():
+        log.error("Clearing data folders failed. Unable to start UI service.")
+        return False
+
     # TODO: Start the acquisition and reconstruction services
     # TODO: Check if the acquisition and reconstruction services are running
+
     return True
 
 

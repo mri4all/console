@@ -10,7 +10,6 @@ import sip  # type: ignore
 
 import common.runtime as rt
 import common.logger as logger
-import common.helper as helper
 from common.types import ScanQueueEntry
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
@@ -252,6 +251,9 @@ class ExaminationWindow(QMainWindow):
         self.timerFrame.setMaximumWidth(int(screen_width * 0.25))
         self.timerFrame.setMinimumWidth(int(screen_width * 0.25))
 
+    def set_status_message(self, message: str):
+        self.statusLabel.setText(message)
+
     def prepare_examination_ui(self):
         """
         Prepare the exam UI screen for a new patient. Note that the UI is not destroyed when
@@ -262,7 +264,7 @@ class ExaminationWindow(QMainWindow):
         patient_text += chr(0xA0) + chr(0xA0)
         patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
         self.patientLabel.setText(patient_text)
-        self.statusLabel.setText("Scanner ready")
+        self.set_status_message("Scanner ready")
         self.sync_queue_widget()
 
     def clear_examination_ui(self):
@@ -295,18 +297,12 @@ class ExaminationWindow(QMainWindow):
                 self.add_sequence_menu.addAction(add_sequence_action)
 
     def add_sequence(self):
-        # TODO: Delegate creation of ScanQueueEntry to UI runtime
+        # Delegate creation of ScanQueueEntry to UI runtime
         sequence_class = self.sender().property("sequence_class")
-        ui_runtime.exam_information.scan_counter += 1
+        if not ui_runtime.create_new_scan(sequence_class):
+            log.error("Failed to create new scan")
+            self.set_status_message("Failed to insert new scan. Check log file.")
 
-        new_scan = ScanQueueEntry()
-        new_scan.sequence = helper.generate_uid()
-        new_scan.sequence = sequence_class
-        new_scan.scan_counter = ui_runtime.exam_information.scan_counter
-        new_scan.protocol_name = SequenceBase.get_sequence(sequence_class).get_readable_name()
-        new_scan.state = "created"
-        new_scan.has_results = False
-        ui_runtime.scan_queue_list.append(new_scan)
         self.sync_queue_widget()
 
     def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
@@ -343,7 +339,9 @@ class ExaminationWindow(QMainWindow):
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
         widget.setStyleSheet(
-            "QWidget { background-color: transparent; color: " + widget_font_color + ";} QLabel { padding-left: 6px; }"
+            "QWidget { background-color: transparent; color: "
+            + widget_font_color
+            + "; padding-top: 12px; padding-bottom: 12px; } QLabel { padding-left: 6px; }"
         )
         widgetText = QLabel(f"{entry.scan_counter}. {entry.protocol_name}")
         widgetText.setStyleSheet("background-color: transparent;")

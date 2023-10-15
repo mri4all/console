@@ -1,11 +1,17 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 from typing import Tuple, Dict, List
+from pathlib import Path
 
 from common.types import PatientInformation, ExamInformation, ScanQueueEntry
 import common.logger as logger
 
 log = logger.get_logger()
+
+import common.helper as helper
+import common.queue as queue
+import common.task as task
+from sequences import SequenceBase
 
 app = None
 stacked_widget = None
@@ -42,9 +48,20 @@ def shutdown():
 
 def register_patient():
     global exam_information
+
+    if not queue.clear_folders():
+        log.error("Failed to clear data folders. Cannot start exam.")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Critical Error")
+        msg.setText("Failed to clear data folders. Cannot start exam. Check log files for details.")
+        msg.exec_()
+        return
+
     exam_information.initialize()
     examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)
+
     log.info(f"Registered patient {patient_information.get_full_name()}")
     log.info(f"Started exam {exam_information.id}")
 
@@ -74,6 +91,43 @@ def get_screen_size() -> Tuple[int, int]:
 
 def update_scan_queue_list() -> bool:
     global scan_queue_list
-    # scan_queue_list = []
+    # TODO
+    return True
 
+
+def create_new_scan(requested_sequence: str) -> bool:
+    global exam_information
+
+    exam_information.scan_counter += 1
+
+    scan_uid = helper.generate_uid()
+    default_protocol_name = SequenceBase.get_sequence(requested_sequence).get_readable_name()
+
+    default_seq_parameters = SequenceBase.get_sequence(requested_sequence).get_default_parameters()
+
+    task_folder = task.create_task(
+        exam_information.id,
+        scan_uid,
+        exam_information.scan_counter,
+        requested_sequence,
+        patient_information,
+        default_seq_parameters,
+    )
+
+    if not task_folder:
+        return False
+
+    # Add entry to the scan queue
+    new_scan = ScanQueueEntry()
+    new_scan.id = scan_uid
+    new_scan.sequence = requested_sequence
+    new_scan.protocol_name = default_protocol_name
+    new_scan.scan_counter = exam_information.scan_counter
+    new_scan.state = "created"
+    new_scan.has_results = False
+    new_scan.folder = Path(task_folder)
+    scan_queue_list.append(new_scan)
+
+    # Check if all entries of the scan queue are up-to-date
+    update_scan_queue_list()
     return True

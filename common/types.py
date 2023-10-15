@@ -12,11 +12,9 @@ class PatientInformation(BaseModel):
     last_name: str = ""
     mrn: str = ""
 
-    # @classmethod
     def get_full_name(self):
         return f"{self.last_name}, {self.first_name}"
 
-    # @classmethod
     def clear(self):
         self.first_name = ""
         self.last_name = ""
@@ -27,15 +25,13 @@ class ExamInformation(BaseModel):
     id: str = ""
     scan_counter: int = 0
 
-    @classmethod
-    def initialize(cls):
-        cls.id = helper.generate_uid()
-        cls.scan_counter = 0
+    def initialize(self):
+        self.id = helper.generate_uid()
+        self.scan_counter = 0
 
-    @classmethod
-    def clear(cls):
-        cls.id = ""
-        cls.scan_counter = 0
+    def clear(self):
+        self.id = ""
+        self.scan_counter = 0
 
 
 class ScanQueueEntry(BaseModel):
@@ -59,12 +55,13 @@ class ScanQueueEntry(BaseModel):
 class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
-    flags: dict = {}
-    exam: dict = {}
+    protocol_name: str = ""
+    flags: dict = {}  # TODO
+    exam: dict = {}  # TODO
     patient: PatientInformation = PatientInformation()
     parameters: dict = {}
-    adjustment: dict = {}
-    system: dict = {}
-    processing: dict = {}
+    adjustment: dict = {}  # TODO
+    system: dict = {}  # TODO
+    processing: dict = {}  # TODO
     other: dict = {}
-    results: dict = {}
+    results: dict = {}  # TODO

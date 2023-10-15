@@ -32,8 +32,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def get_parameters(self) -> dict:
         return {"TE": self.param_TE, "TR": self.param_TR}
 
+    @classmethod
     def get_default_parameters(
-        self,
+        self
     ) -> dict:
         return {"TE": 70, "TR": 250}
 
@@ -110,8 +111,8 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="") -> bool:
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    TR = 250
-    TE = 70
+    TR = 250.0
+    TE = 70.0
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle

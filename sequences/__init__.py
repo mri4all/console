@@ -64,6 +64,7 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return {}
 
+    @classmethod
     def get_default_parameters(self) -> dict:
         """
         Returns a dictionary with default values, used to initialize the protocol.

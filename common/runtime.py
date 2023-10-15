@@ -1,8 +1,11 @@
 import os
 import __main__ as main
 
+# base_path = os.path.dirname(os.path.dirname(os.path.realpath(main.__file__)))
+# Hard-coding the base path for now to avoid problems with starting scripts from different locations
+base_path = "/opt/mri4all"
+
 service_name = "unknown"
-base_path = os.path.dirname(os.path.dirname(os.path.realpath(main.__file__)))
 current_task_id = ""
 
 
