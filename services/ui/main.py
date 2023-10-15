@@ -109,7 +109,9 @@ def prepare_system() -> bool:
     ui_runtime.system_information.name = "dev-system1"
     ui_runtime.system_information.model = "Zeugmatron Z-1"
     ui_runtime.system_information.serial_number = "000001"
-    ui_runtime.system_information.software_version = mri4all_version.get_version_string()
+    ui_runtime.system_information.software_version = (
+        mri4all_version.get_version_string()
+    )
 
     return True
 
@@ -129,7 +131,9 @@ def run():
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     ui_runtime.app = QApplication(sys.argv)
-    ui_runtime.app.setWindowIcon(QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png"))
+    ui_runtime.app.setWindowIcon(
+        QIcon(f"{rt.get_console_path()}/services/ui/assets/mri4all_icon.png")
+    )
     set_MRI4ALL_style(ui_runtime.app)
 
     if not prepare_system():

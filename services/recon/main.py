@@ -26,8 +26,12 @@ def process_reconstruction(scan_name: str) -> bool:
     time.sleep(2)
     log.info("Reconstruction completed")
 
-    if not queue.move_task(mri4all_paths.DATA_RECON + "/" + scan_name, mri4all_paths.DATA_COMPLETE):
-        log.error(f"Failed to move scan {scan_name} to completed folder. Critical Error.")
+    if not queue.move_task(
+        mri4all_paths.DATA_RECON + "/" + scan_name, mri4all_paths.DATA_COMPLETE
+    ):
+        log.error(
+            f"Failed to move scan {scan_name} to completed folder. Critical Error."
+        )
     return True
 
 
@@ -41,8 +45,13 @@ def run_reconstruction_loop():
         log.info(f"Reconstructing scan: {selected_scan}")
         rt.set_current_task_id(selected_scan)
 
-        if not queue.move_task(mri4all_paths.DATA_QUEUE_RECON + "/" + selected_scan, mri4all_paths.DATA_RECON):
-            log.error(f"Failed to move scan {selected_scan} to recon folder. Unable to run reconstruction.")
+        if not queue.move_task(
+            mri4all_paths.DATA_QUEUE_RECON + "/" + selected_scan,
+            mri4all_paths.DATA_RECON,
+        ):
+            log.error(
+                f"Failed to move scan {selected_scan} to recon folder. Unable to run reconstruction."
+            )
         else:
             process_reconstruction(selected_scan)
 
@@ -69,6 +78,10 @@ def prepare_recon_service() -> bool:
     """
     log.info("Preparing for reconstruction...")
 
+    if not queue.check_and_create_folders():
+        log.error("Failed to create data folders. Unable to start acquisition service.")
+        return False
+
     # Clear the recon data folder, in case a previous instance has crashed
     if not queue.clear_folder(mri4all_paths.DATA_RECON):
         return False
@@ -80,10 +93,16 @@ def run():
     log.info(f"-- MRI4ALL {mri4all_version.get_version_string()} --")
     log.info("Reconstruction service started")
 
+    if not prepare_recon_service():
+        log.error("Error while preparing acquisition service. Terminating.")
+        sys.exit(1)
+
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:
-        helper.loop.add_signal_handler(s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop)))
+        helper.loop.add_signal_handler(
+            s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop))
+        )
 
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop
