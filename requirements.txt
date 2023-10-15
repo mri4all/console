@@ -31,6 +31,9 @@ plotly~=5.9.0
 deap~=1.4.1
 imageio~=2.19.3
 numpy==1.25
+tqdm
+numba
+
 
 # Dependencies of the GUI service
 PyQt5
