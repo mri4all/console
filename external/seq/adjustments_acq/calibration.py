@@ -100,6 +100,17 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
 
+    # Plot noise figure
+    if plot:
+        fig, axs = plt.subplots(2, 1, constrained_layout=True)
+        fig.suptitle('NOISE')
+        axs[0].plot(np.abs(signal_array))
+        # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
+        axs[0].set_title('signal_array')
+        axs[1].plot(np.abs(noise_array))
+        axs[1].set_title('noise_array')
+        plt.show()
+
     # Output of useful data for visualization
     data_dict = {'rx_arr': rx_arr,
                  'rx_t': rx_t,
