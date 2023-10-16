@@ -64,6 +64,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
         # Calculate signal to noise ratio 
+        print("rx_arr[:, i] " + str(rx_arr[:, i]))
         snr = np.mean(np.abs(rx_arr[:,i])) / np.abs(np.std(rx_arr[:,i]))
         print("SNR = " + str(snr))
         snr_array.append(snr)
@@ -75,7 +76,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     print(f'Max frequency: {max_freq:.4f} MHz')
 
     # Find the frequency data with the largest maximum SNR value
-    max_snr_ind = np.argmax(np.max(snr_array, axis=0, keepdims=False))
+    max_snr_ind = np.argmax(snr_array)
     max_snr_freq = swept_freqs[max_snr_ind]
     print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
 
