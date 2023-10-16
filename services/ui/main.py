@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 sys.path.append("/opt/mri4all/console/external/")
 from PyQt5.QtCore import *
@@ -164,6 +165,23 @@ def run():
     log.info("-------------")
     sys.exit(return_value)
 
+
+def excepthook(exc_type, exc_value, exc_tb):
+    if issubclass(exc_type, KeyboardInterrupt):
+        # ignore keyboard interrupt to support console applications
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+        exit()
+
+    tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+    log.exception(tb)
+    tb = "An unexpected error occured:\n{}".format(tb)
+    errorbox = QMessageBox()
+    errorbox.setWindowFlag()
+    errorbox.setText(tb)
+    errorbox.exec_()
+
+
+sys.excepthook = excepthook
 
 if __name__ == "__main__":
     run()
