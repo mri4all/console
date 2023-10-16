@@ -1,5 +1,8 @@
+import os
 import sys
 
+# sys.path.insert(0, ".")
+# sys.path.insert(0, "./external/")
 sys.path.append("/opt/mri4all/console/external/")
 
 import signal
@@ -7,10 +10,14 @@ import asyncio
 import time
 import common.logger as logger
 import common.runtime as rt
-import common.helper as helper
 
 rt.set_service_name("acq")
 log = logger.get_logger()
+
+import common.helper as helper
+from common.types import ScanTask
+import common.task as task
+from sequences import SequenceBase
 
 from common.version import mri4all_version
 import common.queue as queue
@@ -19,12 +26,61 @@ from common.constants import *
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
 
+def move_to_fail(scan_name: str) -> bool:
+    if not queue.move_task(
+        mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_FAILURE
+    ):
+        log.error(f"Failed to move scan {scan_name} to failure folder. Critical Error.")
+        return False
+    return True
+
+
 def process_acquisition(scan_name: str) -> bool:
     log.info("Performing acquisition...")
-    # TODO: Process actual case!
-    time.sleep(3)
-    log.info("Acquisition completed")
 
+    # Check if json file with task definition exists in the scan folder
+    if not os.path.isfile(
+        mri4all_paths.DATA_ACQ + "/" + scan_name + "/" + mri4all_files.TASK
+    ):
+        log.error(
+            f"Scan {scan_name} does not contain a scan.json file. Unable to process."
+        )
+        move_to_fail(scan_name)
+        return False
+
+    try:
+        scan_task = task.read_task(mri4all_paths.DATA_ACQ + "/" + scan_name)
+    except:
+        log.error(f"Failed to read task file for scan {scan_name}. Unable to process.")
+        move_to_fail(scan_name)
+        return False
+
+    log.info(f"Requested sequence: {scan_task.sequence}")
+    if not (scan_task.sequence in SequenceBase.installed_sequences()):
+        log.error(f"Requested sequence not installed. Unable to process.")
+        move_to_fail(scan_name)
+        return False
+
+    current_step = ""
+    try:
+        current_step = "instantiation"
+        seq_instance = SequenceBase.get_sequence(scan_task.sequence)()
+        current_step = "set_working_folder"
+        seq_instance.set_working_folder(str(mri4all_paths.DATA_ACQ + "/" + scan_name))
+        current_step = "set_parameters"
+        seq_instance.set_parameters(scan_task.parameters, scan_task)
+        current_step = "calculate_sequence"
+        seq_instance.calculate_sequence()
+        current_step = "run_sequence"
+        seq_instance.run_sequence()
+    except:
+        log.error(
+            f"Failed to run sequence {scan_task.sequence}. Failure during step {current_step}."
+        )
+        move_to_fail(scan_name)
+        return False
+
+    log.info("Acquisition completed with success.")
     if not queue.move_task(
         mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_QUEUE_RECON
     ):
