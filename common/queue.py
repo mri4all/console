@@ -103,11 +103,9 @@ def clear_folder(folder_path, target_path=mri4all_paths.DATA_ARCHIVE) -> bool:
             log.warn(f"Folder {folder} is locked. Skipping...")
             continue
 
-        log.info(f"Moving folder {folder} to archive")
-        if not move_task(folder_path + "/" + folder, mri4all_paths.DATA_ARCHIVE):
-            log.error(
-                f"Failed to move folder {folder} to archive {mri4all_paths.DATA_ARCHIVE}"
-            )
+        log.info(f"Moving folder {folder} to {target_path}")
+        if not move_task(folder_path + "/" + folder, target_path):
+            log.error(f"Failed to move folder {folder} to archive {target_path}")
             return False
 
     return True
