@@ -74,11 +74,10 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     max_freq = swept_freqs[max_ind]
     print(f'Max frequency: {max_freq:.4f} MHz')
 
-    # Find the frequency data with the largest maximum absolute value
-    max_snr_ind = np.argmax(np.max(np.abs(snr_array), axis=0, keepdims=False))
+    # Find the frequency data with the largest maximum SNR value
+    max_snr_ind = np.argmax(np.max(snr_array, axis=0, keepdims=False))
     max_snr_freq = swept_freqs[max_snr_ind]
     print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
-
 
     # Plot figure
     if plot:
