@@ -29,9 +29,10 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
-
+    
         # Using external packages now: TODO: convert to classes later
-        larmor_step_search(
+        
+        max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=cfg.LARMOR_FREQ,
             steps=30,
@@ -43,13 +44,13 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             gui_test=False,
         )
-        
-        larmor_cal(
+
+        larmor_freq, data_dict = larmor_cal(
             seq_file=self.seq_file_path,
-            larmor_start=cfg.LARMOR_FREQ,
+            larmor_start=max_snr_freq,
             iterations=10,
             delay_s=1,
-            echo_count=2,
+            echo_count=1,
             step_size=0.6,
             plot=True,      # For debug
             shim_x=cfg.SHIM_X,
@@ -57,7 +58,22 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_z=cfg.SHIM_Z,
             gui_test=False,
         )
-        
+
+        calibrated_larmor_freq, data_dict = larmor_cal(
+            seq_file=self.seq_file_path,
+            larmor_start=larmor_freq,
+            iterations=10,
+            delay_s=1,
+            echo_count=1,
+            step_size=0.2,
+            plot=True,      # For debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
+            gui_test=False,
+        )
+
+        print("Final Larmor frequency : " + str(calibrated_larmor_freq) + " MHz" )
 
         log.info("Done running sequence " + self.get_name())
         return True
