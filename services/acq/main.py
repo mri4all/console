@@ -77,8 +77,9 @@ def prepare_acq_service() -> bool:
         log.error("Failed to create data folders. Unable to start acquisition service.")
         return False
 
-    # Clear the data acquisition folder, in case a previous instance has crashed
-    if not queue.clear_folder(mri4all_paths.DATA_ACQ):
+    # Clear the data acquisition folder, in case a previous instance has crashed. If a task
+    # is found there, move it to the failure folder (probably the previous instance crashed)
+    if not queue.clear_folder(mri4all_paths.DATA_ACQ, mri4all_paths.DATA_FAILURE):
         return False
 
     return True

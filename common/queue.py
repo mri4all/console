@@ -75,7 +75,9 @@ def move_task(folder_path, target) -> bool:
         return False
 
     # Remove the lock file (note: the lockfile is at a different location now)
-    lock_file = Path(target + "/" + os.path.basename(folder_path) + "/" + mri4all_files.LOCK)
+    lock_file = Path(
+        target + "/" + os.path.basename(folder_path) + "/" + mri4all_files.LOCK
+    )
     try:
         lock_file.unlink()
     except Exception:
@@ -85,7 +87,7 @@ def move_task(folder_path, target) -> bool:
     return True
 
 
-def clear_folder(folder_path) -> bool:
+def clear_folder(folder_path, target_path=mri4all_paths.DATA_ARCHIVE) -> bool:
     if not os.path.isdir(folder_path):
         log.warn(f"Unable to access folder {folder_path}")
         return True
@@ -103,7 +105,9 @@ def clear_folder(folder_path) -> bool:
 
         log.info(f"Moving folder {folder} to archive")
         if not move_task(folder_path + "/" + folder, mri4all_paths.DATA_ARCHIVE):
-            log.error(f"Failed to move folder {folder} to archive {mri4all_paths.DATA_ARCHIVE}")
+            log.error(
+                f"Failed to move folder {folder} to archive {mri4all_paths.DATA_ARCHIVE}"
+            )
             return False
 
     return True
@@ -148,7 +152,9 @@ def get_scan_ready_for_acq() -> str:
 def get_scan_ready_for_recon() -> str:
     scanpath_ready_for_recon = ""
 
-    folders = sorted(Path(mri4all_paths.DATA_QUEUE_RECON).iterdir(), key=os.path.getmtime)
+    folders = sorted(
+        Path(mri4all_paths.DATA_QUEUE_RECON).iterdir(), key=os.path.getmtime
+    )
     for entry in folders:
         if entry.is_dir() and (not (entry / mri4all_files.LOCK).exists()):
             scanpath_ready_for_recon = entry.name
