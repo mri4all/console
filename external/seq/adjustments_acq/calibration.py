@@ -55,6 +55,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
+    signal_array = []
+    noise_array = []
     snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
@@ -63,10 +65,14 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
-        # Calculate signal to noise ratio 
-        print("rx_arr[:, i] " + str(rx_arr[:, i]))
-        snr = np.mean(np.abs(rx_arr[:,i])) / np.abs(np.std(rx_arr[:,i]))
-        print("SNR = " + str(snr))
+        # Calculate signal to noise ratio
+        for index in range(0,len(rx_arr[:, i])):
+            if index >= steps/4 and index < steps - steps/4:
+                signal_array.append(rx_arr[index, i])
+            else:
+                noise_array.append(rx_arr[index, i])
+        snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
+        print("SNR= " + str(snr))
         snr_array.append(snr)
         time.sleep(delay_s)
 
@@ -89,6 +95,17 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[0].set_title('Concatenated signal -- Real')
         axs[1].plot(np.abs(rx_arr))
         axs[1].set_title('Concatenated signal -- Magnitude')
+        plt.show()
+
+    # Plot noise figure
+    if plot:
+        fig, axs = plt.subplots(2, 1, constrained_layout=True)
+        fig.suptitle('NOISE')
+        axs[0].plot(np.abs(signal_array))
+        # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
+        axs[0].set_title('signal_array')
+        axs[1].plot(np.abs(noise_array))
+        axs[1].set_title('noise_array')
         plt.show()
 
     # Output of useful data for visualization
@@ -194,7 +211,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LA
     # Announce results
     print(f'Calibrated Larmor frequency: {larmor_freq:.6f} MHz')
     if std >= 1:
-        print(f"Didn't converge, try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}")
+        print("Didn't converge (std = " + str(std) + f"), try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}")
 
     # Plot if needed
     if plot:

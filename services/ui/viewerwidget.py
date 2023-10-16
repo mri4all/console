@@ -8,6 +8,11 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
+import pyqtgraph as pg
+import pydicom
+import numpy as np
+import os
+
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -28,12 +33,17 @@ class ViewerWidget(QWidget):
         self.update()
 
     def configure(self):
-        if self.property("id") == "3":
-            sc = MplCanvas(self, width=5, height=4, dpi=100)
-            sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
-            layout = QVBoxLayout(self)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.addWidget(sc)
+        if self.property("id") == "1":
+            self.layout = QVBoxLayout(self)
+            self.layout.setContentsMargins(0, 0, 0, 0)
+            # self.visualize_dcm_files()
+
+        # if self.property("id") == "3":
+        #     sc = MplCanvas(self, width=5, height=4, dpi=100)
+        #     sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        #     layout = QVBoxLayout(self)
+        #     layout.setContentsMargins(0, 0, 0, 0)
+        #     layout.addWidget(sc)
 
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -65,3 +75,25 @@ class ViewerWidget(QWidget):
             painter.drawText(8, 8 + 28, "Scan " + self.series_name)
 
         painter.end()
+
+    def visualize_dcm_files(self):
+        input_path = "/vagrant/classDcm"
+        lstFilesDCM = []  # create an empty list
+        for dirName, subdirList, fileList in sorted(os.walk(input_path)):
+            for filename in fileList:
+                if ".dcm" in filename.lower():
+                    lstFilesDCM.append(os.path.join(dirName,filename))
+
+        lstFilesDCM.sort()
+        ds = pydicom.dcmread(lstFilesDCM[0])
+
+        ConstPixelDims = (len(lstFilesDCM), int(ds.Rows), int(ds.Columns))
+
+        ArrayDicom = np.zeros(ConstPixelDims, dtype=ds.pixel_array.dtype)
+
+        for filenameDCM in lstFilesDCM:
+            ds = pydicom.dcmread(filenameDCM)
+            ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
+
+        pg.setConfigOptions(imageAxisOrder='row-major')
+        self.layout.addWidget(pg.image(ArrayDicom))
