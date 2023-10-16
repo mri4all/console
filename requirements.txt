@@ -41,6 +41,8 @@ qtawesome~=1.2.3
 pyqtdarktheme~=2.1.0
 sip~=6.7.12
 pyqtgraph~=0.13.3
+GDCM
+pylibjpeg-libjpeg
 
 # Global dependencies
 rpyc~=5.3.1
