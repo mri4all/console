@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, ".")
 # setting path
 sys.path.append("../")
-sys.path.append("/opt/mri4all/console/external/")
+# sys.path.append("/opt/mri4all/console/external/")
 
 import common.logger as logger
 import common.runtime as rt
