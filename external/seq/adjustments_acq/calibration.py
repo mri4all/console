@@ -291,6 +291,10 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
         # Measure maximums of each measurement
         peak_max_arr = np.max(np.abs(rx_arr), axis=1, keepdims=False)
 
+        # Calculate signal to noise ratio of each measurement
+        snr = np.mean(rx_arr) / np.std(rx_arr)
+        print("SNR = " + str(snr))
+
         # Smooth out data with a rolling average
         if smooth:
             peak_max_arr = np.convolve(np.hstack((peak_max_arr[0:1], peak_max_arr[0:1],
