@@ -1,3 +1,4 @@
+from enum import Enum
 import common.runtime as rt
 
 
@@ -38,3 +39,15 @@ class mri4all_states:
     RECON = "recon"
     COMPLETE = "complete"
     FAILURE = "failure"
+
+
+class Service(Enum):
+    ACQ_SERVICE = "mri4all_acq.service"
+    RECON_SERVICE = "mri4all_recon.service"
+
+
+class ServiceAction(Enum):
+    START = "start"
+    STOP = "stop"
+    KILL = "kill"
+    STATUS = "status"
