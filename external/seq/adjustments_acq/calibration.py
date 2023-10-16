@@ -534,7 +534,15 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         axs[3].set_title(f'FFT -- Magnitude ({(grad_max * 1e-3):.4f} KHz/m gradient max)')
         axs[3].set_xlabel('Frequency (MHz)')
         plt.show()
+    
+    if channel=='x':
+        cfg.GX_MAX = grad_max
+    elif channel=='y':
+        cfg.GY_MAX = grad_max
+    elif channel=='z':
+        cfg.GZ_MAX = grad_max
 
+    
     return grad_max
 
 
