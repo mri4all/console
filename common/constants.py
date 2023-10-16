@@ -42,8 +42,8 @@ class mri4all_states:
 
 
 class Service(Enum):
-    ACQ_SERVICE = "mri4all_acq.service"
-    RECON_SERVICE = "mri4all_recon.service"
+    ACQ_SERVICE = "mri4all_acq"
+    RECON_SERVICE = "mri4all_recon"
 
 
 class ServiceAction(Enum):
@@ -51,3 +51,9 @@ class ServiceAction(Enum):
     STOP = "stop"
     KILL = "kill"
     STATUS = "status"
+
+class ViewerMode(Enum):
+    DICOM = "dicom"
+    PLOT = "plot"
+    RAWDATA = "rawdata"
+    COMPLEXDATA = "complex"
