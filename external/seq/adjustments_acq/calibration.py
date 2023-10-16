@@ -75,7 +75,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         print("signal_array " + str(signal_array))
         print("noise_array " + str(noise_array))
         snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
-        print("SNR = " + str(snr))
+        print("SNR= " + str(snr))
         snr_array.append(snr)
         time.sleep(delay_s)
 
