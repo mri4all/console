@@ -2,46 +2,44 @@ import os
 from pathlib import Path
 import math
 import numpy as np
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
+from matplotlib import animation
 
 from PyQt5 import uic
 
-import pypulseq as pp  # type: ignore
-
 def view_traj(k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc) -> bool:
 
-    pyplot.figure()
-    pyplot.plot(t_adc,k_traj_adc)
-
-    fig, ax = plt.subplots()
-    t = np.linspace(0, 3, 40)
-    g = -9.81
-    v0 = 12
-    z = g * t**2 / 2 + v0 * t
-
-    v02 = 5
-    z2 = g * t**2 / 2 + v02 * t
-
-    scat = ax.scatter(t[0], z[0], c="b", s=5, label=f'v0 = {v0} m/s')
-    line2 = ax.plot(t[0], z2[0], label=f'v0 = {v02} m/s')[0]
-    ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
-    ax.legend()
-
-
-    def update(frame):
-        # for each frame, update the data stored on each artist.
-        x = t[:frame]
-        y = z[:frame]
-        # update the scatter plot:
-        data = np.stack([x, y]).T
-        scat.set_offsets(data)
-        # update the line plot:
-        line2.set_xdata(t[:frame])
-        line2.set_ydata(z2[:frame])
-        return (scat, line2)
-
-
-    ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
+    plt.figure()
+    plt.plot(t_adc,k_traj_adc[0,:])
     plt.show()
 
+    plt.figure()
+    plt.plot(t_adc,k_traj_adc[1,:])
+    plt.show()
+
+    plt.figure()
+    plt.plot(t_adc,k_traj_adc[2,:])
+    plt.show()
+
+    # First set up the figure, the axis, and the plot element we want to animate
+    fig = plt.figure()
+    ax = plt.axes(xlim=(), ylim=())
+    line, = ax.plot([], [], lw=2)
+
+    # initialization function: plot the background of each frame
+    def init():
+        line.set_data([], [])
+        return line,
+
+    # animation function.  This is called sequentially
+    def animate(i):
+        y = k_traj_adc(i)
+        line.set_data(t_adc, y)
+        return line,
+
+    # call the animator.  blit=True means only re-draw the parts that have changed.
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                frames=200, interval=20, blit=True)
+
+    plt.show()
     return True

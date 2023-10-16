@@ -24,7 +24,7 @@ import services.ui.studyviewer as studyviewer
 from sequences import SequenceBase
 from services.ui.viewerwidget import ViewerWidget
 
-from services.ui.errors import SequenceUIFailed, UIException 
+from services.ui.errors import SequenceUIFailed, UIException
 
 log = logger.get_logger()
 
@@ -87,10 +87,9 @@ class ExaminationWindow(QMainWindow):
 
         self.resultsViewerButton.setText("")
         self.resultsViewerButton.setToolTip("Open results viewer")
-        self.resultsViewerButton.setIcon(qta.icon("fa5s.images"))
+        self.resultsViewerButton.setIcon(qta.icon("fa5s.x-ray"))
         self.resultsViewerButton.setIconSize(QSize(32, 32))
         self.resultsViewerButton.clicked.connect(studyviewer.show_viewer)
-
 
         self.closePatientButton.setText("")
         self.closePatientButton.setToolTip("End the exam")
