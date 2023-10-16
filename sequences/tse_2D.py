@@ -355,7 +355,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     ) * seq.grad_raster_time
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
-    assert np.all(delay_TR >= pp.calc_duration(gx_spoil))
+    assert np.all(delay_TR >= np.max(pp.calc_duration(rf1, rf2))/2 )
 
     # ======
     # CONSTRUCT SEQUENCE
