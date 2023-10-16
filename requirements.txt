@@ -31,9 +31,15 @@ plotly~=5.9.0
 deap~=1.4.1
 imageio~=2.19.3
 numpy==1.25
+<<<<<<< HEAD
+tqdm
+numba
+# pypulseq @ git+https://github.com/imr-framework/pypulseq.git@dev
+=======
 tqdm~=4.66.1
 numba==0.58.0
 
+>>>>>>> 147402ee377dbe1d40250a6b97e975516e1f6478
 
 # Dependencies of the GUI service
 PyQt5~=5.15.9
