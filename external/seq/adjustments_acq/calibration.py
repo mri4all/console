@@ -70,6 +70,10 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     max_freq = swept_freqs[max_ind]
     print(f'Max frequency: {max_freq:.4f} MHz')
 
+    # Calculate signal to noise ratio 
+    snr = np.mean(rx_arr) / np.std(rx_arr)
+    print("SNR = " + str(snr))
+
     # Plot figure
     if plot:
         fig, axs = plt.subplots(2, 1, constrained_layout=True)
@@ -290,10 +294,6 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
         rx_arr = np.reshape(rxd_list, (points, 2, -1))[:, 1, :]
         # Measure maximums of each measurement
         peak_max_arr = np.max(np.abs(rx_arr), axis=1, keepdims=False)
-
-        # Calculate signal to noise ratio of each measurement
-        snr = np.mean(rx_arr) / np.std(rx_arr)
-        print("SNR = " + str(snr))
 
         # Smooth out data with a rolling average
         if smooth:
