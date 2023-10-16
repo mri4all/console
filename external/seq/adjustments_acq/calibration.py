@@ -55,6 +55,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
+    snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
         rx_arr[:, i], _ = scr.run_pulseq(seq_file, rf_center=swept_freqs[i],
@@ -62,13 +63,21 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
-
+        # Calculate signal to noise ratio 
+        snr = np.mean(np.abs(rx_arr[:,i])) / np.abs(np.std(rx_arr[:,i]))
+        print("SNR = " + str(snr))
+        snr_array.append(snr)
         time.sleep(delay_s)
 
     # Find the frequency data with the largest maximum absolute value
     max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
     max_freq = swept_freqs[max_ind]
     print(f'Max frequency: {max_freq:.4f} MHz')
+
+    # Find the frequency data with the largest maximum SNR value
+    max_snr_ind = np.argmax(np.max(snr_array, axis=0, keepdims=False))
+    max_snr_freq = swept_freqs[max_snr_ind]
+    print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
 
     # Plot figure
     if plot:
@@ -87,8 +96,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  'larmor_freq': larmor_freq
                  }
 
-    # Return the frequency that worked the best
-    return max_freq, data_dict
+    # Return the frequency that worked the best with SNR
+    return max_snr_freq, data_dict
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,

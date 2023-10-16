@@ -16,6 +16,30 @@ log = logger.get_logger()
 from sequences import SequenceBase
 
 
+def sim_sequence_test(sequence_name: str) -> bool:
+    # TODO: simulated test
+    log.info(f"Testing sequence {sequence_name}...")
+
+    temp_folder = "/tmp/" + helper.generate_uid()
+    log.info(f"Using temporary folder: {temp_folder}")
+
+    try:
+        os.mkdir(temp_folder)
+    except:
+        log.error(f"Could not create temporary folder {temp_folder}.")
+        return False
+
+    sequence_instance = SequenceBase.get_sequence(sequence_name)()
+    # Get the default parameters from the sequence as an example
+    default_parameters = sequence_instance.get_default_parameters()
+    # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+    sequence_instance.set_parameters(default_parameters, {})
+    sequence_instance.set_working_folder(temp_folder)
+    sequence_instance.calculate_sequence()
+
+    return True
+
+
 def run_sequence_test(sequence_name: str) -> bool:
     log.info(f"Testing sequence {sequence_name}...")
 
