@@ -167,6 +167,11 @@ def run():
 
 
 def excepthook(exc_type, exc_value, exc_tb):
+    if issubclass(exc_type, KeyboardInterrupt):
+        # ignore keyboard interrupt to support console applications
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+        exit()
+
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     log.exception(tb)
     tb = "An unexpected error occured:\n{}".format(tb)
