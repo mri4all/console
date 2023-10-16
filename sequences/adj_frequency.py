@@ -31,6 +31,19 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Running sequence " + self.get_name())
 
         # Using external packages now: TODO: convert to classes later
+        larmor_step_search(
+            seq_file=self.seq_file_path,
+            step_search_center=cfg.LARMOR_FREQ,
+            steps=30,
+            step_bw_MHz=5e-3,
+            plot=True,      # For Debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
+            delay_s=1,
+            gui_test=False,
+        )
+        
         larmor_cal(
             seq_file=self.seq_file_path,
             larmor_start=cfg.LARMOR_FREQ,
@@ -38,24 +51,13 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             echo_count=2,
             step_size=0.6,
-            plot=False,
+            plot=True,      # For debug
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
             gui_test=False,
         )
-        larmor_step_search(
-            seq_file=self.seq_file_path,
-            step_search_center=cfg.LARMOR_FREQ,
-            steps=30,
-            step_bw_MHz=5e-3,
-            plot=False,
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            delay_s=1,
-            gui_test=False,
-        )
+        
 
         log.info("Done running sequence " + self.get_name())
         return True

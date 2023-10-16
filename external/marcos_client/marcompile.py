@@ -5,10 +5,10 @@ import numpy as np
 import warnings
 from external.marcos_client.marmachine import *
 try:
-    from local_config import grad_board
+    from external.marcos_client.local_config import grad_board
 except ModuleNotFoundError:
     grad_board = "gpa-fhdo"
-
+print(grad_board)
 import pdb
 st = pdb.set_trace
 

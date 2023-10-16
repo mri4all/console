@@ -112,7 +112,7 @@ def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
         from datetime import datetime
         now = datetime.now()
         current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = constants.DATA_PATH_RECON + f"/{current_time}.npy"
+        filename = constants.DATA_PATH_RECON / f"/{current_time}.npy"
         if os.path.exists(filename):
             os.remove(filename)
         np.save(filename, rxd['rx0'])
