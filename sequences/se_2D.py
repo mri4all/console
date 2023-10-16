@@ -68,13 +68,13 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         # ToDo: if self.trajectory == "Cartesian" (default) 
-        #pypulseq_se2D(
-        #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        #)
-        # else self.trajectory == "Radial"
-        pypulseq_se2D_radial(
+        pypulseq_se2D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
+        # else self.trajectory == "Radial"
+        # pypulseq_se2D_radial(
+        #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
+        #)
 
 
         log.info("Done calculating sequence " + self.get_name())
@@ -317,17 +317,17 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     # Define other gradients and ADC events
     delta_k = 1 / fov # frequency-oversampling is not implemented
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
+    gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
+    gy_pre = pp.make_trapezoid(channel="y", area=gx.area / 2, duration=prephaser_duration, system=system)
 
-    gy = gx
-    gy_pre = gx_pre
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
     gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_k, system=system)
-    gy_spoil = gx_spoil
+    gy_spoil = pp.make_trapezoid(channel="y", area=2 * Nx * delta_k, system=system)
 
     # ======
     # CALCULATE DELAYS
