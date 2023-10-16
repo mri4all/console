@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import traceback
 
@@ -9,6 +10,7 @@ import qdarktheme  # type: ignore
 
 import common.logger as logger
 import common.runtime as rt
+from common.constants import ServiceAction
 
 rt.set_service_name("ui")
 log = logger.get_logger()
@@ -16,6 +18,7 @@ log = logger.get_logger()
 from common.version import mri4all_version
 from services.ui import registration
 from services.ui import examination
+from services.ui.control import control_services
 import services.ui.ui_runtime as ui_runtime
 import common.queue as queue
 
@@ -93,7 +96,7 @@ def set_MRI4ALL_style(app):
     )
 
 
-def prepare_system() -> bool:
+async def prepare_system() -> bool:
     # Make sure that all needed folders are available
     if not queue.check_and_create_folders():
         log.error("Failed to create data folders. Unable to start UI service.")
@@ -104,7 +107,7 @@ def prepare_system() -> bool:
         return False
 
     # TODO: If disk space is low, clear old cases from the archive folder
-    # TODO: Start the acquisition and reconstruction services
+    await control_services(ServiceAction.START)
     # TODO: Check if the acquisition and reconstruction services are running
 
     ui_runtime.system_information.name = "dev-system1"
@@ -117,9 +120,8 @@ def prepare_system() -> bool:
     return True
 
 
-def shutdown_system():
-    # TODO: Stop the acquisition and reconstruction services
-    return True
+async def shutdown_system():
+    await control_services(ServiceAction.STOP)
 
 
 def run():
@@ -137,7 +139,7 @@ def run():
     )
     set_MRI4ALL_style(ui_runtime.app)
 
-    if not prepare_system():
+    if not asyncio.run(prepare_system()):
         log.error("Failed to prepare system. Unable to start UI service.")
         msg = QMessageBox()
         msg.critical(
@@ -159,7 +161,7 @@ def run():
 
     return_value = ui_runtime.app.exec_()
 
-    shutdown_system()
+    asyncio.run(shutdown_system())
 
     log.info("UI service terminated")
     log.info("-------------")
