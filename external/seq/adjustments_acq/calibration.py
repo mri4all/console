@@ -96,8 +96,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  'larmor_freq': larmor_freq
                  }
 
-    # Return the frequency that worked the best
-    return max_freq, data_dict
+    # Return the frequency that worked the best with SNR
+    return max_snr_freq, data_dict
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
