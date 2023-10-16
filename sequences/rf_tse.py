@@ -9,7 +9,7 @@ import numpy as np
 import pypulseq as pp  # type: ignore
 from external.seq.adjustments_acq.scripts import run_pulseq
 import external.seq.adjustments_acq.config as cfg
-
+import matplotlib.pyplot as plt
 from sequences import PulseqSequence
 
 import common.logger as logger
@@ -58,7 +58,11 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-
+        # Debug 
+        plt.figure()
+        plt.plot(np.abs(rxd))
+        plt.show()
+        
         log.info("Done running sequence " + self.get_name())
         return True
 
