@@ -325,7 +325,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system)
-    gy_pre = pp.make_trapezoid(channel="y", area=gy.area / 2, duration=pp.calc_duration(gx) / 2, system=system)
+    gy_pre = pp.make_trapezoid(channel="y", area=gy.area / 2, duration=pp.calc_duration(gy) / 2, system=system)
 
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
