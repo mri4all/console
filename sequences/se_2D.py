@@ -10,6 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
+from sequences.common import view_traj
 import common.logger as logger
 
 log = logger.get_logger()
@@ -238,6 +239,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
      # Visualize trajactory
     [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
     log.info("Completed calculating trajectory")
+    view_traj.view_traj(k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc)
 
     # Save sequence
     log.debug(output_file)
