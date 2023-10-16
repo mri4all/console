@@ -229,6 +229,11 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
+     # Visualize trajactory
+    [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+    log.info("Completed calculating trajectory")
+
+    # Save sequence
     log.debug(output_file)
     try:
         seq.write(output_file)
