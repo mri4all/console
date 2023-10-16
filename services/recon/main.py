@@ -1,3 +1,4 @@
+import os
 import sys
 
 sys.path.append("/opt/mri4all/console/external/")
@@ -16,15 +17,58 @@ log = logger.get_logger()
 from common.version import mri4all_version
 import common.queue as queue
 from common.constants import *
+import common.task as task
+import services.recon.reconstruction as reconstruction
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
 
+def move_to_fail(scan_name: str) -> bool:
+    if not queue.move_task(
+        mri4all_paths.DATA_RECON + "/" + scan_name, mri4all_paths.DATA_FAILURE
+    ):
+        log.error(f"Failed to move scan {scan_name} to failure folder. Critical Error.")
+        return False
+    return True
+
+
 def process_reconstruction(scan_name: str) -> bool:
     log.info("Performing reconstruction...")
-    # TODO: Process actual case!
-    time.sleep(2)
-    log.info("Reconstruction completed")
+
+    # Check if JSON file with task definition exists in the recon folder
+    if not os.path.isfile(
+        mri4all_paths.DATA_RECON + "/" + scan_name + "/" + mri4all_files.TASK
+    ):
+        log.error(
+            f"Scan {scan_name} does not contain a scan.json file. Unable to reconstruct."
+        )
+        move_to_fail(scan_name)
+        return False
+
+    try:
+        scan_task = task.read_task(mri4all_paths.DATA_RECON + "/" + scan_name)
+    except:
+        log.error(
+            f"Failed to read task file for scan {scan_name}. Unable to reconstruct."
+        )
+        move_to_fail(scan_name)
+        return False
+
+    recon_success = False
+    try:
+        recon_success = reconstruction.run_reconstruction(
+            mri4all_paths.DATA_RECON + "/" + scan_name, scan_task
+        )
+    except:
+        log.exception(f"Exception caught during recon of scan {scan_name}.")
+        recon_success = False
+
+    if not recon_success:
+        log.info("Reconstruction failed.")
+        move_to_fail(scan_name)
+        return False
+
+    log.info("Reconstruction completed.")
 
     if not queue.move_task(
         mri4all_paths.DATA_RECON + "/" + scan_name, mri4all_paths.DATA_COMPLETE
@@ -84,7 +128,7 @@ def prepare_recon_service() -> bool:
 
     # Clear the data acquisition folder, in case a previous instance has crashed. If a task
     # is found there, move it to the failure folder (probably the previous instance crashed)
-    if not queue.clear_folder(mri4all_paths.DATA_ACQ, mri4all_paths.DATA_FAILURE):
+    if not queue.clear_folder(mri4all_paths.DATA_RECON, mri4all_paths.DATA_FAILURE):
         return False
 
     return True
