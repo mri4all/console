@@ -345,7 +345,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>PushButton</string>
+                     <string>add</string>
                     </property>
                    </widget>
                   </item>
@@ -364,7 +364,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>PushButton</string>
+                     <string>edit</string>
                     </property>
                    </widget>
                   </item>
@@ -399,7 +399,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>PushButton</string>
+                     <string>delete</string>
                     </property>
                    </widget>
                   </item>
@@ -418,7 +418,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>PushButton</string>
+                     <string>stop</string>
                     </property>
                    </widget>
                   </item>
@@ -563,7 +563,7 @@
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>4</number>
+               <number>3</number>
               </property>
               <widget class="QWidget" name="adjustmentsTab">
                <attribute name="title">
@@ -677,7 +677,7 @@
              <number>12</number>
             </property>
             <property name="topMargin">
-             <number>29</number>
+             <number>32</number>
             </property>
             <property name="rightMargin">
              <number>0</number>
@@ -685,28 +685,6 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QPushButton" name="protocolBrowserButton">
-              <property name="minimumSize">
-               <size>
-                <width>64</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>64</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Protocol Browser</string>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QPushButton" name="resultsViewerButton">
               <property name="minimumSize">
@@ -722,7 +700,29 @@
                </size>
               </property>
               <property name="text">
-               <string>PushButton</string>
+               <string>results view</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="protocolBrowserButton">
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>prot browse</string>
               </property>
               <property name="flat">
                <bool>true</bool>
@@ -757,7 +757,7 @@
                </size>
               </property>
               <property name="text">
-               <string>PushButton</string>
+               <string>close pt</string>
               </property>
               <property name="flat">
                <bool>true</bool>
@@ -780,7 +780,7 @@
      <x>0</x>
      <y>0</y>
      <width>1228</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuControl">

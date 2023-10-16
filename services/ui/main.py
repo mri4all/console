@@ -111,7 +111,7 @@ async def prepare_system() -> bool:
     # TODO: Check if the acquisition and reconstruction services are running
 
     ui_runtime.system_information.name = "dev-system1"
-    ui_runtime.system_information.model = "Zeugmatron Z-1"
+    ui_runtime.system_information.model = "Zeugmatron Z1"
     ui_runtime.system_information.serial_number = "000001"
     ui_runtime.system_information.software_version = (
         mri4all_version.get_version_string()
@@ -169,16 +169,19 @@ def run():
 
 
 def excepthook(exc_type, exc_value, exc_tb):
+    # TODO: maybe implement this instead
+    # https://timlehr.com/2018/01/python-exception-hooks-with-qt-message-box/
+    # This may not work well with exceptions on other threads.
     if issubclass(exc_type, KeyboardInterrupt):
         # ignore keyboard interrupt to support console applications
         sys.__excepthook__(exc_type, exc_value, exc_tb)
-        exit()
+        shutdown_system()
+        sys.exit()
 
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     log.exception(tb)
     tb = "An unexpected error occured:\n{}".format(tb)
     errorbox = QMessageBox()
-    errorbox.setWindowFlag()
     errorbox.setText(tb)
     errorbox.exec_()
 

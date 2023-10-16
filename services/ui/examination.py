@@ -5,7 +5,7 @@ import json
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *  # type: ignore
+from PyQt5.QtGui import *
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
@@ -20,8 +20,11 @@ import services.ui.logviewer as logviewer
 import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
 import services.ui.taskviewer as taskviewer
+import services.ui.studyviewer as studyviewer
 from sequences import SequenceBase
 from services.ui.viewerwidget import ViewerWidget
+
+from services.ui.errors import SequenceUIFailed, UIException
 
 log = logger.get_logger()
 
@@ -84,8 +87,9 @@ class ExaminationWindow(QMainWindow):
 
         self.resultsViewerButton.setText("")
         self.resultsViewerButton.setToolTip("Open results viewer")
-        self.resultsViewerButton.setIcon(qta.icon("fa5s.images"))
+        self.resultsViewerButton.setIcon(qta.icon("fa5s.x-ray"))
         self.resultsViewerButton.setIconSize(QSize(32, 32))
+        self.resultsViewerButton.clicked.connect(studyviewer.show_viewer)
 
         self.closePatientButton.setText("")
         self.closePatientButton.setToolTip("End the exam")

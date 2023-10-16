@@ -29,35 +29,42 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
-
+    
         # Using external packages now: TODO: convert to classes later
-        larmor_step_search(
-            seq_file=self.seq_file_path,
-            step_search_center=cfg.LARMOR_FREQ,
-            steps=30,
-            step_bw_MHz=5e-3,
-            plot=True,      # For Debug
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            delay_s=1,
-            gui_test=False,
-        )
+
+        iterations = 4
+        larmor_frequency_sum = 0
+        for index in range(0, iterations):
+            print("Iteration " + str(index) + "/" + str(iterations) + " for Larmor frequency calibration.")
+            larmor_step_search(
+                seq_file=self.seq_file_path,
+                step_search_center=cfg.LARMOR_FREQ,
+                steps=30,
+                step_bw_MHz=5e-3,
+                plot=True,      # For Debug
+                shim_x=cfg.SHIM_X,
+                shim_y=cfg.SHIM_Y,
+                shim_z=cfg.SHIM_Z,
+                delay_s=1,
+                gui_test=False,
+            )
         
-        larmor_cal(
-            seq_file=self.seq_file_path,
-            larmor_start=cfg.LARMOR_FREQ,
-            iterations=10,
-            delay_s=1,
-            echo_count=2,
-            step_size=0.6,
-            plot=True,      # For debug
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            gui_test=False,
-        )
-        
+            larmor_freq, data_dict = larmor_cal(
+                seq_file=self.seq_file_path,
+                larmor_start=cfg.LARMOR_FREQ,
+                iterations=10,
+                delay_s=1,
+                echo_count=1,
+                step_size=0.2,
+                plot=True,      # For debug
+                shim_x=cfg.SHIM_X,
+                shim_y=cfg.SHIM_Y,
+                shim_z=cfg.SHIM_Z,
+                gui_test=False,
+            )
+            larmor_frequency_sum += larmor_freq
+        mean_larmor_frequency = larmor_frequency_sum / iterations
+        print("Calibrated Larmor frequency : " + str(mean_larmor_frequency) + "MHz" )
 
         log.info("Done running sequence " + self.get_name())
         return True

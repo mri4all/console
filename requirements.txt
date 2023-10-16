@@ -31,18 +31,18 @@ plotly~=5.9.0
 deap~=1.4.1
 imageio~=2.19.3
 numpy==1.25
-tqdm
-numba
-pypulseq @ git+https://github.com/imr-framework/pypulseq.git@dev
+tqdm~=4.66.1
+numba==0.58.0
+
 
 # Dependencies of the GUI service
-PyQt5
-qtawesome
-pyqtdarktheme
-sip
-pyqtgraph
+PyQt5~=5.15.9
+qtawesome~=1.2.3
+pyqtdarktheme~=2.1.0
+sip~=6.7.12
+pyqtgraph~=0.13.3
 
 # Global dependencies
-rpyc
-mypy
-pydantic
+rpyc~=5.3.1
+mypy~=1.6.0
+pydantic~=2.4.2
