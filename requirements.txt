@@ -33,7 +33,7 @@ imageio~=2.19.3
 numpy==1.25
 tqdm
 numba
-pypulseq @ git+https://github.com/imr-framework/pypulseq.git@dev
+# pypulseq @ git+https://github.com/imr-framework/pypulseq.git@dev
 
 # Dependencies of the GUI service
 PyQt5
