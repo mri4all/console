@@ -174,7 +174,9 @@ class ExaminationWindow(QMainWindow):
         self.scanParametersWidget.widget(3).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(4).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(5).setStyleSheet("background-color: #0C1123;")
-        self.scanParametersWidget.tabBar().setTabIcon(5, qta.icon("fa5s.exclamation-circle", color="#E5554F"))
+        self.scanParametersWidget.tabBar().setTabIcon(
+            5, qta.icon("fa5s.exclamation-circle", color="#E5554F")
+        )
         self.scanParametersWidget.setTabVisible(5, False)
 
         self.problemsWidget.setStyleSheet(
@@ -237,10 +239,15 @@ class ExaminationWindow(QMainWindow):
         else:
             self.set_status_message("Scanner ready")
 
-        if ui_runtime.status_last_completed_scan != ui_runtime.status_viewer_last_autoload_scan:
+        if (
+            ui_runtime.status_last_completed_scan
+            != ui_runtime.status_viewer_last_autoload_scan
+        ):
             # TODO: Trigger autoload of the last case
             self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
-            ui_runtime.status_viewer_last_autoload_scan = ui_runtime.status_last_completed_scan
+            ui_runtime.status_viewer_last_autoload_scan = (
+                ui_runtime.status_last_completed_scan
+            )
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -304,13 +311,16 @@ class ExaminationWindow(QMainWindow):
         self.add_sequence_menu.clear()
 
         sequence_list = sorted(
-            SequenceBase.installed_sequences(), key=lambda d: SequenceBase.get_sequence(d).get_readable_name()
+            SequenceBase.installed_sequences(),
+            key=lambda d: SequenceBase.get_sequence(d).get_readable_name(),
         )
         for seq in sequence_list:
             # Adjustment sequences should not be shown here
             if not seq.startswith("adj_"):
                 add_sequence_action = QAction(self)
-                add_sequence_action.setText(SequenceBase.get_sequence(seq).get_readable_name())
+                add_sequence_action.setText(
+                    SequenceBase.get_sequence(seq).get_readable_name()
+                )
                 add_sequence_action.setProperty("sequence_class", seq)
                 add_sequence_action.triggered.connect(self.add_sequence)
                 self.add_sequence_menu.addAction(add_sequence_action)
@@ -373,7 +383,9 @@ class ExaminationWindow(QMainWindow):
         widgetButton.setProperty("state", str(entry.state))
         if widget_icon:
             if (entry.state != "acq") and (entry.state != "recon"):
-                widgetButton.setIcon(qta.icon(f"fa5s.{widget_icon}", color=widget_font_color))
+                widgetButton.setIcon(
+                    qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
+                )
             else:
                 widgetButton.setIcon(
                     qta.icon(
@@ -438,12 +450,16 @@ class ExaminationWindow(QMainWindow):
 
         self.queueWidget.item(index).setBackground(QColor(widget_background_color))
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(index))
-        selected_widget.layout().itemAt(0).widget().setText(f"{entry.scan_counter}. {entry.protocol_name}")
+        selected_widget.layout().itemAt(0).widget().setText(
+            f"{entry.scan_counter}. {entry.protocol_name}"
+        )
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
-            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property("state"):
+            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property(
+                "state"
+            ):
                 if (entry.state != "acq") and (entry.state != "recon"):
                     selected_widget.layout().itemAt(1).widget().setIcon(
                         qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
@@ -453,7 +469,9 @@ class ExaminationWindow(QMainWindow):
                         qta.icon(
                             f"fa5s.{widget_icon}",
                             color=widget_font_color,
-                            animation=qta.Spin(selected_widget.layout().itemAt(1).widget()),
+                            animation=qta.Spin(
+                                selected_widget.layout().itemAt(1).widget()
+                            ),
                         )
                     )
         else:
@@ -463,7 +481,9 @@ class ExaminationWindow(QMainWindow):
     last_item_clicked = -1
 
     def edit_queue_clicked(self):
-        if (self.queueWidget.currentRow() > -1) and (self.last_item_clicked == self.queueWidget.currentRow()):
+        if (self.queueWidget.currentRow() > -1) and (
+            self.last_item_clicked == self.queueWidget.currentRow()
+        ):
             self.queueWidget.clearSelection()
             self.last_item_clicked = -1
         else:
@@ -488,7 +508,10 @@ class ExaminationWindow(QMainWindow):
 
         # Protocols can only be edited if they have not been scanned yet
         read_only = True
-        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
             read_only = False
 
         # Make the selected item bold
@@ -515,11 +538,19 @@ class ExaminationWindow(QMainWindow):
         log.info(f"Editing protocol {scan_entry.protocol_name} of type {sequence_type}")
 
         if not sequence_type in SequenceBase.installed_sequences():
-            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed")
+            log.error(
+                f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed"
+            )
             return
 
-        # Create an instance of the sequence class and buffer it
-        ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(sequence_type)()
+        try:
+            # Create an instance of the sequence class and buffer it
+            ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(
+                sequence_type
+            )()
+        except:
+            log.error(f"Failed to create instance of sequence {sequence_type}")
+            return
 
         # Ask the sequence to insert its UI into the first tab of the parameter widget
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
@@ -536,14 +567,18 @@ class ExaminationWindow(QMainWindow):
 
         scan_task = task.read_task(scan_path)
 
-        if not ui_runtime.editor_sequence_instance.set_parameters(scan_task.parameters, scan_task):
+        if not ui_runtime.editor_sequence_instance.set_parameters(
+            scan_task.parameters, scan_task
+        ):
             # TODO: Parameters from task file are invalid. Needs error handling.
             pass
 
         self.otherParametersTextEdit.setPlainText(json.dumps(scan_task.other, indent=4))
 
         ui_runtime.editor_scantask = scan_task
-        ui_runtime.editor_sequence_instance.write_parameters_to_ui(sequence_ui_container)
+        ui_runtime.editor_sequence_instance.write_parameters_to_ui(
+            sequence_ui_container
+        )
 
         # Configure UI for editing
         for i in range(self.scanParametersWidget.count()):
@@ -563,8 +598,12 @@ class ExaminationWindow(QMainWindow):
         if update_job:
             # Update the scan job with the new settings
             scan_path = ui_runtime.get_scan_location(ui_runtime.editor_queue_index)
-            ui_runtime.editor_scantask.parameters = ui_runtime.editor_sequence_instance.get_parameters()
-            ui_runtime.editor_scantask.other = json.loads(self.otherParametersTextEdit.toPlainText())
+            ui_runtime.editor_scantask.parameters = (
+                ui_runtime.editor_sequence_instance.get_parameters()
+            )
+            ui_runtime.editor_scantask.other = json.loads(
+                self.otherParametersTextEdit.toPlainText()
+            )
             task.write_task(scan_path, ui_runtime.editor_scantask)
             task.set_task_state(scan_path, mri4all_files.EDITING, False)
             task.set_task_state(scan_path, mri4all_files.PREPARED, True)
@@ -572,7 +611,9 @@ class ExaminationWindow(QMainWindow):
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
-            selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: normal;")
+            selected_widget.layout().itemAt(0).widget().setStyleSheet(
+                "font-weight: normal;"
+            )
 
         self.clear_seq_tab_and_return_empty()
         self.scanParametersWidget.setCurrentIndex(0)
@@ -609,13 +650,17 @@ class ExaminationWindow(QMainWindow):
             json.loads(self.otherParametersTextEdit.toPlainText())
         except:
             parameters_valid = False
-            problems_list.append("Other additional parameters have invalid format. Please validate JSON syntax.")
+            problems_list.append(
+                "Other additional parameters have invalid format. Please validate JSON syntax."
+            )
 
         if not parameters_valid:
             self.scanParametersWidget.setTabVisible(5, True)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet_error)
             self.scanParametersWidget.setCurrentIndex(5)
-            problems_list = ui_runtime.editor_sequence_instance.get_problems() + problems_list
+            problems_list = (
+                ui_runtime.editor_sequence_instance.get_problems() + problems_list
+            )
             self.problemsWidget.clear()
             for problem in problems_list:
                 self.problemsWidget.addItem(str(problem))
