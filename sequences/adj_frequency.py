@@ -32,7 +32,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     
         # Using external packages now: TODO: convert to classes later
         
-        larmor_step_search(
+        max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=cfg.LARMOR_FREQ,
             steps=30,
@@ -47,7 +47,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         larmor_freq, data_dict = larmor_cal(
             seq_file=self.seq_file_path,
-            larmor_start=cfg.LARMOR_FREQ,
+            larmor_start=max_snr_freq,
             iterations=10,
             delay_s=1,
             echo_count=1,
