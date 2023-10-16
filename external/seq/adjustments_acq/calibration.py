@@ -55,6 +55,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
+    signal_array = []
+    noise_array = []
     snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
@@ -63,10 +65,17 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
-        # Calculate signal to noise ratio 
+        # Calculate signal to noise ratio
+        for index in range(0,len(rx_arr[:, i])):
+            if index >= steps/4 and index < steps - steps/4:
+                signal_array.append(rx_arr[index, i])
+            else:
+                noise_array.append(rx_arr[index, i])
         print("rx_arr[:, i] " + str(rx_arr[:, i]))
-        snr = np.mean(np.abs(rx_arr[:,i])) / np.abs(np.std(rx_arr[:,i]))
-        print("SNR = " + str(snr))
+        print("signal_array " + str(signal_array))
+        print("noise_array " + str(noise_array))
+        snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
+        print("SNR= " + str(snr))
         snr_array.append(snr)
         time.sleep(delay_s)
 

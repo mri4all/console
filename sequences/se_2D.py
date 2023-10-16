@@ -68,11 +68,11 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian" (default) 
+        # ToDo: if self.trajectory == "Cartesian": (default) 
         pypulseq_se2D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
-        # else self.trajectory == "Radial"
+        # elif self.trajectory == "Radial":
         # pypulseq_se2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         #)
@@ -322,7 +322,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
-    gy_pre = pp.make_trapezoid(channel="y", area=gx.area / 2, duration=prephaser_duration, system=system)
+    gy_pre = pp.make_trapezoid(channel="y", area=gy.area / 2, duration=prephaser_duration, system=system)
 
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
