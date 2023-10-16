@@ -36,7 +36,7 @@ class ViewerWidget(QWidget):
         if self.property("id") == "1":
             self.layout = QVBoxLayout(self)
             self.layout.setContentsMargins(0, 0, 0, 0)
-            self.visualize_dcm_files()
+            # self.visualize_dcm_files()
 
         # if self.property("id") == "3":
         #     sc = MplCanvas(self, width=5, height=4, dpi=100)
