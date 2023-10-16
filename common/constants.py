@@ -51,3 +51,9 @@ class ServiceAction(Enum):
     STOP = "stop"
     KILL = "kill"
     STATUS = "status"
+
+class ViewerMode(Enum):
+    DICOM = "dicom"
+    PLOT = "plot"
+    RAWDATA = "rawdata"
+    COMPLEXDATA = "complex"
