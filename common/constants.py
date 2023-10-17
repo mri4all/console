@@ -57,3 +57,8 @@ class ViewerMode(Enum):
     PLOT = "plot"
     RAWDATA = "rawdata"
     COMPLEXDATA = "complex"
+
+
+class Scanner(Enum):
+    # TODO: change for the actual IP
+    IP = "localhost"

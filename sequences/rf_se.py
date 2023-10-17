@@ -100,7 +100,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -114,9 +114,9 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="") -> bool:
     TR = 250.0
     TE = 70.0
     alpha1 = 90  # flip angle
-    alpha1_duration = 100e-6  # pulse duration
+    alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
-    alpha2_duration = 100e-6  # pulse duration
+    alpha2_duration = rf_duration  # pulse duration
     TE = 70e-3
     TR = 250e-3
     num_averages = 1
