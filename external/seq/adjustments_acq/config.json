@@ -1,14 +1,13 @@
-
 {
     "rf_parameters": {
-        "larmor_frequency_MHz": 15.52,
-        "rf_maximum_amplitude_Hze-4": 7661.29,
+        "larmor_frequency_MHz": 15.58,
+        "rf_maximum_amplitude_Hze": 0.0,
         "rf_pi2_fraction": 0.6744
     },
     "gradients_parameters": {
-        "gx_maximum": 8.0e6,
-        "gy_maximum": 9.0e6,
-        "gz_maximum": 10.0e6
+        "gx_maximum": 8000000.0,
+        "gy_maximum": 9000000.0,
+        "gz_maximum": 10000000.0
     },
     "shim_parameters": {
         "shim_x": 0.0,
@@ -18,7 +17,6 @@
     "path_parameters": {
         "mgh_path": "/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq",
         "log_path": "./server/log/",
-        "seq_path": "./server/scanner_control/seq/",
-        "data_path": "../data/scanner_control/data/"
+        "seq_path": "./server/scanner_control/seq/"
     }
-} 
+}
