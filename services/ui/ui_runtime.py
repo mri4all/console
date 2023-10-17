@@ -76,13 +76,17 @@ def shutdown():
 
 def register_patient():
     global exam_information
+    global status_last_completed_scan
+    global status_viewer_last_autoload_scan
 
     if not queue.clear_folders():
         log.error("Failed to clear data folders. Cannot start exam.")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setWindowTitle("Critical Error")
-        msg.setText("Failed to clear data folders. Cannot start exam. Check log files for details.")
+        msg.setText(
+            "Failed to clear data folders. Cannot start exam. Check log files for details."
+        )
         msg.exec_()
         return
 
@@ -153,7 +157,13 @@ def update_scan_queue_list() -> bool:
 
         # Check the current location of the task folder to determine the state
         if os.path.isdir(mri4all_paths.DATA_QUEUE_ACQ + "/" + folder):
-            if os.path.isfile(mri4all_paths.DATA_QUEUE_ACQ + "/" + folder + "/" + mri4all_files.PREPARED):
+            if os.path.isfile(
+                mri4all_paths.DATA_QUEUE_ACQ
+                + "/"
+                + folder
+                + "/"
+                + mri4all_files.PREPARED
+            ):
                 current_state = mri4all_states.SCHEDULED_ACQ
             else:
                 current_state = mri4all_states.CREATED
@@ -190,8 +200,13 @@ def create_new_scan(requested_sequence: str) -> bool:
 
     exam_information.scan_counter += 1
     scan_uid = helper.generate_uid()
-    default_protocol_name = SequenceBase.get_sequence(requested_sequence).get_readable_name()
-    default_seq_parameters = SequenceBase.get_sequence(requested_sequence).get_default_parameters()
+    default_protocol_name = SequenceBase.get_sequence(
+        requested_sequence
+    ).get_readable_name()
+    default_seq_parameters = SequenceBase.get_sequence(
+        requested_sequence
+    ).get_default_parameters()
+    seq_description = SequenceBase.get_sequence(requested_sequence).get_description()
 
     task_folder = task.create_task(
         exam_information.id,
@@ -202,6 +217,7 @@ def create_new_scan(requested_sequence: str) -> bool:
         default_seq_parameters,
         default_protocol_name,
         system_information,
+        exam_information,
     )
 
     if not task_folder:
@@ -216,10 +232,34 @@ def create_new_scan(requested_sequence: str) -> bool:
     new_scan.state = "created"
     new_scan.has_results = False
     new_scan.folder_name = task_folder
+    new_scan.description = seq_description
     scan_queue_list.append(new_scan)
 
     # Check if all entries of the scan queue are up-to-date
     update_scan_queue_list()
+    return True
+
+
+def duplicate_sequence(index: int) -> bool:
+    template_scan_path = get_scan_location(index)
+    template_scan_data = task.read_task(template_scan_path)
+
+    if not create_new_scan(template_scan_data.sequence):
+        log.error("Failed to create new scan of same sequence.")
+        return False
+
+    new_scan_path = get_scan_location(len(scan_queue_list) - 1)
+    new_scan_data = task.read_task(new_scan_path)
+    new_scan_data.protocol_name = template_scan_data.protocol_name
+    new_scan_data.parameters = template_scan_data.parameters
+    new_scan_data.adjustment = template_scan_data.adjustment
+    new_scan_data.processing = template_scan_data.processing
+    new_scan_data.other = template_scan_data.other
+
+    if not task.write_task(new_scan_path, new_scan_data):
+        log.error("Failed to write new scan task. Cannot create sequence")
+        return False
+
     return True
 
 

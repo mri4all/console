@@ -8,9 +8,8 @@ from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
-
+from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
-from sequences.common import view_traj
 import common.logger as logger
 
 log = logger.get_logger()
@@ -23,7 +22,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
     @classmethod
     def get_readable_name(self) -> str:
-        return "2D Spin-Echo"
+        return "3D Spin-Echo"
 
     # def setup_ui(self, widget) -> bool:
     #     seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -69,11 +68,11 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         # ToDo: if self.trajectory == "Cartesian": (default) 
-        pypulseq_se2D(
+        pypulseq_se3D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
-        # elif self.trajectory == "Radial":
-        # pypulseq_se2D_radial(
+        # elif self.trajectory == "Radial": # stack-of-stars
+        # pypulseq_se3D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         #)
 
@@ -105,7 +104,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -118,8 +117,11 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
     fov = 140e-3  # Define FOV and resolution
+    fov_y = fov
+    fov_z = 140e-3
     Nx = 70
     Ny = Nx
+    Nz = 28
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
@@ -129,7 +131,8 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
-
+    dim0 = Ny
+    dim1 = Nz   # TODO: Get this info from the UI
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
 
@@ -169,11 +172,17 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
 
     # Define other gradients and ADC events
     delta_k = 1 / fov
+    delta_ky = 1 / fov_y
+    delta_kz = 1 / fov_z # TODO: Need to make it amenable to UI input
+    
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
 
-    phase_areas = -(np.arange(Ny) - Ny / 2) * delta_k
+    pe_order = choose_pe_order(ndims=3, npe=[dim0, dim1], traj='center_out', pf = [1,1], save_pe_order=False)
+    npe = pe_order.shape[0]
+    phase_areas0 = pe_order[:, 0] * delta_ky
+    phase_areas1 = pe_order[:, 1] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
     gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_k, system=system)
@@ -206,7 +215,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
-        for i in range(Ny):
+        for i in range(npe):
             # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
             # adc.phase_offset = rf_phase / 180 * np.pi
             # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
@@ -214,17 +223,24 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
             seq.add_block(rf1)
             gy_pre = pp.make_trapezoid(
                 channel="y",
-                area=phase_areas[i],
+                area=phase_areas0[i],
                 duration=pp.calc_duration(gx_pre),
                 system=system,
             )
-            seq.add_block(gx_pre, gy_pre)
+            gz_pre = pp.make_trapezoid(
+                channel="z",
+                area=phase_areas1[i],
+                duration=pp.calc_duration(gx_pre),
+                system=system,
+            )
+            seq.add_block(gx_pre, gy_pre, gz_pre)
             seq.add_block(pp.make_delay(tau1))
             seq.add_block(rf2)
             seq.add_block(pp.make_delay(tau2))
             seq.add_block(gx, adc)
             gy_pre.amplitude = -gy_pre.amplitude
-            seq.add_block(gx_spoil, gy_pre)  # TODO: Figure if we need spoiling
+            gz_pre.amplitude = -gz_pre.amplitude
+            seq.add_block(gx_spoil, gy_pre, gz_pre)  # TODO: Figure if we need spoiling
             seq.add_block(pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct
@@ -239,7 +255,6 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
      # Visualize trajactory
     [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
     log.info("Completed calculating trajectory")
-    view_traj.view_traj(k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc)
 
     # Save sequence
     log.debug(output_file)
@@ -252,8 +267,8 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
 
     return True
 
-# implement 2D radial trajectory (Ruoxun Zi)
-def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool:
+# implement 3D radial stack-of-stars trajectory 
+def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -266,8 +281,10 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
     fov = 140e-3  # Define FOV and resolution
+    fov_z = 140e-3
     Nx = 70
     Ny = Nx
+    Nz = 28
     Nspokes = math.ceil(Nx * math.pi/2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
@@ -278,7 +295,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
-
+    dim0 = Nz   # slice direction as PE, TODO: Get this info from the UI
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
     spoke_inc = "golden_angle" # TODO: get from UI: GA or linear increment over 180
@@ -318,15 +335,21 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     )
 
     # Define other gradients and ADC events
-    delta_k = 1 / fov # frequency-oversampling is not implemented
+    delta_k = 1 / fov
+    delta_kz = 1 / fov_z # TODO: Need to make it amenable to UI input
+    
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
-    gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
+    gy = pp.make_trapezoid(channel="y", flat_area=Ny * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
     gy_pre = pp.make_trapezoid(channel="y", area=gy.area / 2, duration=prephaser_duration, system=system)
 
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
+
+    pe_order = choose_pe_order(ndims=2, npe=[dim0], traj='linear_up', pf =[1], save_pe_order=False)
+    npe = pe_order.shape[0]
+    phase_areas0 = pe_order[:, 0] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
     gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_k, system=system)
@@ -360,28 +383,35 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
-        for i in range(Nspokes):
-            # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
-            # adc.phase_offset = rf_phase / 180 * np.pi
-            # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
-            # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
-            seq.add_block(rf1)
+        for j in range(Nspokes): # use radial spokes as outer_loop, TODO: switch inner/outer loop
             if spoke_inc == "linear_increment":
                 phi = i * (math.pi/Nspokes) 
             elif spoke_inc == "golden_angle":
                 phi = i * (111.246117975/180*math.pi)
             gx_pre.amplitude = amp_pre_max * math.sin(phi)
             gy_pre.amplitude = amp_pre_max * math.cos(phi)
-            seq.add_block(gx_pre, gy_pre)
-            seq.add_block(pp.make_delay(tau1))
-            seq.add_block(rf2)
-            seq.add_block(pp.make_delay(tau2))
             gx.amplitude = amp_enc_max * math.sin(phi)
             gy.amplitude = amp_enc_max * math.cos(phi)
-            seq.add_block(gx, gy, adc)
-            seq.add_block(gx_spoil, gy_spoil)  # TODO: Figure if we need spoiling
-            seq.add_block(pp.make_delay(delay_TR))
-        seq.plot(time_range=[0,3*TR])
+            for i in range(npe):
+                # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
+                # adc.phase_offset = rf_phase / 180 * np.pi
+                # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
+                # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
+                seq.add_block(rf1)
+                gz_pre = pp.make_trapezoid(
+                    channel="z",
+                    area=phase_areas0[i],
+                    duration=pp.calc_duration(gx_pre),
+                    system=system,
+                )
+                seq.add_block(gx_pre, gy_pre, gz_pre)
+                seq.add_block(pp.make_delay(tau1))
+                seq.add_block(rf2)
+                seq.add_block(pp.make_delay(tau2))
+                seq.add_block(gx, gy, adc)
+                gz_pre.amplitude = -gz_pre.amplitude
+                seq.add_block(gx_spoil, gy_spoil, gz_pre)  # TODO: Figure if we need spoiling
+                seq.add_block(pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct
     if check_timing:
@@ -392,6 +422,11 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
+     # Visualize trajactory
+    [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+    log.info("Completed calculating trajectory")
+
+    # Save sequence
     log.debug(output_file)
     try:
         seq.write(output_file)
