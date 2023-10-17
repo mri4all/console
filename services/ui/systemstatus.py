@@ -9,7 +9,7 @@ import qtawesome as qta  # type: ignore
 from common.version import mri4all_version
 import common.runtime as rt
 import services.ui.ui_runtime as ui_runtime
-from services.ui.control import control_service
+from services.ui.control import control_service, ping
 from common.constants import *
 
 
@@ -34,6 +34,7 @@ class SystemStatusWindow(QDialog):
         self.reconStartButton.clicked.connect(self.reconStartButton_clicked)
         self.acqKillButton.clicked.connect(self.acqKillButton_clicked)
         self.reconKillButton.clicked.connect(self.reconKillButton_clicked)
+        self.pingButton.clicked.connect(self.pingButton_clicked)
         
         # Define widgets
         self.acqStartButton.setIcon(qta.icon("fa5s.stop"))
@@ -97,6 +98,16 @@ class SystemStatusWindow(QDialog):
     
     def reconKillButton_clicked(self) -> None:
         control_service(ServiceAction.KILL, Service.RECON_SERVICE)
+
+    def pingButton_clicked(self) -> None:
+        if ping(Scanner.IP.value):
+            self.pingLabel.setText(
+                '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Responding"
+            )
+        else:
+            self.pingLabel.setText(
+                '<span style="color: #E5554F; font-size: 24px;"> ' + chr(0xF057) + chr(0xA0) + " </span> Not responding"
+            )
 
     def get_acq_service_status(self) -> bool:
         return control_service(ServiceAction.STATUS, Service.ACQ_SERVICE)

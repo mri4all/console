@@ -179,6 +179,7 @@ def update_scan_queue_list() -> bool:
         if os.path.isdir(mri4all_paths.DATA_COMPLETE + "/" + folder):
             current_state = mri4all_states.COMPLETE
             status_last_completed_scan = entry.folder_name
+            entry.has_results = True
         if os.path.isdir(mri4all_paths.DATA_FAILURE + "/" + folder):
             current_state = mri4all_states.FAILURE
 

@@ -75,7 +75,10 @@ def set_MRI4ALL_style(app):
     }    
     QLabel[type = "dimmed"] {
         color: #424d76;
-    }      
+    }  
+    QMenu {
+        border: 1px solid rgba(38, 44, 68, 255);
+    }    
     """
 
     qdarktheme.setup_theme(
