@@ -543,6 +543,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         axs[3].set_xlabel('Frequency (MHz)')
         plt.show()
     
+    print(channel)
     if channel=='x':
         cfg.GX_MAX = grad_max
     elif channel=='y':

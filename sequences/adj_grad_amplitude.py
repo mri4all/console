@@ -8,6 +8,8 @@ import common.logger as logger
 from sequences import PulseqSequence
 from sequences.rf_se import pypulseq_rfse
 
+import configparser
+
 
 log = logger.get_logger()
 
