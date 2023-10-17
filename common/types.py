@@ -78,7 +78,7 @@ class ResultItem(BaseModel):
 
 
 FailStages = Literal[
-    "preparation", "adjustment", "acquisition", "reconstruction", "other", "unknown"
+    "preparation", "adjustment", "acquisition", "reconstruction", "other", "none"
 ]
 
 
@@ -90,7 +90,7 @@ class ScanJournal(BaseModel):
     reconstruction_start: str = ""
     reconstruction_end: str = ""
     failed_at: str = ""
-    fail_stage: FailStages = "unknown"
+    fail_stage: FailStages = "none"
 
 
 class ScanTask(BaseModel):
