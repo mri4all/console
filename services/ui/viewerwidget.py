@@ -54,4 +54,8 @@ class ViewerWidget(QWidget):
             ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
 
         pg.setConfigOptions(imageAxisOrder='row-major')
-        self.layout.addWidget(pg.image(ArrayDicom))
+        widget = pg.image(ArrayDicom)
+        widget.ui.histogram.hide()
+        widget.ui.roiBtn.hide()
+        widget.ui.menuBtn.hide()
+        self.layout.addWidget(widget)
