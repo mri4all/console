@@ -116,12 +116,12 @@ def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fov = 224e-3  # Define FOV and resolution
+    fov = 140e-3  # Define FOV and resolution
     fov_y = fov
-    fov_z = 128e-3
-    Nx = 128
+    fov_z = 140e-3
+    Nx = 70
     Ny = Nx
-    Nz = Nx
+    Nz = 28
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
@@ -284,7 +284,7 @@ def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool
     fov_z = 140e-3
     Nx = 70
     Ny = Nx
-    Nz = 27
+    Nz = 28
     Nspokes = math.ceil(Nx * math.pi/2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
