@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 sys.path.append("/opt/mri4all/console/external/")
 
 import signal
@@ -10,6 +11,7 @@ import time
 import common.logger as logger
 import common.runtime as rt
 import common.helper as helper
+from common.ipc import Communicator
 
 rt.set_service_name("recon")
 log = logger.get_logger()
@@ -22,6 +24,7 @@ import services.recon.reconstruction as reconstruction
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
+communicator = Communicator(Communicator.ACQ)
 
 def move_to_fail(scan_name: str) -> bool:
     if not queue.move_task(
@@ -152,6 +155,7 @@ def run():
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop
     main_loop = helper.AsyncTimer(0.1, run_reconstruction_loop)
+    communicator.send_user_alert("recon booting")
     try:
         main_loop.run_until_complete(helper.loop)
     except Exception as e:

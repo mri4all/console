@@ -47,6 +47,8 @@ class Helper():
         Present the user with an input dialog. 
         input_type: Which kind of input dialog. Interprets result as this type.
         in_min, in_max: the min/max value for a float or integer type. 
+            Default minimum: 0
+            Default maximum: 1000
         """
         args:Dict[str,Any] = {}
         if input_type is not None:

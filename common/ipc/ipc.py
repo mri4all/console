@@ -18,6 +18,9 @@ from common.constants import *
 from common.ipc.messages import *
 
 class PipeFile(Enum):
+    """
+    valid pipe files
+    """
     RECON = "recon_pipe"
     ACQ = "acq_pipe"
     UI_RECON = "ui_recon_pipe"
@@ -25,7 +28,9 @@ class PipeFile(Enum):
 
     
 class CommunicatorEnvelope(BaseModel):
-    # TODO: Add missing entries from registration form
+    """
+    Contains a message, an id, and an error bool
+    """
     id: str = str(uuid.uuid1())
     value: Union[UserResponseMessage, UserQueryMessage, UserAlertMessage, SetStatusMessage]
     error: bool = False
@@ -34,6 +39,9 @@ class CommunicatorEnvelope(BaseModel):
 log = logger.get_logger()
 
 class PipeEnd(Enum):
+    """
+    valid pipe begin/end pairs
+    """
     RECON = (PipeFile.RECON, PipeFile.UI_RECON)
     ACQ = (PipeFile.ACQ, PipeFile.UI_ACQ)
     UI_ACQ = (PipeFile.UI_ACQ,PipeFile.ACQ)
