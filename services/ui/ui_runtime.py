@@ -237,6 +237,29 @@ def create_new_scan(requested_sequence: str) -> bool:
     return True
 
 
+def duplicate_sequence(index: int) -> bool:
+    template_scan_path = get_scan_location(index)
+    template_scan_data = task.read_task(template_scan_path)
+
+    if not create_new_scan(template_scan_data.sequence):
+        log.error("Failed to create new scan of same sequence.")
+        return False
+
+    new_scan_path = get_scan_location(len(scan_queue_list) - 1)
+    new_scan_data = task.read_task(new_scan_path)
+    new_scan_data.protocol_name = template_scan_data.protocol_name
+    new_scan_data.parameters = template_scan_data.parameters
+    new_scan_data.adjustment = template_scan_data.adjustment
+    new_scan_data.processing = template_scan_data.processing
+    new_scan_data.other = template_scan_data.other
+
+    if not task.write_task(new_scan_path, new_scan_data):
+        log.error("Failed to write new scan task. Cannot create sequence")
+        return False
+
+    return True
+
+
 def get_scan_location(index_queue: int) -> str:
     global scan_queue_list
 
