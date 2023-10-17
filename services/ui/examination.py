@@ -856,4 +856,13 @@ class ExaminationWindow(QMainWindow):
             log.warning("Invalid scan queue index selected")
             return
 
-        # TODO
+        if not ui_runtime.duplicate_sequence(index):
+            log.error("Failed to duplicate scan")
+            # TODO: Show error message
+            return
+
+        ui_runtime.get_scan_queue_entry(
+            index + 1
+        ).protocol_name = scan_entry.protocol_name
+
+        self.sync_queue_widget(True)
