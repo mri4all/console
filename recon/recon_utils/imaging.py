@@ -61,7 +61,7 @@ def compute_noise_variance(SNR: float, img: np.ndarray, use_complex=True):
     return var/2 if use_complex else var
 
 
-def center_kspace(kspace):
+def kspace_center_correction(kspace):
     '''
     Identify the maximum value in the k-space matrix and adjust the matrix via rolling operations to position this maximum value at the center.
     Input: kspace, shape (x,y,z)
