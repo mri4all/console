@@ -29,27 +29,26 @@ from services.ui.errors import SequenceUIFailed, UIException
 log = logger.get_logger()
 
 scanParameters_stylesheet = """ 
-                QTabBar { 
-                    font-size: 16px;
-                    font-weight: bold;
-                }  
-                QTabBar::tab {
-                    margin-left:0px;
-                    margin-right:16px;          
-                    border-bottom: 3px solid transparent;
-                }
-               QTabBar::tab:selected {
-                    border-bottom: 3px solid #E0A526;
-                }                
-                QTabBar::tab:selected:disabled {
-                    border-bottom: 3px solid transparent;
-                }                
-               QTabBar::tab:disabled {
-                    color: #515669;
-                    border-bottom: 3px solid transparent;
-                }                    
-           
-            """
+    QTabBar { 
+        font-size: 16px;
+        font-weight: bold;
+    }  
+    QTabBar::tab {
+        margin-left:0px;
+        margin-right:16px;          
+        border-bottom: 3px solid transparent;
+    }
+    QTabBar::tab:selected {
+        border-bottom: 3px solid #E0A526;
+    }                
+    QTabBar::tab:selected:disabled {
+        border-bottom: 3px solid transparent;
+    }                
+    QTabBar::tab:disabled {
+        color: #515669;
+        border-bottom: 3px solid transparent;
+    }                            
+    """
 
 scanParameters_stylesheet_error = (
     scanParameters_stylesheet
@@ -370,7 +369,10 @@ class ExaminationWindow(QMainWindow):
             widget_icon = "wrench"
 
         item = QListWidgetItem()
-        item.setToolTip(f"Sequence class = {entry.sequence}")
+        tool_tip = f"Sequence class = {entry.sequence}"
+        if entry.description:
+            tool_tip += f"\n\n{entry.description}"
+        item.setToolTip(tool_tip)
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
         widget.setStyleSheet(

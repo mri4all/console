@@ -43,7 +43,14 @@ class SystemInformation(BaseModel):
 
 
 ScanStatesType = Literal[
-    "created", "scheduled_acq", "acq", "scheduled_recon", "recon", "complete", "failure", "invalid"
+    "created",
+    "scheduled_acq",
+    "acq",
+    "scheduled_recon",
+    "recon",
+    "complete",
+    "failure",
+    "invalid",
 ]
 
 
@@ -55,6 +62,7 @@ class ScanQueueEntry(BaseModel):
     state: ScanStatesType = "created"
     has_results: bool = False
     folder_name: str = ""
+    description: str = ""
 
 
 class ScanTask(BaseModel):
