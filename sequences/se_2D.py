@@ -117,8 +117,8 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fov = 224e-3  # Define FOV and resolution
-    Nx = 128
+    fov = 140e-3  # Define FOV and resolution
+    Nx = 70
     Ny = Nx
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
