@@ -265,8 +265,8 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fov = 224e-3  # Define FOV and resolution
-    Nx = 128
+    fov = 140e-3  # Define FOV and resolution
+    Nx = 70
     Ny = Nx
     Nspokes = math.ceil(Nx * math.pi/2)
     alpha1 = 90  # flip angle
@@ -281,6 +281,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
+    spoke_inc = "golden_angle" # TODO: get from UI: GA or linear increment over 180
 
     # ======
     # INITIATE SEQUENCE
@@ -365,7 +366,10 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
             # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
             # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
             seq.add_block(rf1)
-            phi = i * (math.pi/Nspokes) # linear increment for now (could add golden-angle)
+            if spoke_inc == "linear_increment":
+                phi = i * (math.pi/Nspokes) 
+            elif spoke_inc == "golden_angle":
+                phi = i * (111.246117975/180*math.pi)
             gx_pre.amplitude = amp_pre_max * math.sin(phi)
             gy_pre.amplitude = amp_pre_max * math.cos(phi)
             seq.add_block(gx_pre, gy_pre)
