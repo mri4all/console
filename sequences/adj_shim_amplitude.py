@@ -24,7 +24,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         return "Adjust Shim Sequence."
 
     def calculate_sequence(self) -> bool:
-        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
+        self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
 
         pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
