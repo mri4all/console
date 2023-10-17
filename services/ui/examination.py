@@ -1,4 +1,8 @@
 from datetime import datetime
+from multiprocessing import set_start_method
+import os
+import sys
+import threading
 import time
 import json
 
@@ -6,6 +10,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
@@ -14,6 +19,9 @@ import common.logger as logger
 import common.task as task
 from common.constants import *
 from common.types import ScanQueueEntry, ScanTask
+from common.ipc import Communicator
+import common.ipc as ipc
+
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -61,6 +69,7 @@ class ExaminationWindow(QMainWindow):
     viewer2 = None
     viewer3 = None
 
+    status_overwrite = None
     updating_queue_widget = False
 
     def __init__(self):
@@ -229,9 +238,61 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
+        self.recon_pipe = Communicator(Communicator.UI_RECON)
+        self.recon_pipe.recieved.connect(self.received_recon)
+        self.recon_pipe.listen()
+
+        self.acq_pipe = Communicator(Communicator.UI_ACQ)
+        self.acq_pipe.recieved.connect(self.received_acq)
+        self.acq_pipe.listen()
+
         self.monitorTimer = QTimer(self)
         self.monitorTimer.timeout.connect(self.update_monitor_status)
         self.monitorTimer.start(1000)
+
+    def received_recon(self, o):
+        self.received_message(o, self.recon_pipe)
+    
+    def received_acq(self, o):
+        self.received_message(o, self.acq_pipe)
+
+    def received_message(self, o, pipe):
+        msg_value = o.value
+        if isinstance(msg_value,ipc.messages.UserQueryMessage):
+            try:
+                ok = False
+                value = None
+                dlg = None
+                while value is None: 
+                    dlg = QInputDialog(self)
+                    dlg.setInputMode(dict(text=QInputDialog.TextInput,int=QInputDialog.IntInput,float=QInputDialog.DoubleInput)[msg_value.input_type])
+                    
+                    if msg_value.input_type == "int":
+                        dlg.setIntMinimum(int(msg_value.in_min))
+                        dlg.setIntMaximum(int(msg_value.in_max))
+                    if msg_value.input_type == "float":
+                        dlg.setDoubleMinimum(msg_value.in_min)
+                        dlg.setDoubleMaximum(msg_value.in_max)
+
+                    dlg.setLabelText(f"Enter {msg_value.request}")
+                    dlg.setWindowTitle(msg_value.request.capitalize())
+                    dlg.resize(500, 100)
+                    ok = dlg.exec_()
+                    get_value = dict(text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue)[msg_value.input_type]
+                    value = get_value()
+                pipe.send_user_response(response=value, error=False)
+
+            except Exception as e:
+                log.exception("Error")
+                pipe.send_user_response(error=True)
+        elif isinstance(msg_value, ipc.messages.UserAlertMessage):
+            msg = QMessageBox()
+            msg.setIcon(dict(information=QMessageBox.Information, warning=QMessageBox.Warning, critical=QMessageBox.Critical)[msg_value.alert_type])
+            msg.setWindowTitle(msg_value.alert_type.capitalize())
+            msg.setText(msg_value.message)
+            msg.exec_()
+        elif isinstance(msg_value, ipc.messages.SetStatusMessage):
+            self.overwrite_status_message(msg_value.message)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
@@ -239,7 +300,7 @@ class ExaminationWindow(QMainWindow):
             self.set_status_message("Running scan...")
         elif ui_runtime.status_recon_active:
             self.set_status_message("Reconstruction data...")
-        else:
+        elif not self.status_overwrite: # TODO: unset the overwritten status
             self.set_status_message("Scanner ready")
 
         if (
@@ -287,6 +348,10 @@ class ExaminationWindow(QMainWindow):
 
     def set_status_message(self, message: str):
         self.statusLabel.setText(message)
+
+    def overwrite_status_message(self, message: str):
+        self.status_overwrite = message
+        self.set_status_message(message)
 
     def prepare_examination_ui(self):
         """
