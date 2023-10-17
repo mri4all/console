@@ -1,7 +1,7 @@
 import numpy as np
 
 def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'center_out',
-                    save_pe_order: bool = True) -> np.ndarray:
+                    pf = [8/8, 8/8], save_pe_order: bool = True) -> np.ndarray:
     
     """
     Choose k-space trajectory for Cartesian acquisition: 2D or 3D.
@@ -10,7 +10,8 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
     ----------
     ndims: number of encoding dimensions: two or three
     npe: number of phase encodes, 2D [nphase1], 3D [nphase1,nphase2]
-    traj: view ordering 'center_out' or 'linear-up'
+    traj: view ordering 'center_out', 'linear-up', and 'hybird' (3D only)
+    pf: Partial Fourier
     save_pe_order: save to a numpy file with fixed name for now TODO: agree on the conventions
 
     Return
@@ -20,6 +21,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
     
     if ndims == 2:
         npe = npe[0]
+        pf = pf[0]
         if traj == 'center_out':
             pe_order = np.zeros((npe, 1), dtype=int)
             pe_order[0] = 0
@@ -31,7 +33,16 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
 
         elif traj == 'linear_up':
             pe_order = np.zeros((npe, 1), dtype=int)
-            pe_order = -(np.arange(npe) - int(npe/2))
+            for pe in range(npe):
+                pe_order[pe] = -(pe - int(npe/2))
+
+        if pf < 1:
+            num2remove = int(npe*(1-pf))
+            idx2remove = int(-npe/2+num2remove)
+            # print(idx2remove)
+            pe_order = pe_order[pe_order>idx2remove]
+            pe_order = np.expand_dims(pe_order,1)
+            
 
     if ndims == 3:
         if traj == 'center_out': # center_out for both phase encoding direction
@@ -96,6 +107,18 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
                     pe_order[pe, 0] = -(pe1 - int(npe[0]/2))
                     pe_order[pe, 1] = -(pe2 - int(npe[1]/2))  
 
+        if pf[0] < 1:
+            num2remove = int(npe[0]*(1-pf[0]))
+            idx2remove = int(-npe[0]/2+num2remove)
+            # print(idx2remove)
+            pe_order = pe_order[pe_order[:,0]>idx2remove]
+        if pf[1] < 1:
+            num2remove = int(npe[1]*(1-pf[1]))
+            idx2remove = int(-npe[1]/2+num2remove)
+            # print(idx2remove)
+            pe_order = pe_order[pe_order[:,1]>idx2remove]
+
+
     if save_pe_order is True:
         np.save('pe_order.npy', pe_order)
 
@@ -107,4 +130,5 @@ if __name__ == "__main__":
     ndims = 3
     Npe = [128, 128]
     traj = 'center_out'
+    pf = [1, 1]
     choose_pe_order(ndims=ndims, npe=Npe, traj=traj, save_pe_order=True)
