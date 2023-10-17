@@ -76,6 +76,8 @@ def shutdown():
 
 def register_patient():
     global exam_information
+    global status_last_completed_scan
+    global status_viewer_last_autoload_scan
 
     if not queue.clear_folders():
         log.error("Failed to clear data folders. Cannot start exam.")
@@ -215,6 +217,7 @@ def create_new_scan(requested_sequence: str) -> bool:
         default_seq_parameters,
         default_protocol_name,
         system_information,
+        exam_information,
     )
 
     if not task_folder:

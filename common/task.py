@@ -9,7 +9,12 @@ log = logger.get_logger()
 
 import common.helper as helper
 from common.constants import *
-from common.types import ScanTask, PatientInformation, SystemInformation
+from common.types import (
+    ScanTask,
+    ExamInformation,
+    PatientInformation,
+    SystemInformation,
+)
 
 
 def create_task(
@@ -21,6 +26,7 @@ def create_task(
     default_seq_parameters: dict,
     default_protocol_name: str,
     system_information: SystemInformation,
+    exam_information: ExamInformation,
 ) -> str:
     """
     Creates a new scan task for the given exam ID. Returns empty string on failure.
@@ -51,10 +57,11 @@ def create_task(
     scan_task.id = scan_id
     scan_task.sequence = sequence
     scan_task.protocol_name = default_protocol_name
+    scan_task.system = system_information
+    scan_task.exam = exam_information
     scan_task.patient = patient_information
     scan_task.parameters = default_seq_parameters
     scan_task.other = {}
-    scan_task.system = system_information
 
     try:
         with open(task_filename, "w") as task_file:
@@ -95,7 +102,9 @@ def read_task(folder) -> Any:
 
     # Check if lock file exists (should not happen)
     if os.path.isfile(lock_file):
-        log.warning(f"Lock file {lock_file} exists. Task might be open in other service.")
+        log.warning(
+            f"Lock file {lock_file} exists. Task might be open in other service."
+        )
 
     try:
         with open(task_filename, "r") as task_file:

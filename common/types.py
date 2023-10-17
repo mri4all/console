@@ -42,12 +42,13 @@ class ExamInformation(BaseModel):
 
     def initialize(self):
         self.id = helper.generate_uid()
-        dicom_study_uid: str = pydicom.uid.generate_uid()
+        self.dicom_study_uid: str = pydicom.uid.generate_uid()
         self.scan_counter = 0
 
     def clear(self):
         self.id = ""
         self.scan_counter = 0
+        self.dicom_study_uid = ""
 
 
 class SystemInformation(BaseModel):
