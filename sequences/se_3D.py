@@ -280,11 +280,11 @@ def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fov = 224e-3  # Define FOV and resolution
-    fov_z = 64e-3
-    Nx = 128
+    fov = 140e-3  # Define FOV and resolution
+    fov_z = 140e-3
+    Nx = 70
     Ny = Nx
-    Nz = 32
+    Nz = 27
     Nspokes = math.ceil(Nx * math.pi/2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
@@ -298,6 +298,7 @@ def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool
     dim0 = Nz   # slice direction as PE, TODO: Get this info from the UI
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
+    spoke_inc = "golden_angle" # TODO: get from UI: GA or linear increment over 180
 
     # ======
     # INITIATE SEQUENCE
@@ -383,7 +384,10 @@ def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
         for j in range(Nspokes): # use radial spokes as outer_loop, TODO: switch inner/outer loop
-            phi = i * (math.pi/Nspokes) # linear increment for now (could add golden-angle)
+            if spoke_inc == "linear_increment":
+                phi = i * (math.pi/Nspokes) 
+            elif spoke_inc == "golden_angle":
+                phi = i * (111.246117975/180*math.pi)
             gx_pre.amplitude = amp_pre_max * math.sin(phi)
             gy_pre.amplitude = amp_pre_max * math.cos(phi)
             gx.amplitude = amp_enc_max * math.sin(phi)
