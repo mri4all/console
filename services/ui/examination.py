@@ -246,8 +246,8 @@ class ExaminationWindow(QMainWindow):
             ui_runtime.status_last_completed_scan
             != ui_runtime.status_viewer_last_autoload_scan
         ):
-            # TODO: Trigger autoload of the last case
-            self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
+            # Trigger autoload of the last case
+            self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
             ui_runtime.status_viewer_last_autoload_scan = (
                 ui_runtime.status_last_completed_scan
             )
@@ -407,10 +407,45 @@ class ExaminationWindow(QMainWindow):
                 )
         widgetButton.setIconSize(QSize(24, 24))
         widgetButton.setStyleSheet("background-color: transparent;")
+
+        imageWidgetButton = QPushButton("")
+        imageWidgetButton.setContentsMargins(0, 0, 0, 0)
+        imageWidgetButton.setMaximumWidth(32)
+        imageWidgetButton.setFlat(True)
+        imageWidgetButton.setIcon(qta.icon(f"fa5s.image", color=widget_font_color))
+        imageWidgetButton.setIconSize(QSize(24, 24))
+        imageWidgetButton.setStyleSheet("background-color: transparent;")
+        image_button_menu = QMenu(self)
+        image_button_menu.addAction("Show in Viewer 1", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer1")
+        image_button_menu.addAction("Show in Viewer 2", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer2")
+        image_button_menu.addAction("Show in Viewer 3", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer3")
+        imageWidgetButton.setMenu(image_button_menu)
+        imageWidgetButton.setStyleSheet(
+            """QPushButton::menu-indicator {
+                                                image: none;
+                                                subcontrol-position: right top;
+                                                subcontrol-origin: padding;
+                                            }
+            """
+        )
         widgetLayout = QHBoxLayout()
         widgetLayout.addWidget(widgetText)
+        widgetLayout.addWidget(imageWidgetButton)
         widgetLayout.addWidget(widgetButton)
+
+        if entry.has_results:
+            imageWidgetButton.setVisible(True)
+        else:
+            imageWidgetButton.setVisible(False)
+
         widgetLayout.setContentsMargins(0, 0, 0, 0)
+        widgetLayout.setSpacing(0)
         widget.setLayout(widgetLayout)
         item.setSizeHint(widget.sizeHint())
         self.queueWidget.addItem(item)  # type: ignore
@@ -466,22 +501,30 @@ class ExaminationWindow(QMainWindow):
         )
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
+        selected_widget.layout().itemAt(1).widget().setIcon(
+            qta.icon(f"fa5s.image", color=widget_font_color)
+        )
+        if entry.has_results:
+            selected_widget.layout().itemAt(1).widget().setVisible(True)
+        else:
+            selected_widget.layout().itemAt(1).widget().setVisible(False)
+
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
             if str(entry.state) != selected_widget.layout().itemAt(1).widget().property(
                 "state"
             ):
                 if (entry.state != "acq") and (entry.state != "recon"):
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
                     )
                 else:
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(
                             f"fa5s.{widget_icon}",
                             color=widget_font_color,
                             animation=qta.Spin(
-                                selected_widget.layout().itemAt(1).widget()
+                                selected_widget.layout().itemAt(2).widget()
                             ),
                         )
                     )
@@ -883,3 +926,18 @@ class ExaminationWindow(QMainWindow):
         ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)
+
+    def load_result_in_viewer(self):
+        source_results = self.sender().property("source")
+        target_viewer = self.sender().property("source")
+        if target_viewer == "viewer1":
+            pass
+        elif target_viewer == "viewer2":
+            pass
+        elif target_viewer == "viewer3":
+            pass
+        else:
+            log.error("Invalid target viewer selected")
+
+    def autoload_results_in_viewer(self, folder_name: str):
+        pass
