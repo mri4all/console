@@ -115,7 +115,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  }
 
     # Return the frequency that worked the best with SNR
-    return max_snr_freq, data_dict
+    return max_freq, data_dict
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
@@ -383,6 +383,109 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
 
     return est_rf_max, data_dict
 
+def rf_duration_cal(rxd_list=[], points=25, zoom_factor=2, smooth=True, iterations=2, first_max=False, \
+                    plot=True):
+    """
+    Calibrate RF optimal duration for pi/2 flip angle
+
+    Args:
+        larmor_freq (float): [MHz] Scanner larmor frequency
+        points (int): Points to plot per iteration
+        iterations (int): Iterations to focus in
+        zoom_factor (float): About to zoom in by each iteration -- must be greater than 1
+        shim_x, shim_y, shim_z (float): Shim value, defaults to config SHIM_ values, must be less than 1 magnitude
+        tr_spacing (float): [us] Time between repetitions
+        force_tr (bool): Default False, forces long TR times that would otherwise throw an error
+        first_max (bool): Default False, changes search to find the first maximum instead of global
+        smooth (bool): Default True, 3-wide running average on data
+        plot (bool): Default False, plot final data
+
+    Returns:
+        float: Estimated optimal RF duration in us
+        dict: Dictionary of data
+    """
+    # Select seq file for 2 spin echoes
+    RF_PI2_DURATION = 50  # us, hardcoded from sequence
+    
+    # Needs to zoom in, not out
+    assert (zoom_factor > 1)
+
+    # Initializations
+    rf_duration_val = 0
+    rf_min_duration, rf_max_duration = 50e-6,300e-6 # in seconds
+    rf_duration_vals = np.linspace(rf_min_duration, rf_max_duration, num=points, endpoint=True)
+        
+    # Run iterative search
+    for it in range(iterations):
+        # Reshape data to split echoes, ignore first echo due to measurement inconsistencies
+        rx_arr = np.reshape(rxd_list, (points, 2, -1))[:, 1, :]
+        # Measure maximums of each measurement
+        peak_max_arr = np.max(np.abs(rx_arr), axis=1, keepdims=False)
+
+        # Smooth out data with a rolling average
+        if smooth:
+            peak_max_arr = np.convolve(np.hstack((peak_max_arr[0:1], peak_max_arr[0:1],
+                                                  peak_max_arr, peak_max_arr[-1:], peak_max_arr[-1:])),
+                                       [1 / 3, 1 / 3, 1 / 3])[3:-3]
+
+        # Pick out first maximum or absolute maximum
+        dec_inds = np.where(peak_max_arr[:-1] >= peak_max_arr[1:])[0]
+        if first_max and len(dec_inds) > 0:
+            max_ind = dec_inds[0]
+        else:
+            max_ind = np.argmax(peak_max_arr)
+        rf_optimal_duration_val = rf_duration_vals[max_ind]
+
+        # Plot if asked
+        if plot and it < iterations - 1:
+            fig, axs = plt.subplots(2, 1, constrained_layout=True)
+            fig.suptitle(f'Iteration {it + 1}/{iterations}')
+            axs[0].plot(np.abs(rx_arr).T)
+            axs[0].set_title('Stacked signals -- Magnitude')
+            axs[1].plot(rf_duration_vals, peak_max_arr)
+            axs[1].plot(rf_optimal_duration_val, peak_max_arr[max_ind], 'x')
+            if first_max:
+                axs[1].set_title(f'Max signals -- first max at {rf_optimal_duration_val:.4f}')
+            else:
+                axs[1].set_title(f'Max signals -- global max at {rf_optimal_duration_val:.4f}')
+            plt.ion()
+            plt.show()
+            plt.draw()
+            plt.pause(0.001)
+
+        # Update range by zooming around max value
+        rf_min_duration = max(0.05, rf_optimal_duration_val - zoom_factor ** (-1 * (it + 1)) / 2)
+        rf_max_duration = min(0.95, rf_optimal_duration_val + zoom_factor ** (-1 * (it + 1)) / 2)
+
+    # Calculate optimal duration in seconds
+    print(f'Estimated RF optimal duration: {rf_optimal_duration_val:.2f} us')
+    
+    # Plot if asked
+    if plot:
+        fig, axs = plt.subplots(2, 1, constrained_layout=True)
+        fig.suptitle(f'Iteration {it + 1}/{iterations}')
+        axs[0].plot(np.abs(rx_arr).T)
+        axs[0].set_title('Stacked signals -- Magnitude')
+        axs[1].plot(rf_duration_vals, peak_max_arr)
+        axs[1].plot(rf_optimal_duration_val, peak_max_arr[max_ind], 'x')
+        if first_max:
+            axs[1].set_title(f'Max signals -- first max at {rf_optimal_duration_val:.4f}')
+        else:
+            axs[1].set_title(f'Max signals -- global max at {rf_optimal_duration_val:.4f}')
+        plt.ioff()
+        plt.show()
+
+    # Saved data for visualization
+    data_dict = {
+                #  'rxd': rxd,
+                 'rx_arr': rx_arr,
+                #  'rx_t': rx_t,
+                 'rxd_list': rxd_list,
+                 'rf_max': rf_optimal_duration_val
+                 }
+
+    return rf_optimal_duration_val, data_dict
+
 
 # TODO Add gui test functionality
 # TODO Comment
@@ -396,6 +499,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     Calibrate gradient maximum using a phantom of known width
 
     Args:
+        channel (str): channel to calibrate
         phantom_width (float): [mm] Phantom width
         larmor_freq (float): [MHz] Scanner larmor frequency
         calibration_power (float): [arb.] Fractional power to evaluate at
@@ -404,9 +508,10 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         echo_duration (float): [us] Time between echo peaks
         readout_duration (float): [us] Readout window around echo peak
         rx_period (float): [us] Readout dwell time
-        gradient_overshoot (float): [us] Amount of time to hold the readout gradient on for longer than readout_duration
         RF_PI2_DURATION (float): [us] RF pi/2 pulse duration
         rf_max (float): [Hz] System RF max
+        trap_ramp_duration (int): [us] duration of the gradient ramps
+        trap_ramp_pts (int): points to include in ramp
         plot (bool): Default False, plot final data
 
     Returns:
@@ -543,6 +648,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         axs[3].set_xlabel('Frequency (MHz)')
         plt.show()
     
+    # TODO need to actually update to config file 
     if channel=='x':
         cfg.GX_MAX = grad_max
     elif channel=='y':
@@ -554,15 +660,18 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal(seq_file=cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
-    Calibrate RF maximum for pi/2 flip angle
+    Calibrate gradient shim values 
 
 
     Args:
         larmor_freq (float): [MHz] Scanner larmor frequency
+        channel (str): channel's shim to calibrate
+        range (float): range of shim values to calibrate over, [-range, range]
+        shim_points (int): points to assess across range
         points (int): Points to plot per iteration
         iterations (int): Iterations to focus in
         zoom_factor (float): About to zoom in by each iteration -- must be greater than 1
@@ -572,6 +681,7 @@ def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3
         first_max (bool): Default False, changes search to find the first maximum instead of global
         smooth (bool): Default True, 3-wide running average on data
         plot (bool): Default False, plot final data
+        gui_test (bool): option to play with the gui
 
     Returns:
         float: Estimated RF max in Hz
@@ -582,7 +692,6 @@ def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
 
-    seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
     rxd_list = []
 
     if channel == 'x':

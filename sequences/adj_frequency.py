@@ -45,9 +45,22 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
+        opt_max_snr_freq, data_dict = larmor_step_search(
+            seq_file=self.seq_file_path,
+            step_search_center=max_snr_freq,
+            steps=30,
+            step_bw_MHz=5e-3,
+            plot=True,      # For Debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
+            delay_s=1,
+            gui_test=False,
+        )
+
         larmor_freq, data_dict = larmor_cal(
             seq_file=self.seq_file_path,
-            larmor_start=max_snr_freq,
+            larmor_start=opt_max_snr_freq,
             iterations=10,
             delay_s=1,
             echo_count=1,

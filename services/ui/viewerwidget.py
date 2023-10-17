@@ -9,10 +9,22 @@ import pydicom
 import numpy as np
 import os
 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+
+class MplCanvas(FigureCanvasQTAgg):
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        plt.style.use("dark_background")
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
 
 class ViewerWidget(QWidget):
     def __init__(self):
         super(ViewerWidget, self).__init__()
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
     series_name = ""
 
@@ -21,16 +33,13 @@ class ViewerWidget(QWidget):
         self.update()
 
     def configure(self):
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.visualize_dcm_files()
-
-        # if self.property("id") == "3":
-        #     sc = MplCanvas(self, width=5, height=4, dpi=100)
-        #     sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
-        #     layout = QVBoxLayout(self)
-        #     layout.setContentsMargins(0, 0, 0, 0)
-        #     layout.addWidget(sc)
+        if self.property("id") == "1":
+            self.visualize_dcm_files()
+        elif self.property("id") == "2":
+            self.plot_array()
+        elif self.property("id") == "3":
+            # Do something else later.
+            self.plot_array()
 
     def visualize_dcm_files(self):
         input_path = "/vagrant/classDcm"
@@ -54,4 +63,14 @@ class ViewerWidget(QWidget):
             ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
 
         pg.setConfigOptions(imageAxisOrder='row-major')
-        self.layout.addWidget(pg.image(ArrayDicom))
+        widget = pg.image(ArrayDicom)
+        widget.ui.histogram.hide()
+        widget.ui.roiBtn.hide()
+        widget.ui.menuBtn.hide()
+        self.layout.addWidget(widget)
+
+    def plot_array(self):
+        sc = MplCanvas(self, width=5, height=4, dpi=100)
+        y = np.random.normal(size=10)
+        sc.axes.plot(y)
+        self.layout.addWidget(sc)

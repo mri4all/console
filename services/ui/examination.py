@@ -1,4 +1,8 @@
 from datetime import datetime
+from multiprocessing import set_start_method
+import os
+import sys
+import threading
 import time
 import json
 
@@ -6,6 +10,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
@@ -14,6 +19,10 @@ import common.logger as logger
 import common.task as task
 from common.constants import *
 from common.types import ScanQueueEntry, ScanTask
+from common.ipc import Communicator
+import common.ipc as ipc
+
+from common.types import ScanQueueEntry, ScanTask, ResultItem
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -29,27 +38,26 @@ from services.ui.errors import SequenceUIFailed, UIException
 log = logger.get_logger()
 
 scanParameters_stylesheet = """ 
-                QTabBar { 
-                    font-size: 16px;
-                    font-weight: bold;
-                }  
-                QTabBar::tab {
-                    margin-left:0px;
-                    margin-right:16px;          
-                    border-bottom: 3px solid transparent;
-                }
-               QTabBar::tab:selected {
-                    border-bottom: 3px solid #E0A526;
-                }                
-                QTabBar::tab:selected:disabled {
-                    border-bottom: 3px solid transparent;
-                }                
-               QTabBar::tab:disabled {
-                    color: #515669;
-                    border-bottom: 3px solid transparent;
-                }                    
-           
-            """
+    QTabBar { 
+        font-size: 16px;
+        font-weight: bold;
+    }  
+    QTabBar::tab {
+        margin-left:0px;
+        margin-right:16px;          
+        border-bottom: 3px solid transparent;
+    }
+    QTabBar::tab:selected {
+        border-bottom: 3px solid #E0A526;
+    }                
+    QTabBar::tab:selected:disabled {
+        border-bottom: 3px solid transparent;
+    }                
+    QTabBar::tab:disabled {
+        color: #515669;
+        border-bottom: 3px solid transparent;
+    }                            
+    """
 
 scanParameters_stylesheet_error = (
     scanParameters_stylesheet
@@ -62,6 +70,7 @@ class ExaminationWindow(QMainWindow):
     viewer2 = None
     viewer3 = None
 
+    status_overwrite = None
     updating_queue_widget = False
 
     def __init__(self):
@@ -230,9 +239,61 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
+        self.recon_pipe = Communicator(Communicator.UI_RECON)
+        self.recon_pipe.received.connect(self.received_recon)
+        self.recon_pipe.listen()
+
+        self.acq_pipe = Communicator(Communicator.UI_ACQ)
+        self.acq_pipe.received.connect(self.received_acq)
+        self.acq_pipe.listen()
+
         self.monitorTimer = QTimer(self)
         self.monitorTimer.timeout.connect(self.update_monitor_status)
         self.monitorTimer.start(1000)
+
+    def received_recon(self, o):
+        self.received_message(o, self.recon_pipe)
+    
+    def received_acq(self, o):
+        self.received_message(o, self.acq_pipe)
+
+    def received_message(self, o, pipe):
+        msg_value = o.value
+        if isinstance(msg_value,ipc.messages.UserQueryMessage):
+            try:
+                ok = False
+                value = None
+                dlg = None
+                while value is None: 
+                    dlg = QInputDialog(self)
+                    dlg.setInputMode(dict(text=QInputDialog.TextInput,int=QInputDialog.IntInput,float=QInputDialog.DoubleInput)[msg_value.input_type])
+                    
+                    if msg_value.input_type == "int":
+                        dlg.setIntMinimum(int(msg_value.in_min))
+                        dlg.setIntMaximum(int(msg_value.in_max))
+                    if msg_value.input_type == "float":
+                        dlg.setDoubleMinimum(msg_value.in_min)
+                        dlg.setDoubleMaximum(msg_value.in_max)
+
+                    dlg.setLabelText(f"Enter {msg_value.request}")
+                    dlg.setWindowTitle(msg_value.request.capitalize())
+                    dlg.resize(500, 100)
+                    ok = dlg.exec_()
+                    get_value = dict(text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue)[msg_value.input_type]
+                    value = get_value()
+                pipe.send_user_response(response=value, error=False)
+
+            except Exception as e:
+                log.exception("Error")
+                pipe.send_user_response(error=True)
+        elif isinstance(msg_value, ipc.messages.UserAlertMessage):
+            msg = QMessageBox()
+            msg.setIcon(dict(information=QMessageBox.Information, warning=QMessageBox.Warning, critical=QMessageBox.Critical)[msg_value.alert_type])
+            msg.setWindowTitle(msg_value.alert_type.capitalize())
+            msg.setText(msg_value.message)
+            msg.exec_()
+        elif isinstance(msg_value, ipc.messages.SetStatusMessage):
+            self.overwrite_status_message(msg_value.message)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
@@ -240,30 +301,57 @@ class ExaminationWindow(QMainWindow):
             self.set_status_message("Running scan...")
         elif ui_runtime.status_recon_active:
             self.set_status_message("Reconstruction data...")
-        else:
+        elif not self.status_overwrite: # TODO: unset the overwritten status
             self.set_status_message("Scanner ready")
 
         if (
             ui_runtime.status_last_completed_scan
             != ui_runtime.status_viewer_last_autoload_scan
         ):
-            # TODO: Trigger autoload of the last case
-            self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
+            # Trigger autoload of the last case
+            self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
             ui_runtime.status_viewer_last_autoload_scan = (
                 ui_runtime.status_last_completed_scan
             )
 
+            # Retrieving the list of result objects.
+            dummy_result_json = {
+                "results": [
+                    {
+                    "type": "dicom",
+                    "name": "temp1",
+                    "file_path": "/path/to/exact/folder/from/base/folder",
+                    "autoload_viewer": "1"
+                    },
+                    {
+                    "type": "plot",
+                    "name": "temp2",
+                    "file_path": "/path/to/exact/folder/from/base/folder",
+                    "autoload_viewer": "1"
+                    }
+                ]
+            }
+            result_item_objects = []
+            for result_item in dummy_result_json["results"]:
+                result_item_object = ResultItem(**result_item)
+                result_item_objects.append(result_item_object)
+
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
-            if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
-                menu = QMenu()
-                menu.addAction("Duplicate")
-                menu.addAction("Rename...", self.rename_scan_clicked)
-                menu.addSeparator()
-                menu.addAction("Save to browser...")
-                menu.addSeparator()
-                menu.addAction("Show definition...", self.show_definition_clicked)
-                menu.exec_(event.globalPos())
+            if self.queueWidget.currentRow() >= 0:
+                if ui_runtime.editor_active == False:
+                    menu = QMenu()
+                    menu.addAction("Duplicate", self.duplicate_scan_clicked)
+                    menu.addAction("Rename...", self.rename_scan_clicked)
+                    menu.addSeparator()
+                    menu.addAction("Save to browser...")
+                    menu.addSeparator()
+                    menu.addAction("Show definition...", self.show_definition_clicked)
+                    menu.exec_(event.globalPos())
+                else:
+                    menu = QMenu()
+                    menu.addAction("Rename...", self.rename_scan_clicked)
+                    menu.exec_(event.globalPos())
 
         return super(QMainWindow, self).eventFilter(source, event)
 
@@ -283,6 +371,10 @@ class ExaminationWindow(QMainWindow):
 
     def set_status_message(self, message: str):
         self.statusLabel.setText(message)
+
+    def overwrite_status_message(self, message: str):
+        self.status_overwrite = message
+        self.set_status_message(message)
 
     def prepare_examination_ui(self):
         """
@@ -370,7 +462,10 @@ class ExaminationWindow(QMainWindow):
             widget_icon = "wrench"
 
         item = QListWidgetItem()
-        item.setToolTip(f"Sequence class = {entry.sequence}")
+        tool_tip = f"Sequence class = {entry.sequence}"
+        if entry.description:
+            tool_tip += f"\n\n{entry.description}"
+        item.setToolTip(tool_tip)
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
         widget.setStyleSheet(
@@ -400,10 +495,48 @@ class ExaminationWindow(QMainWindow):
                 )
         widgetButton.setIconSize(QSize(24, 24))
         widgetButton.setStyleSheet("background-color: transparent;")
+
+        imageWidgetButton = QPushButton("")
+        imageWidgetButton.setContentsMargins(0, 0, 0, 0)
+        imageWidgetButton.setMaximumWidth(32)
+        imageWidgetButton.setFlat(True)
+        imageWidgetButton.setIcon(qta.icon(f"fa5s.image", color=widget_font_color))
+        imageWidgetButton.setIconSize(QSize(24, 24))
+        imageWidgetButton.setStyleSheet("background-color: transparent;")
+        image_button_menu = QMenu(self)
+        image_button_menu.addAction("Show in Viewer 1", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer1")
+        image_button_menu.addAction("Show in Viewer 2", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer2")
+        image_button_menu.addAction("Show in Viewer 3", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer3")
+        imageWidgetButton.setMenu(image_button_menu)
+        imageWidgetButton.setStyleSheet(
+            """QPushButton::menu-indicator {
+                                                image: none;
+                                                subcontrol-position: right top;
+                                                subcontrol-origin: padding;
+                                            }
+                QPushButton::hover {
+                    background-color: #FFF;
+                }     
+            """
+        )
         widgetLayout = QHBoxLayout()
         widgetLayout.addWidget(widgetText)
+        widgetLayout.addWidget(imageWidgetButton)
         widgetLayout.addWidget(widgetButton)
+
+        if entry.has_results:
+            imageWidgetButton.setVisible(True)
+        else:
+            imageWidgetButton.setVisible(False)
+
         widgetLayout.setContentsMargins(0, 0, 0, 0)
+        widgetLayout.setSpacing(0)
         widget.setLayout(widgetLayout)
         item.setSizeHint(widget.sizeHint())
         self.queueWidget.addItem(item)  # type: ignore
@@ -459,22 +592,30 @@ class ExaminationWindow(QMainWindow):
         )
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
+        selected_widget.layout().itemAt(1).widget().setIcon(
+            qta.icon(f"fa5s.image", color=widget_font_color)
+        )
+        if entry.has_results:
+            selected_widget.layout().itemAt(1).widget().setVisible(True)
+        else:
+            selected_widget.layout().itemAt(1).widget().setVisible(False)
+
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
             if str(entry.state) != selected_widget.layout().itemAt(1).widget().property(
                 "state"
             ):
                 if (entry.state != "acq") and (entry.state != "recon"):
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
                     )
                 else:
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(
                             f"fa5s.{widget_icon}",
                             color=widget_font_color,
                             animation=qta.Spin(
-                                selected_widget.layout().itemAt(1).widget()
+                                selected_widget.layout().itemAt(2).widget()
                             ),
                         )
                     )
@@ -570,6 +711,7 @@ class ExaminationWindow(QMainWindow):
             task.set_task_state(scan_path, mri4all_files.PREPARED, False)
 
         scan_task = task.read_task(scan_path)
+        ui_runtime.editor_protocol_name = scan_task.protocol_name
 
         if not ui_runtime.editor_sequence_instance.set_parameters(
             scan_task.parameters, scan_task
@@ -793,37 +935,100 @@ class ExaminationWindow(QMainWindow):
             log.error("Invalid scan queue index selected")
             return
 
-        # Update the scan queue list to ensure that the job can still be deleted at this time
-        ui_runtime.update_scan_queue_list()
-        scan_entry = ui_runtime.get_scan_queue_entry(index)
-        if not scan_entry:
-            log.warning("Invalid scan queue index selected")
-            return
+        current_name = ""
+        if not ui_runtime.editor_active:
+            # Update the scan queue list to ensure that the job can still be renamed at this time
+            ui_runtime.update_scan_queue_list()
+            scan_entry = ui_runtime.get_scan_queue_entry(index)
+            if not scan_entry:
+                log.warning("Invalid scan queue index selected")
+                return
+            current_name = scan_entry.protocol_name
+        else:
+            current_name = ui_runtime.editor_scantask.protocol_name
 
         dlg = QInputDialog(self)
         dlg.setInputMode(QInputDialog.TextInput)
         dlg.setLabelText("Enter protocol name")
         dlg.setWindowTitle("Protocol Name")
         dlg.resize(500, 100)
-        dlg.setTextValue(scan_entry.protocol_name)
+        dlg.setTextValue(current_name)
         ok = dlg.exec_()
         new_name = dlg.textValue()
 
         if ok:
-            scan_path = ui_runtime.get_scan_location(index)
-            if not scan_path:
-                log.error("Case has invalid state. Cannot read scan parameters")
-                # Needs handling
-                pass
-            scan_task = task.read_task(scan_path)
-            if scan_task == None:
-                log.error("Failed to read task file")
-                # Needs handling
-                pass
-            scan_task.protocol_name = new_name
-            ui_runtime.get_scan_queue_entry(index).protocol_name = new_name
-            if not task.write_task(scan_path, scan_task):
-                log.error("Failed to write updated task file")
-                # Needs handling
-                pass
+            if ui_runtime.editor_active == False:
+                ui_runtime.update_scan_queue_list()
+                scan_entry = ui_runtime.get_scan_queue_entry(index)
+
+                if (
+                    scan_entry.state != mri4all_states.CREATED
+                    and scan_entry.state != mri4all_states.SCHEDULED_ACQ
+                ):
+                    log.warning("Cannot rename scan. Scan has already been started.")
+                    # TODO: Post message to UI
+                    return
+
+                scan_path = ui_runtime.get_scan_location(index)
+                if not scan_path:
+                    log.error("Case has invalid state. Cannot read scan parameters")
+                    # Needs handling
+                    pass
+                scan_task = task.read_task(scan_path)
+                if scan_task == None:
+                    log.error("Failed to read task file")
+                    # Needs handling
+                    pass
+                scan_task.protocol_name = new_name
+                ui_runtime.get_scan_queue_entry(index).protocol_name = new_name
+                if not task.write_task(scan_path, scan_task):
+                    log.error("Failed to write updated task file")
+                    # Needs handling
+                    pass
+            else:
+                ui_runtime.editor_scantask.protocol_name = new_name
+                ui_runtime.get_scan_queue_entry(index).protocol_name = new_name
+                # self.update_entry_in_queue_widget(index, ui_runtime.get_scan_queue_entry(index))
+
             self.sync_queue_widget(False)
+
+    def duplicate_scan_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        if not ui_runtime.duplicate_sequence(index):
+            log.error("Failed to duplicate scan")
+            # TODO: Show error message
+            return
+
+        ui_runtime.get_scan_queue_entry(
+            index + 1
+        ).protocol_name = scan_entry.protocol_name
+
+        self.sync_queue_widget(True)
+
+    def load_result_in_viewer(self):
+        source_results = self.sender().property("source")
+        target_viewer = self.sender().property("source")
+        if target_viewer == "viewer1":
+            pass
+        elif target_viewer == "viewer2":
+            pass
+        elif target_viewer == "viewer3":
+            pass
+        else:
+            log.error("Invalid target viewer selected")
+
+    def autoload_results_in_viewer(self, folder_name: str):
+        pass

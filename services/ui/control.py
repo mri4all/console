@@ -1,23 +1,34 @@
-import asyncio
+import subprocess
+
 from common.constants import Service, ServiceAction
 
 
-async def async_run(cmd, **params) -> (int | None, bytes, bytes):
-    """Executes the given shell command in a way compatible with asyncio."""
-    proc = await asyncio.create_subprocess_shell(
-        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **params
-    )
-
-    stdout, stderr = await proc.communicate()
-    return proc.returncode, stdout, stderr
-
-
 def get_services() -> list[str]:
-    return [service.value for service in Service]
+    return [service for service in Service]
 
 
-async def control_services(action: ServiceAction) -> None:
-    services = get_services()
-    for service in services:
-        command = "sudo systemctl " + action.value + " " + service
-        await async_run(command)
+def control_service(action: ServiceAction, service: Service) -> bool | None:
+    command = ["sudo", "systemctl", "--no-block", action.value, service.value]
+    result = subprocess.run(command, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+                            universal_newlines=True)
+    
+    if action == ServiceAction.STATUS:
+        return "active (running)" in result.stdout
+    
+    return None
+
+
+def control_services(action: ServiceAction) -> None:
+    for service in get_services():
+        control_service(action, service)
+
+
+def ping(ip: str):
+    """Returns True if host responds to a ping request on Ubuntu."""
+    command = ["ping", "-c", "1", ip]
+
+    try:
+        subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
