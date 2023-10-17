@@ -70,12 +70,11 @@ class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
     protocol_name: str = ""
-    flags: dict = {}  # TODO
-    exam: dict = {}  # TODO
-    patient: PatientInformation = PatientInformation()
-    parameters: dict = {}
-    adjustment: dict = {}  # TODO
     system: SystemInformation = SystemInformation()
+    patient: PatientInformation = PatientInformation()
+    exam: ExamInformation = ExamInformation()
+    parameters: dict = {}  # TODO
+    adjustment: dict = {}  # TODO
     processing: ProcessingConfig = ProcessingConfig()
     other: dict = {}
     results: dict = {}  # TODO
