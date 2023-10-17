@@ -589,7 +589,7 @@ def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
 
-    seq_file = cfg.MGH_PATH + f'cal_seq_files/shim.seq'
+    seq_file = cfg.MGH_PATH + f'seq/shim.seq'
     rxd_list = []
 
     if channel == 'x':
