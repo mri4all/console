@@ -22,6 +22,7 @@ from common.types import ScanQueueEntry, ScanTask
 from common.ipc import Communicator
 import common.ipc as ipc
 
+from common.types import ScanQueueEntry, ScanTask, ResultItem
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -312,6 +313,28 @@ class ExaminationWindow(QMainWindow):
             ui_runtime.status_viewer_last_autoload_scan = (
                 ui_runtime.status_last_completed_scan
             )
+
+            # Retrieving the list of result objects.
+            dummy_result_json = {
+                "results": [
+                    {
+                    "type": "dicom",
+                    "name": "temp1",
+                    "file_path": "/path/to/exact/folder/from/base/folder",
+                    "autoload_viewer": "1"
+                    },
+                    {
+                    "type": "plot",
+                    "name": "temp2",
+                    "file_path": "/path/to/exact/folder/from/base/folder",
+                    "autoload_viewer": "1"
+                    }
+                ]
+            }
+            result_item_objects = []
+            for result_item in dummy_result_json["results"]:
+                result_item_object = ResultItem(**result_item)
+                result_item_objects.append(result_item_object)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
