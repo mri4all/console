@@ -23,7 +23,13 @@ class ViewerWidget(QWidget):
     def configure(self):
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.visualize_dcm_files()
+        if self.property("id") == "1":
+            self.visualize_dcm_files()
+        elif self.property("id") == "2":
+            self.plot_array()
+        elif self.property("id") == "3":
+            # Do something else later.
+            self.plot_array()
 
         # if self.property("id") == "3":
         #     sc = MplCanvas(self, width=5, height=4, dpi=100)
@@ -59,3 +65,8 @@ class ViewerWidget(QWidget):
         widget.ui.roiBtn.hide()
         widget.ui.menuBtn.hide()
         self.layout.addWidget(widget)
+
+    def plot_array(self):
+        y = np.random.normal(size=10)
+        plot = pg.plot(y)
+        self.layout.addWidget(plot)
