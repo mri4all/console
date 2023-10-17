@@ -239,11 +239,11 @@ class ExaminationWindow(QMainWindow):
         self.update_size()
 
         self.recon_pipe = Communicator(Communicator.UI_RECON)
-        self.recon_pipe.recieved.connect(self.received_recon)
+        self.recon_pipe.received.connect(self.received_recon)
         self.recon_pipe.listen()
 
         self.acq_pipe = Communicator(Communicator.UI_ACQ)
-        self.acq_pipe.recieved.connect(self.received_acq)
+        self.acq_pipe.received.connect(self.received_acq)
         self.acq_pipe.listen()
 
         self.monitorTimer = QTimer(self)
