@@ -64,3 +64,14 @@ class filter_lib():
 
         return mask
         
+    def sine_bell_filter2D(matrix_size, a=1):
+        
+        """ 
+        a kspace sine bell filter mask 2D
+        JC
+        """
+        mask_1 = np.sin(np.pi * a * np.arange(matrix_size[0])/matrix_size[0])
+        mask_2 = np.sin(np.pi * a * np.arange(matrix_size[1])/matrix_size[1])
+
+        return np.outer(mask_1,mask_2)
+        
