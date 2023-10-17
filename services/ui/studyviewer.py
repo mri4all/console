@@ -23,6 +23,7 @@ def show_viewer():
     w.exec_()
 
 class ScanData(BaseModel):
+    id: str
     dicom: List[float]
     rawdata: List[float]
     metadata: ScanTask
@@ -81,13 +82,13 @@ class StudyViewer(QDialog):
             # create a new exam object if not found
             exam = next((e for e in patient.exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=exam_id, scans=[])
+                exam = ExamData(id=f'{scan_id}_{exam_id}', scans=[])
                 patient.exams.append(exam)
 
             dicom_data = np.array([])
             rawdata = np.array([])
 
-            scan = ScanData(dicom=dicom_data, rawdata=rawdata, metadata=scan_task)
+            scan = ScanData(id=scan_id, dicom=dicom_data, rawdata=rawdata, metadata=scan_task)
             exam.scans.append(scan)
 
         return organized_data
