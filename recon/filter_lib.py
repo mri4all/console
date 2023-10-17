@@ -69,22 +69,4 @@ class filter_lib():
         mask_2 = np.sin(np.pi * a * np.arange(matrix_size[1])/matrix_size[1])
 
         return np.outer(mask_1,mask_2)
-
-    def sine_bell_fermi3D(matrix_size, rr, wwz, a=1):
-        
-        """ 
-        a kspace sine bell filter mask 2D
-        JC
-        """
-
-
-        nx, ny, nz = matrix_size
-        mask = np.zeros((nx, ny, nz))
-        xv, yv, zv = np.meshgrid(np.linspace(-1,1,nx),np.linspace(-1,1,ny), np.linspace(-1,1,nz) )
-        mask_1 = np.sin(np.pi * a * np.arange(matrix_size[0])/matrix_size[0])
-        mask_2 = np.sin(np.pi * a * np.arange(matrix_size[1])/matrix_size[1])
-        mask = np.outer(mask_1,mask_2)
-        mask = np.mininum(np.repeat(mask[:,:,None],nz,axis=2), 1/(1+np.exp((zv**2-wwz)/rr)))
-
-        return mask  
         
