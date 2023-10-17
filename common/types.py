@@ -67,6 +67,15 @@ class ProcessingConfig(BaseModel):
     kspace_ordering: str = ""  # TODO: Decide where this is coming from
 
 
+ResultTypes = Literal["dicom", "plot", "rawdata"]
+
+class ResultItem(BaseModel):
+    type: ResultTypes
+    name: str = ""
+    file_path: str = ""
+    autoload_viewer: int
+
+
 class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
@@ -79,6 +88,8 @@ class ScanTask(BaseModel):
     processing: ProcessingConfig = ProcessingConfig()
     other: dict = {}
     results: dict = {}  # TODO
+
+
 
 
 ScanStatesType = Literal[
