@@ -12,11 +12,11 @@ import asyncio
 import time
 import common.logger as logger
 import common.runtime as rt
-from common.ipc import Communicator
 
 rt.set_service_name("acq")
 log = logger.get_logger()
 
+from common.ipc import Communicator
 import common.helper as helper
 from common.types import ScanTask
 import common.task as task
@@ -29,6 +29,7 @@ from common.constants import *
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
 communicator = Communicator(Communicator.ACQ)
+
 
 def move_to_fail(scan_name: str) -> bool:
     if not queue.move_task(

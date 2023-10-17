@@ -26,4 +26,4 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
         # self.problem_list.append("TR is too short")
         # self.problem_list.append("Gradient strength is too high")
 
-        return False
+        return True
