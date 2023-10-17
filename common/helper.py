@@ -3,12 +3,20 @@ import uuid
 import asyncio
 import inspect
 from typing import Optional
+import datetime
 
 
 def generate_uid() -> str:
     """Generate a new UUID and return it as string. The UUID is used to identify exams and scan tasks."""
     new_uuid = str(uuid.uuid1())
     return new_uuid
+
+
+def get_datetime() -> str:
+    """
+    Returns the current time as ISO 8601 formatted string, which should be used in JSON files.
+    """
+    return datetime.datetime.now().isoformat()
 
 
 class FileLock:
@@ -37,6 +45,7 @@ class FileLock:
 terminate_process = False
 loop = asyncio.get_event_loop()
 
+
 def trigger_terminate() -> None:
     """Trigger that the processing loop should terminate after finishing the currently active task."""
     global terminate_process
@@ -46,6 +55,7 @@ def trigger_terminate() -> None:
 def is_terminated() -> bool:
     """Checks if the process will terminate after the current task."""
     return terminate_process
+
 
 class AsyncTimer(object):
     def __init__(self, interval: float, func):

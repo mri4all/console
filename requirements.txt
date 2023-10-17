@@ -48,3 +48,7 @@ pylibjpeg-libjpeg
 rpyc~=5.3.1
 mypy~=1.6.0
 pydantic~=2.4.2
+
+# Recon dependences
+ismrmrd~=1.14.0
+pynufft>=2019.2.3

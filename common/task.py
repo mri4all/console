@@ -62,6 +62,7 @@ def create_task(
     scan_task.patient = patient_information
     scan_task.parameters = default_seq_parameters
     scan_task.other = {}
+    scan_task.journal.created_at = helper.get_datetime()
 
     try:
         with open(task_filename, "w") as task_file:
@@ -116,20 +117,23 @@ def read_task(folder) -> Any:
     return scan_task
 
 
-def write_task(folder, scan_task: ScanTask) -> bool:
+def write_task(folder, scan_task: ScanTask, use_internal_lock=True) -> bool:
     """
     Writes the provided scan task into the task file in JSON format.
     """
     task_filename = Path(folder) / mri4all_files.TASK
 
-    lock_file = Path(folder) / mri4all_files.LOCK
-    # Create lock file in the folder to prevent other services from accessing it
-    try:
-        lock = helper.FileLock(lock_file)
-    except:
-        # Can't create lock file, so something must be seriously wrong
-        log.error(f"Unable to create lock file {lock_file}")
-        return False
+    # Unless disabled, create an internal lock file to secure the scan task
+    # from other processes while writing it.
+    if use_internal_lock:
+        lock_file = Path(folder) / mri4all_files.LOCK
+        # Create lock file in the folder to prevent other services from accessing it
+        try:
+            lock = helper.FileLock(lock_file)
+        except:
+            # Can't create lock file, so something must be seriously wrong
+            log.error(f"Unable to create lock file {lock_file}")
+            return False
 
     try:
         with open(task_filename, "w") as task_file:
@@ -138,10 +142,41 @@ def write_task(folder, scan_task: ScanTask) -> bool:
         log.error(f"Unable to write task file {task_filename}")
         return False
 
+    # Unless disabled, create an internal lock file to secure the scan task
+    # from other processes while writing it.
+    if use_internal_lock:
+        try:
+            lock.free()
+        except Exception:
+            log.error(f"Unable to remove lock file {lock_file}")
+            return False
+
+    return True
+
+
+def lock_folder(folder: str) -> bool:
+    """
+    Creates a lock file in the provided folder. Returns True on success.
+    """
+    lock_file = Path(folder + "/" + mri4all_files.LOCK)
     try:
-        lock.free()
+        lock_file.touch(exist_ok=False)
     except Exception:
-        log.error(f"Unable to remove lock file {lock_file}")
+        log.error(f"Error locking folder {folder}. Case might be locked currently.")
+        return False
+
+    return True
+
+
+def unlock_folder(folder: str) -> bool:
+    """
+    Unlock a previously locked scan task.
+    """
+    lock_file = Path(folder + "/" + mri4all_files.LOCK)
+    try:
+        lock_file.unlink()
+    except Exception:
+        log.error(f"Error unlocking folder {folder}")
         return False
 
     return True
