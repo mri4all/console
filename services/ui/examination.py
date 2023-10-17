@@ -10,7 +10,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-import services.ui.fifo as fifo
+
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
@@ -19,6 +19,9 @@ import common.logger as logger
 import common.task as task
 from common.constants import *
 from common.types import ScanQueueEntry, ScanTask
+from common.ipc import Communicator
+import common.ipc as ipc
+
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -235,12 +238,12 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
-        self.recon_pipe = fifo.FifoPipe(fifo.PipeFile.UI_RECON, fifo.PipeFile.RECON)
+        self.recon_pipe = Communicator(Communicator.UI_RECON)
         self.recon_pipe.recieved.connect(self.received_recon)
         self.recon_pipe.listen()
 
-        self.acq_pipe = fifo.FifoPipe(fifo.PipeFile.UI_ACQ, fifo.PipeFile.ACQ)
-        self.acq_pipe.recieved.connect(self.received_recon)
+        self.acq_pipe = Communicator(Communicator.UI_ACQ)
+        self.acq_pipe.recieved.connect(self.received_acq)
         self.acq_pipe.listen()
 
         self.monitorTimer = QTimer(self)
@@ -255,7 +258,7 @@ class ExaminationWindow(QMainWindow):
 
     def received_message(self, o, pipe):
         msg_value = o.value
-        if isinstance(msg_value,fifo.UserQueryMessage):
+        if isinstance(msg_value,ipc.messages.UserQueryMessage):
             try:
                 ok = False
                 value = None
@@ -277,18 +280,18 @@ class ExaminationWindow(QMainWindow):
                     ok = dlg.exec_()
                     get_value = dict(text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue)[msg_value.input_type]
                     value = get_value()
-                pipe.send(fifo.UserResponseMessage(response=value))
+                pipe.send_user_response(response=value, error=False)
 
             except Exception as e:
                 log.exception("Error")
-                pipe.send(fifo.UserResponseMessage(), error=True)
-        elif isinstance(msg_value, fifo.UserAlertMessage):
+                pipe.send_user_response(error=True)
+        elif isinstance(msg_value, ipc.messages.UserAlertMessage):
             msg = QMessageBox()
             msg.setIcon(dict(information=QMessageBox.Information, warning=QMessageBox.Warning, critical=QMessageBox.Critical)[msg_value.alert_type])
             msg.setWindowTitle(msg_value.alert_type.capitalize())
             msg.setText(msg_value.message)
             msg.exec_()
-        elif isinstance(msg_value, fifo.SetStatusMessage):
+        elif isinstance(msg_value, ipc.messages.SetStatusMessage):
             self.overwrite_status_message(msg_value.message)
 
     def update_monitor_status(self):

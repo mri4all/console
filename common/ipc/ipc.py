@@ -1,12 +1,11 @@
 import atexit
-import errno
 import json
-from operator import truediv
 import os
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Any, Dict, Literal, Optional, Union
 from uuid import uuid5
 import uuid
+
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -15,9 +14,8 @@ import common.logger as logger
 import threading
 from pydantic import BaseModel
 
-import common.helper as helper
 from common.constants import *
-import services.ui.ui_runtime as ui_runtime
+from common.ipc.messages import *
 
 class PipeFile(Enum):
     RECON = "recon_pipe"
@@ -25,38 +23,8 @@ class PipeFile(Enum):
     UI_RECON = "ui_recon_pipe"
     UI_ACQ = "ui_recon_acq"
 
-class FifoMessageType(BaseModel):
-    pass
-
-class SimpleMessage(FifoMessageType):
-    type: Literal["simple"] = "simple"
-    message: str
-
-class SetStatusMessage(FifoMessageType):
-    type: Literal["set_status"] = "set_status"
-    message: str
-
-    # def __init__(self, message):
-    #     super().__init__(message=message)
-
-class UserQueryMessage(FifoMessageType):
-    type: Literal["user_query"] = "user_query"
-    input_type: Literal["text","int","float"] = "text"
-    in_min: Union[float, int] = 0
-    in_max: Union[float, int] = 1000
-    request: str
-
-class UserResponseMessage(FifoMessageType):
-    type: Literal["user_response"] = "user_response"
-    response: Optional[Union[float,int,str]] = None
-
-class UserAlertMessage(BaseModel):
-    type: Literal["user_alert"] = "user_alert"
-    message: str
-    alert_type: Literal["information", "warning", "critical"] = "information"
-
     
-class Message(BaseModel):
+class CommunicatorEnvelope(BaseModel):
     # TODO: Add missing entries from registration form
     id: str = str(uuid.uuid1())
     value: Union[UserResponseMessage, UserQueryMessage, UserAlertMessage, SetStatusMessage]
@@ -65,12 +33,25 @@ class Message(BaseModel):
 
 log = logger.get_logger()
 
-class FifoPipe(QObject):
+class PipeEnd(Enum):
+    RECON = (PipeFile.RECON, PipeFile.UI_RECON)
+    ACQ = (PipeFile.ACQ, PipeFile.UI_ACQ)
+    UI_ACQ = (PipeFile.UI_ACQ,PipeFile.ACQ)
+    UI_RECON = (PipeFile.UI_RECON, PipeFile.RECON)
+
+class Communicator(QObject, Helper):
+    RECON = PipeEnd.RECON
+    ACQ = PipeEnd.ACQ
+    UI_ACQ = PipeEnd.UI_ACQ
+    UI_RECON = PipeEnd.UI_RECON
+
     recieved = pyqtSignal(object)
     receive_thread = None
     base = "/tmp/mri4all/pipes"
-
-    def __init__(self,in_, out_):
+    pipe_end = None
+    def __init__(self, pipe_end: PipeEnd):
+        in_, out_ = pipe_end.value
+        self.pipe_end = pipe_end
         super().__init__()
         Path(self.base).mkdir(parents=True,exist_ok=True)
 
@@ -80,23 +61,30 @@ class FifoPipe(QObject):
         self.mkfifo(str(self.in_file))
         atexit.register(self.cleanup)
 
+
+    def is_open(self):
+        if not os.path.exists(self.out_file):
+            return False
+        return True
+
     def cleanup(self):
         os.unlink(self.in_file)
 
     def listen(self):
+        if (self.receive_thread):
+            raise Exception("already listening")
         self.receive_thread = threading.Thread(target=self._listen_emit, daemon=True)
         self.receive_thread.start()
 
-    def send(self, obj, error=False):
-        print(f"send to {self.out_file}")
+    def _send(self, obj:FifoMessageType, error=False):
         if not os.path.exists(self.out_file):
             return False
         with open(self.out_file,"w") as f:
-            f.write(Message(value=obj,error=error).model_dump_json())
+            f.write(CommunicatorEnvelope(value=obj,error=error).model_dump_json())
         return True
 
-    def query(self, obj):
-        if not self.send(obj):
+    def _query(self, obj):
+        if not self._send(obj):
             raise Exception("Other end of the pipe is not available.")
 
         result = next(self._listen())
@@ -106,7 +94,7 @@ class FifoPipe(QObject):
         
     def parse(self,line):
         print(json.loads(line))
-        return Message(**json.loads(line))
+        return CommunicatorEnvelope(**json.loads(line))
 
     def mkfifo(self, FIFO):
         try:
@@ -129,6 +117,6 @@ class FifoPipe(QObject):
 
 
 if __name__=="__main__":
-    k = FifoPipe(PipeFile.RECON, PipeFile.UI_RECON)
-    # result = k.query(UserQueryMessage(request="test request",input_type="float"))
-    k.send(SetStatusMessage(message="OK"))
+    k = Communicator(Communicator.RECON)
+    result = k.query_user(request="test request",input_type="float")
+    k.send_user_alert(message=f"You typed {result}")
