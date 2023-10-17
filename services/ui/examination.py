@@ -21,6 +21,7 @@ from common.constants import *
 from common.types import ScanQueueEntry, ScanTask
 from common.ipc import Communicator
 import common.ipc as ipc
+import common.helper as helper
 
 from common.types import ScanQueueEntry, ScanTask, ResultItem
 import services.ui.ui_runtime as ui_runtime
@@ -205,9 +206,10 @@ class ExaminationWindow(QMainWindow):
             """
         )
 
-        self.viewer1Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
-        self.viewer2Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
-        self.viewer3Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
+        viewer_styles = "QFrame:hover { border: 1px solid #E0A526; }"
+        self.viewer1Frame.setStyleSheet(viewer_styles)
+        self.viewer2Frame.setStyleSheet(viewer_styles)
+        self.viewer3Frame.setStyleSheet(viewer_styles)
 
         viewer1Layout = QHBoxLayout(self.viewer1Frame)
         viewer1Layout.setContentsMargins(0, 0, 0, 0)
@@ -253,21 +255,27 @@ class ExaminationWindow(QMainWindow):
 
     def received_recon(self, o):
         self.received_message(o, self.recon_pipe)
-    
+
     def received_acq(self, o):
         self.received_message(o, self.acq_pipe)
 
     def received_message(self, o, pipe):
         msg_value = o.value
-        if isinstance(msg_value,ipc.messages.UserQueryMessage):
+        if isinstance(msg_value, ipc.messages.UserQueryMessage):
             try:
                 ok = False
                 value = None
                 dlg = None
-                while value is None: 
+                while value is None:
                     dlg = QInputDialog(self)
-                    dlg.setInputMode(dict(text=QInputDialog.TextInput,int=QInputDialog.IntInput,float=QInputDialog.DoubleInput)[msg_value.input_type])
-                    
+                    dlg.setInputMode(
+                        dict(
+                            text=QInputDialog.TextInput,
+                            int=QInputDialog.IntInput,
+                            float=QInputDialog.DoubleInput,
+                        )[msg_value.input_type]
+                    )
+
                     if msg_value.input_type == "int":
                         dlg.setIntMinimum(int(msg_value.in_min))
                         dlg.setIntMaximum(int(msg_value.in_max))
@@ -279,7 +287,9 @@ class ExaminationWindow(QMainWindow):
                     dlg.setWindowTitle(msg_value.request.capitalize())
                     dlg.resize(500, 100)
                     ok = dlg.exec_()
-                    get_value = dict(text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue)[msg_value.input_type]
+                    get_value = dict(
+                        text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue
+                    )[msg_value.input_type]
                     value = get_value()
                 pipe.send_user_response(response=value, error=False)
 
@@ -288,7 +298,13 @@ class ExaminationWindow(QMainWindow):
                 pipe.send_user_response(error=True)
         elif isinstance(msg_value, ipc.messages.UserAlertMessage):
             msg = QMessageBox()
-            msg.setIcon(dict(information=QMessageBox.Information, warning=QMessageBox.Warning, critical=QMessageBox.Critical)[msg_value.alert_type])
+            msg.setIcon(
+                dict(
+                    information=QMessageBox.Information,
+                    warning=QMessageBox.Warning,
+                    critical=QMessageBox.Critical,
+                )[msg_value.alert_type]
+            )
             msg.setWindowTitle(msg_value.alert_type.capitalize())
             msg.setText(msg_value.message)
             msg.exec_()
@@ -301,7 +317,7 @@ class ExaminationWindow(QMainWindow):
             self.set_status_message("Running scan...")
         elif ui_runtime.status_recon_active:
             self.set_status_message("Reconstruction data...")
-        elif not self.status_overwrite: # TODO: unset the overwritten status
+        elif not self.status_overwrite:  # TODO: unset the overwritten status
             self.set_status_message("Scanner ready")
 
         if (
@@ -318,17 +334,17 @@ class ExaminationWindow(QMainWindow):
             dummy_result_json = {
                 "results": [
                     {
-                    "type": "dicom",
-                    "name": "temp1",
-                    "file_path": "/path/to/exact/folder/from/base/folder",
-                    "autoload_viewer": "1"
+                        "type": "dicom",
+                        "name": "temp1",
+                        "file_path": "/path/to/exact/folder/from/base/folder",
+                        "autoload_viewer": "1",
                     },
                     {
-                    "type": "plot",
-                    "name": "temp2",
-                    "file_path": "/path/to/exact/folder/from/base/folder",
-                    "autoload_viewer": "1"
-                    }
+                        "type": "plot",
+                        "name": "temp2",
+                        "file_path": "/path/to/exact/folder/from/base/folder",
+                        "autoload_viewer": "1",
+                    },
                 ]
             }
             result_item_objects = []
@@ -750,6 +766,7 @@ class ExaminationWindow(QMainWindow):
             ui_runtime.editor_scantask.other = json.loads(
                 self.otherParametersTextEdit.toPlainText()
             )
+            ui_runtime.editor_scantask.journal.prepared_at = helper.get_datetime()
             task.write_task(scan_path, ui_runtime.editor_scantask)
             task.set_task_state(scan_path, mri4all_files.EDITING, False)
             task.set_task_state(scan_path, mri4all_files.PREPARED, True)
