@@ -2,6 +2,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
+from common.constants import ViewerMode
 import qtawesome as qta  # type: ignore
 
 import pyqtgraph as pg
@@ -32,13 +33,11 @@ class ViewerWidget(QWidget):
         self.series_name = name
         self.update()
 
-    def configure(self):
-        if self.property("id") == "1":
+    def view_data(self, file_path: str, viewerMode: ViewerMode):
+        #TODO- use file_path to pick values from the specified folder.
+        if viewerMode == ViewerMode.DICOM:
             self.visualize_dcm_files()
-        elif self.property("id") == "2":
-            self.plot_array()
-        elif self.property("id") == "3":
-            # Do something else later.
+        elif viewerMode == ViewerMode.PLOT:
             self.plot_array()
 
     def visualize_dcm_files(self):
@@ -70,7 +69,7 @@ class ViewerWidget(QWidget):
         self.layout.addWidget(widget)
 
     def plot_array(self):
-        sc = MplCanvas(self, width=5, height=4, dpi=100)
+        sc = MplCanvas(self)
         y = np.random.normal(size=10)
         sc.axes.plot(y)
         self.layout.addWidget(sc)

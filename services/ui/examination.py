@@ -217,7 +217,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer1.setProperty("id", "1")
         viewer1Layout.addWidget(self.viewer1)
         self.viewer1Frame.setLayout(viewer1Layout)
-        self.viewer1.configure()
 
         viewer2Layout = QHBoxLayout(self.viewer2Frame)
         viewer2Layout.setContentsMargins(0, 0, 0, 0)
@@ -225,7 +224,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer2.setProperty("id", "2")
         viewer2Layout.addWidget(self.viewer2)
         self.viewer2Frame.setLayout(viewer2Layout)
-        self.viewer2.configure()
 
         viewer3Layout = QHBoxLayout(self.viewer3Frame)
         viewer3Layout.setContentsMargins(0, 0, 0, 0)
@@ -233,7 +231,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer3.setProperty("id", "3")
         viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
-        self.viewer3.configure()
 
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
@@ -325,7 +322,6 @@ class ExaminationWindow(QMainWindow):
             != ui_runtime.status_viewer_last_autoload_scan
         ):
             # Trigger autoload of the last case
-            self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
             ui_runtime.status_viewer_last_autoload_scan = (
                 ui_runtime.status_last_completed_scan
             )
@@ -351,6 +347,8 @@ class ExaminationWindow(QMainWindow):
             for result_item in dummy_result_json["results"]:
                 result_item_object = ResultItem(**result_item)
                 result_item_objects.append(result_item_object)
+
+            self.autoload_results_in_viewer(result_item_objects)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -1047,5 +1045,9 @@ class ExaminationWindow(QMainWindow):
         else:
             log.error("Invalid target viewer selected")
 
-    def autoload_results_in_viewer(self, folder_name: str):
-        pass
+    def autoload_results_in_viewer(self, result_item_objects):
+        for result_item_object in result_item_objects:
+            if result_item_object.type == ViewerMode.DICOM.value:
+                self.viewer1.view_data(result_item_object.file_path, ViewerMode.DICOM)
+            elif result_item_object.type == ViewerMode.PLOT.value:
+                self.viewer2.view_data(result_item_object.file_path, ViewerMode.PLOT)
