@@ -618,7 +618,7 @@ class ExaminationWindow(QMainWindow):
 
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
-            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property(
+            if str(entry.state) != selected_widget.layout().itemAt(2).widget().property(
                 "state"
             ):
                 if (entry.state != "acq") and (entry.state != "recon"):
@@ -636,8 +636,8 @@ class ExaminationWindow(QMainWindow):
                         )
                     )
         else:
-            selected_widget.layout().itemAt(1).widget().setIcon(QIcon())
-        selected_widget.layout().itemAt(1).widget().setProperty("state", entry.state)
+            selected_widget.layout().itemAt(2).widget().setIcon(QIcon())
+        selected_widget.layout().itemAt(2).widget().setProperty("state", entry.state)
 
     last_item_clicked = -1
 
