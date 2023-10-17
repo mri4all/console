@@ -55,7 +55,7 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
             rxd, rx_t = scr.run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ,
                                        tx_t=1, grad_t=10, tx_warmup=100,
                                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, rf_max=cfg.RF_MAX,
-                                       grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
+                                       grad_cal=False, save_np=True, save_mat=False, save_msgs=False,
                                        gui_test=False)
             rxd_list.append(rxd)
             time.sleep(tr_spacing)
