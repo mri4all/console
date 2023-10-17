@@ -48,6 +48,21 @@ class PipeEnd(Enum):
     UI_RECON = (PipeFile.UI_RECON, PipeFile.RECON)
 
 class Communicator(QObject, Helper):
+    """
+    Use this mechanism to communicate between the UI and the acquisition / recon services.
+
+    In the acquisition or recon services, you can (for instance) send a simple dialog box the user like so:
+        communicator.send_user_alert("Uh oh", alert_type="warning")
+
+    You can prompt the user to enter a value:
+        value = communicator.query_user("Pick a number", input_type="int", in_min=0, in_max=1000)
+
+        value = communicator.query_user("Input a value", input_type="text")
+        
+    These are handled in services/ui/examination.py:ExaminationWindow.received_message
+    
+    """
+
     RECON = PipeEnd.RECON
     ACQ = PipeEnd.ACQ
     UI_ACQ = PipeEnd.UI_ACQ
