@@ -256,7 +256,7 @@ class ExaminationWindow(QMainWindow):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
             if self.queueWidget.currentRow() >= 0 and ui_runtime.editor_active == False:
                 menu = QMenu()
-                menu.addAction("Duplicate")
+                menu.addAction("Duplicate", self.duplicate_scan_clicked)
                 menu.addAction("Rename...", self.rename_scan_clicked)
                 menu.addSeparator()
                 menu.addAction("Save to browser...")
@@ -795,7 +795,7 @@ class ExaminationWindow(QMainWindow):
             log.error("Invalid scan queue index selected")
             return
 
-        # Update the scan queue list to ensure that the job can still be deleted at this time
+        # Update the scan queue list to ensure that the job can still be renamed at this time
         ui_runtime.update_scan_queue_list()
         scan_entry = ui_runtime.get_scan_queue_entry(index)
         if not scan_entry:
@@ -812,6 +812,17 @@ class ExaminationWindow(QMainWindow):
         new_name = dlg.textValue()
 
         if ok:
+            ui_runtime.update_scan_queue_list()
+            scan_entry = ui_runtime.get_scan_queue_entry(index)
+
+            if (
+                scan_entry.state != mri4all_states.CREATED
+                and scan_entry.state != mri4all_states.SCHEDULED_ACQ
+            ):
+                log.warning("Cannot rename scan. Scan has already been started.")
+                # TODO: Post message to UI
+                return
+
             scan_path = ui_runtime.get_scan_location(index)
             if not scan_path:
                 log.error("Case has invalid state. Cannot read scan parameters")
@@ -829,3 +840,20 @@ class ExaminationWindow(QMainWindow):
                 # Needs handling
                 pass
             self.sync_queue_widget(False)
+
+    def duplicate_scan_clicked(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.error("Invalid scan queue index selected")
+            return
+
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected")
+            return
+
+        # TODO
