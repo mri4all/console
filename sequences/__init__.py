@@ -57,6 +57,14 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return "INVALID"
 
+    @classmethod
+    def get_description(self) -> str:
+        """
+        Returns a description that explains what the sequences does. This is shown in the
+        tooltip when hovering over a protocol.
+        """
+        return ""
+
     def get_parameters(self) -> dict:
         """
         Returns the current sequence parameters as dictionary.
