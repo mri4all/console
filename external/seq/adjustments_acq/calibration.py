@@ -557,7 +557,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal(seq_file=cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
@@ -589,7 +589,6 @@ def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
 
-    seq_file = cfg.MGH_PATH + f'/shim.seq'
     rxd_list = []
 
     if channel == 'x':
