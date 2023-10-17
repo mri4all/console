@@ -432,6 +432,9 @@ class ExaminationWindow(QMainWindow):
                                                 subcontrol-position: right top;
                                                 subcontrol-origin: padding;
                                             }
+                QPushButton::hover {
+                    background-color: #FFF;
+                }     
             """
         )
         widgetLayout = QHBoxLayout()
