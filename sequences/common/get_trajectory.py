@@ -122,7 +122,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
     if save_pe_order is True:
         np.save('pe_order.npy', pe_order)
 
-    print(pe_order)
+    # print(pe_order) # - For debug
     return pe_order
 
 
