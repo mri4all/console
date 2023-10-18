@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+from typing import Optional
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -13,6 +16,9 @@ import os
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import common.logger as logger
+
+log = logger.get_logger()
 
 
 class MplCanvas(FigureCanvasQTAgg):
@@ -24,13 +30,13 @@ class MplCanvas(FigureCanvasQTAgg):
 
 
 class ViewerWidget(QWidget):
-    layout: QBoxLayout
-    image_widget = None
+    # layout: QBoxLayout
+    widget: Optional[QWidget] = None
 
     def __init__(self):
         super(ViewerWidget, self).__init__()
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(QVBoxLayout(self))
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
     series_name = ""
 
@@ -45,13 +51,23 @@ class ViewerWidget(QWidget):
         elif viewerMode == ViewerMode.PLOT:
             self.plot_array()
 
-    def visualize_dcm_files(self, input_path="/vagrant/classDcm"):
-        lstFilesDCM = []  # create an empty list
-        for dirName, subdirList, fileList in sorted(os.walk(input_path)):
-            for filename in fileList:
-                if ".dcm" in filename.lower():
-                    lstFilesDCM.append(os.path.join(dirName, filename))
+    def clear_view(self):
+        if self.widget:
+            self.layout().removeWidget(self.widget)
+            self.widget.deleteLater()
+            self.widget = None
 
+    def view_scan(self, file_path: str):
+        self.clear_view()
+        dcm_path = Path(file_path) / "dicom"
+        other_path = Path(file_path) / "other"
+        if list(dcm_path.glob("**/*.dcm")):
+            self.visualize_dcm_files(str(dcm_path))
+        elif others := list(other_path.glob("*.json")):
+            self.plot_array(json.loads(others[0].read_text()))
+
+    def visualize_dcm_files(self, input_path="/vagrant/classDcm"):
+        lstFilesDCM = [str(p) for p in Path(input_path).glob("**/*.dcm")]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
             return
@@ -67,16 +83,17 @@ class ViewerWidget(QWidget):
 
         pg.setConfigOptions(imageAxisOrder="row-major")
         widget = pg.image(ArrayDicom)
+
         widget.ui.histogram.hide()
         widget.ui.roiBtn.hide()
         widget.ui.menuBtn.hide()
-        if self.image_widget:
-            self.layout.removeWidget(self.image_widget)
-        self.layout.addWidget(widget)
-        self.image_widget = widget
+        self.layout().addWidget(widget)
+        self.widget = widget
 
-    def plot_array(self):
+    def plot_array(self, array=None):
         sc = MplCanvas(self)
-        y = np.random.normal(size=10)
-        sc.axes.plot(y)
-        self.layout.addWidget(sc)
+        if array is None:
+            array = np.random.normal(size=10)
+        sc.axes.plot(array)
+        self.layout().addWidget(sc)
+        self.widget = sc

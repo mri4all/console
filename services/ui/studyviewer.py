@@ -52,7 +52,7 @@ class StudyViewer(QDialog):
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/studyviewer.ui", self)
         self.setWindowTitle("Study Viewer")
 
-        self.archive_path = Path("/opt/mri4all/data/archive")
+        self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.patients = self.organize_scan_data_from_folders()
 
         self.patientComboBox.addItems([p.id for p in self.patients])
@@ -67,15 +67,15 @@ class StudyViewer(QDialog):
         # self.viewer1.setProperty("id", "1")
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
-        self.viewer.plot_array()
         self.patient_selected(0)
 
     def scan_selected(self, row: int):
         the_patient = self.patients[self.patientComboBox.currentIndex()]
         the_exam = the_patient.exams[self.examListWidget.currentRow()]
         the_scan = the_exam.scans[row]
-        self.viewer.visualize_dcm_files(the_scan.exam_dir)
-        pass
+
+        self.viewer.clear_view()
+        self.viewer.view_scan(the_scan.exam_dir)
 
     def exam_selected(self, row):
         self.scanListWidget.clear()
@@ -85,14 +85,13 @@ class StudyViewer(QDialog):
         for scan_obj in the_exam.scans:
             self.scanListWidget.addItem(scan_obj.metadata.protocol_name)
         self.scanListWidget.setCurrentRow(0)
-        self.scan_selected(0)
 
     def patient_selected(self, index):
         self.examListWidget.clear()
         the_patient = self.patients[index]
         for exam_obj in the_patient.exams:
             self.examListWidget.addItem(exam_obj.id)
-        pass
+        self.examListWidget.setCurrentRow(0)
 
     def organize_scan_data_from_folders(self):
         patients = []
