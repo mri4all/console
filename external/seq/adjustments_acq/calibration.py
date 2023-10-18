@@ -276,7 +276,7 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
         dict: Dictionary of data
     """
     # Select seq file for 2 spin echoes
-    RF_PI2_DURATION = 50  # us, hardcoded from sequence
+    RF_PI2_DURATION = 100  # us, hardcoded from sequence
 
     # Make sure the TR units are right (in case someone puts in us rather than s)
     if (tr_spacing >= 30) and not force_tr:
