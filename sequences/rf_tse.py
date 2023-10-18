@@ -8,7 +8,7 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 from external.seq.adjustments_acq.scripts import run_pulseq
-from external.seq.adjustments_acq.util import reading_json_parameter
+# from external.seq.adjustments_acq.util import reading_json_parameter
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
 from sequences import PulseqSequence
@@ -45,11 +45,11 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Running sequence " + self.get_name())
 
         # reading configuration data from config.json
-        configuration_data=reading_json_parameter(file_name='config.json')
+        # configuration_data=reading_json_parameter(file_name='config.json')
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
-            rf_center=configuration_data.rf_parameters.larmor_frequency_MHz,
+            rf_center=cfg.LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
@@ -76,11 +76,11 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         # ======
         # DEFAULTS              TODO: MOVE DEFAULTS TO UI
         # ======
-        
+
         # reading configuration data from config.json
         configuration_data=reading_json_parameter(file_name='config.json')
 
-        LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
+        LARMOR_FREQ = cfg.LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
         RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
         alpha1 = 90  # flip angle
