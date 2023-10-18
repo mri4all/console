@@ -506,7 +506,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     Returns:
         float: Estimated gradient max in Hz/m
     """
-
+    print(channel)
     if channel not in {'x', 'y', 'z'}:
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
