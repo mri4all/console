@@ -75,6 +75,7 @@ class ResultItem(BaseModel):
     name: str = ""
     file_path: str = ""
     autoload_viewer: int
+    primary: bool = False
 
 
 FailStages = Literal[
