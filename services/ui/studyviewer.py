@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 from pathlib import Path
 from pydantic import BaseModel
@@ -27,6 +28,7 @@ class ScanData(BaseModel):
     dicom: list[float]
     rawdata: list[float]
     metadata: ScanTask
+    exam_dir: str
 
 
 class ExamData(BaseModel):
@@ -43,6 +45,7 @@ class StudyViewer(QDialog):
     patientComboBox: QComboBox
     examListWidget: QListWidget
     scanListWidget: QListWidget
+    patients: List[PatientData]
 
     def __init__(self):
         super(StudyViewer, self).__init__()
@@ -67,7 +70,11 @@ class StudyViewer(QDialog):
         self.viewer.plot_array()
         self.patient_selected(0)
 
-    def scan_selected(self, row):
+    def scan_selected(self, row: int):
+        the_patient = self.patients[self.patientComboBox.currentIndex()]
+        the_exam = the_patient.exams[self.examListWidget.currentRow()]
+        the_scan = the_exam.scans[row]
+        self.viewer.visualize_dcm_files(the_scan.exam_dir)
         pass
 
     def exam_selected(self, row):
@@ -117,7 +124,11 @@ class StudyViewer(QDialog):
             rawdata = np.array([])
 
             scan = ScanData(
-                id=scan_id, dicom=dicom_data, rawdata=rawdata, metadata=scan_task
+                id=scan_id,
+                dicom=dicom_data,
+                rawdata=rawdata,
+                metadata=scan_task,
+                exam_dir=str(exam_dir),
             )
             exam.scans.append(scan)
 
