@@ -115,6 +115,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         plt.subplot(133)
         plt.imshow(np.imag(data))
         plt.title('imag')
+        plt.show()
 
         img = np.fft.fft2(data)
         plt.figure()
@@ -127,6 +128,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         plt.subplot(133)
         plt.imshow(np.imag(img))
         plt.title('imag')
+        plt.show()
 
         return True
 
