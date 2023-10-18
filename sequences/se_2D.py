@@ -95,7 +95,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=0,
             shim_z=0,
             grad_cal=False,
-            save_np=True,
+            save_np=False,
             save_mat=False,
             save_msgs=False,
             gui_test=False,
@@ -105,11 +105,22 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         # test for recon testing
         data = rxd.reshape((70,70))
+        plt.figure()
+        plt.subplot(131)
+        plt.imshow(np.abs(data))
+        plt.title('kspace, abs')
+        plt.subplot(132)
+        plt.imshow(np.real(data))
+        plt.title('real')
+        plt.subplot(133)
+        plt.imshow(np.imag(data))
+        plt.title('imag')
+
         img = np.fft.fft2(data)
         plt.figure()
         plt.subplot(131)
         plt.imshow(np.abs(img))
-        plt.title('abs')
+        plt.title('image, abs')
         plt.subplot(132)
         plt.imshow(np.real(img))
         plt.title('real')
