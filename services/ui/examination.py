@@ -1035,7 +1035,7 @@ class ExaminationWindow(QMainWindow):
 
     def load_result_in_viewer(self):
         source_results = self.sender().property("source")
-        target_viewer = self.sender().property("source")
+        target_viewer = self.sender().property("target")
         if target_viewer == "viewer1":
             pass
         elif target_viewer == "viewer2":

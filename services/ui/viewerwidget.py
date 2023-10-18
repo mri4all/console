@@ -31,6 +31,7 @@ class ViewerWidget(QWidget):
         super(ViewerWidget, self).__init__()
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
 
     series_name = ""
 
@@ -70,6 +71,17 @@ class ViewerWidget(QWidget):
         widget.ui.histogram.hide()
         widget.ui.roiBtn.hide()
         widget.ui.menuBtn.hide()
+        
+        text = pg.LabelItem("Patient ID", color=(255, 255, 255), bold=True, size="18px")
+        text.setPos(-30, -10)
+        widget.addItem(text)
+
+        # Another option to display text
+        # label = QLabel("Patient ID")
+        # label.move(0, 0)
+        # label.setStyleSheet("background-color: #000;")
+        # self.layout.addWidget(label)
+
         if self.image_widget:
             self.layout.removeWidget(self.image_widget)
         self.layout.addWidget(widget)
