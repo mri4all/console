@@ -1,5 +1,5 @@
 import json 
-from pydanticConfig import Config
+from external.seq.adjustments_acq.pydanticConfig import Config
 
 def reading_json_parameter(file_name='config.json'):
     with open(file_name) as file:
