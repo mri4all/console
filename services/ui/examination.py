@@ -123,21 +123,23 @@ class ExaminationWindow(QMainWindow):
 
         self.stopScanButton.setText("")
         self.stopScanButton.setToolTip("Halt selected sequence")
-        self.stopScanButton.setIcon(qta.icon("fa5s.stop"))
+        self.stopScanButton.setIcon(qta.icon("fa5s.stop", color_disabled="#515669"))
         self.stopScanButton.setIconSize(QSize(24, 24))
         self.stopScanButton.setProperty("type", "toolbar")
         self.stopScanButton.clicked.connect(self.stop_scan_clicked)
 
         self.editScanButton.setText("")
         self.editScanButton.setToolTip("Edit selected sequence")
-        self.editScanButton.setIcon(qta.icon("fa5s.pen"))
+        self.editScanButton.setIcon(qta.icon("fa5s.pen", color_disabled="#515669"))
         self.editScanButton.setIconSize(QSize(24, 24))
         self.editScanButton.setProperty("type", "toolbar")
         self.editScanButton.clicked.connect(self.edit_sequence_clicked)
 
         self.deleteScanButton.setText("")
         self.deleteScanButton.setToolTip("Delete selected sequence")
-        self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt"))
+        self.deleteScanButton.setIcon(
+            qta.icon("fa5s.trash-alt", color_disabled="#515669")
+        )
         self.deleteScanButton.setIconSize(QSize(24, 24))
         self.deleteScanButton.setProperty("type", "toolbar")
         self.deleteScanButton.clicked.connect(self.delete_sequence_clicked)
@@ -174,6 +176,7 @@ class ExaminationWindow(QMainWindow):
         self.queueWidget.setStyleSheet("background-color: rgba(38, 44, 68, 60);")
         self.queueWidget.itemDoubleClicked.connect(self.edit_sequence_clicked)
         self.queueWidget.itemClicked.connect(self.edit_queue_clicked)
+        self.queueWidget.currentItemChanged.connect(self.queue_selection_changed)
         self.queueWidget.installEventFilter(self)
 
         self.setStyleSheet(
@@ -249,6 +252,8 @@ class ExaminationWindow(QMainWindow):
         self.monitorTimer = QTimer(self)
         self.monitorTimer.timeout.connect(self.update_monitor_status)
         self.monitorTimer.start(1000)
+
+        self.queue_selection_changed()
 
     def received_recon(self, o):
         self.received_message(o, self.recon_pipe)
@@ -640,15 +645,22 @@ class ExaminationWindow(QMainWindow):
     last_item_clicked = -1
 
     def edit_queue_clicked(self):
-        if (self.queueWidget.currentRow() > -1) and (
-            self.last_item_clicked == self.queueWidget.currentRow()
-        ):
-            self.queueWidget.clearSelection()
-            self.last_item_clicked = -1
-        else:
-            self.last_item_clicked = self.queueWidget.currentRow()
+        pass
+        # TODO: Find better way to highlight selected state
+        # if (self.queueWidget.currentRow() > -1) and (
+        #     self.last_item_clicked == self.queueWidget.currentRow()
+        # ):
+        #     self.queueWidget.clearSelection()
+        #     self.last_item_clicked = -1
+        # else:
+        #     self.last_item_clicked = self.queueWidget.currentRow()
 
     def edit_sequence_clicked(self):
+        # Prevent switching to another scan while editing
+        if ui_runtime.editor_active:
+            self.queueWidget.setCurrentRow(ui_runtime.editor_queue_index)
+            return
+
         self.last_item_clicked = -1
         index = self.queueWidget.currentRow()
 
@@ -915,9 +927,13 @@ class ExaminationWindow(QMainWindow):
             # Jobs can only be deleted if they have not been scanned yet
             return
 
-        # TODO: Delete case the corresponding task folder
+        scan_path = ui_runtime.get_scan_location(index)
 
-        ui_runtime.scan_queue_list.pop(index)
+        # Delete case the corresponding task folder
+        if not task.delete_task(scan_path):
+            # TODO: Show error message
+            pass
+        # Update the scan queue list
         self.sync_queue_widget(True)
 
     def debug_update_scan_list(self):
@@ -1051,3 +1067,45 @@ class ExaminationWindow(QMainWindow):
                 self.viewer1.view_data(result_item_object.file_path, ViewerMode.DICOM)
             elif result_item_object.type == ViewerMode.PLOT.value:
                 self.viewer2.view_data(result_item_object.file_path, ViewerMode.PLOT)
+
+    def queue_selection_changed(self):
+        index = self.queueWidget.currentRow()
+
+        if index < 0:
+            self.deleteScanButton.setEnabled(False)
+            self.stopScanButton.setEnabled(False)
+            self.editScanButton.setEnabled(False)
+            return
+        if index >= len(ui_runtime.scan_queue_list):
+            log.warning("Invalid scan queue index selected")
+            return
+
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
+            self.deleteScanButton.setEnabled(True)
+        else:
+            self.deleteScanButton.setEnabled(False)
+
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
+            self.deleteScanButton.setEnabled(True)
+        else:
+            self.deleteScanButton.setEnabled(False)
+
+        if scan_entry.state in [
+            mri4all_states.FAILURE,
+            mri4all_states.COMPLETE,
+            mri4all_states.SCHEDULED_RECON,
+        ]:
+            self.stopScanButton.setEnabled(False)
+        else:
+            self.stopScanButton.setEnabled(True)
+
+        self.editScanButton.setEnabled(True)
