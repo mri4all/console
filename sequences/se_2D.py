@@ -103,7 +103,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         log.info("Done running sequence " + self.get_name())
 
-        # test for recon
+        # test for recon testing
         data = rxd.reshape((70,70))
         img = np.fft.fft2(data)
         plt.figure()
