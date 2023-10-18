@@ -131,10 +131,11 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
 
     fov = 140e-3  # Define FOV and resolution
     Nx = 96
-    # BW = 32e3
-    # adc_dwell = 1 / BW
-    # adc_duration = Nx * adc_dwell  # 6.4e-3
+    BW = 32e3
+    adc_dwell = 1 / BW
+    adc_duration = Nx * adc_dwell  # 6.4e-3
 
+    prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
     # RF_MAX = ui_inputs["RF_MAX"]
@@ -176,28 +177,44 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
         system=system,
     )
 
-    # ======
-    # CALCULATE DELAYS
-    # ======
-    tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
-    tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
-    delay_TR = TR - TE - (0.5 * adc_duration)
-    assert np.all(tau1 >= 0)
 
     delta_k = 1 / fov
+    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     # Define ADC events
     # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
 
+
+    # ======
+    # CALCULATE DELAYS
+    # ======
+    tau1 = (
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
+    ) * seq.grad_raster_time
+
+    tau2 = (
+        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+    ) * seq.grad_raster_time
+
+    delay_TR = TR - TE - (0.5 * adc_duration)
+    assert np.all(tau1 >= 0)
+    assert np.all(tau2 >= 0)
+    assert np.all(delay_TR >= 0)
+    
     # ======
     # CONSTRUCT SEQUENCE
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
         seq.add_block(rf1)
+        seq.add_block(gx_pre)
         seq.add_block(pp.make_delay(tau1))
         seq.add_block(rf2)
+        seq.add_block(pp.make_delay(tau2))
         seq.add_block(gx, adc, pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct
