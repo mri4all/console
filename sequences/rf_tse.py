@@ -78,7 +78,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         # ======
 
         # reading configuration data from config.json
-        configuration_data=reading_json_parameter(file_name='config.json')
+        # configuration_data=reading_json_parameter(file_name='config.json')
 
         LARMOR_FREQ = cfg.LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
