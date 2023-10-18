@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import numpy as np
 from pathlib import Path
 from pydantic import BaseModel
@@ -13,6 +13,7 @@ from common.types import (
 )
 import common.runtime as rt
 import common.logger as logger
+from services.ui import ui_runtime
 from services.ui.viewerwidget import ViewerWidget
 
 log = logger.get_logger()
@@ -46,6 +47,8 @@ class StudyViewer(QDialog):
     examListWidget: QListWidget
     scanListWidget: QListWidget
     patients: List[PatientData]
+    dicomTargetComboBox: QComboBox
+    selected_scan: Optional[ScanData]
 
     def __init__(self):
         super(StudyViewer, self).__init__()
@@ -61,6 +64,10 @@ class StudyViewer(QDialog):
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
 
+        self.dicomTargetComboBox.addItems(
+            [t.name for t in ui_runtime.get_config().dicom_targets]
+        )
+        self.sendDicomsButton.clicked.connect(self.dicoms_send)
         viewerLayout = QHBoxLayout(self.viewerFrame)
         viewerLayout.setContentsMargins(0, 0, 0, 0)
         self.viewer = ViewerWidget()
@@ -69,13 +76,35 @@ class StudyViewer(QDialog):
         self.viewerFrame.setLayout(viewerLayout)
         self.patient_selected(0)
 
+    def dicoms_send(self):
+        if not self.selected_scan:
+            return
+
+        try:
+            ui_runtime.send_dicoms(
+                self.selected_scan.exam_dir + "/dicom",
+                ui_runtime.get_config().dicom_targets[
+                    self.dicomTargetComboBox.currentIndex()
+                ],
+            )
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("Transfer error")
+            msg.setText(f"Error transferring dicoms: \n {e}")
+            msg.exec_()
+
     def scan_selected(self, row: int):
         the_patient = self.patients[self.patientComboBox.currentIndex()]
         the_exam = the_patient.exams[self.examListWidget.currentRow()]
-        the_scan = the_exam.scans[row]
+        self.selected_scan = the_exam.scans[row]
 
         self.viewer.clear_view()
-        self.viewer.view_scan(the_scan.exam_dir)
+        has_dcms = self.viewer.view_scan(self.selected_scan.exam_dir)
+        if has_dcms:
+            self.sendDicomsButton.setDisabled(False)
+        else:
+            self.sendDicomsButton.setDisabled(True)
 
     def exam_selected(self, row):
         self.scanListWidget.clear()

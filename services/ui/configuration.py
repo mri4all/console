@@ -9,6 +9,7 @@ from common.version import mri4all_version
 from common.config import Configuration, DicomTarget
 import common.runtime as rt
 import common.logger as logger
+from services.ui import ui_runtime
 
 log = logger.get_logger()
 
@@ -50,7 +51,7 @@ class ConfigurationWindow(QDialog):
             self.add_target_clicked
         )
 
-        self.config = Configuration.load_from_file()
+        self.config = ui_runtime.get_config()
 
         delegate = MyDelegate()
         self.tree.setItemDelegate(delegate)

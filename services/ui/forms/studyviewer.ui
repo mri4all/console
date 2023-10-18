@@ -101,9 +101,12 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QPushButton" name="actionButton3">
+          <widget class="QComboBox" name="dicomTargetComboBox"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sendDicomsButton">
            <property name="text">
-            <string>button 1</string>
+            <string>Send</string>
            </property>
           </widget>
          </item>

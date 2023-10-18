@@ -112,6 +112,7 @@ def prepare_system() -> bool:
     control_services(ServiceAction.START)
     # TODO: Check if the acquisition and reconstruction services are running
 
+    ui_runtime.load_config()
     ui_runtime.system_information.name = "dev-system1"
     ui_runtime.system_information.model = "Zeugmatron Z1"
     ui_runtime.system_information.serial_number = "000001"

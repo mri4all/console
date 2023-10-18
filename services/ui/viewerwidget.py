@@ -64,8 +64,10 @@ class ViewerWidget(QWidget):
         other_path = Path(file_path) / "other"
         if list(dcm_path.glob("**/*.dcm")):
             self.visualize_dcm_files(str(dcm_path))
+            return True
         elif others := list(other_path.glob("*.json")):
             self.plot_array(json.loads(others[0].read_text()))
+            return False
 
     def visualize_dcm_files(self, input_path="/vagrant/classDcm"):
         lstFilesDCM = [str(p) for p in Path(input_path).glob("**/*.dcm")]
