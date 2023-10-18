@@ -80,23 +80,22 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
-        iterations = 1000
-        for iter in range(iterations):
-            rxd, rx_t = run_pulseq(
-                seq_file=self.seq_file_path,
-                rf_center=cfg.LARMOR_FREQ,
-                tx_t=1,
-                grad_t=10,
-                tx_warmup=100,
-                shim_x=0,
-                shim_y=0,
-                shim_z=0,
-                grad_cal=False,
-                save_np=False,
-                save_mat=False,
-                save_msgs=False,
-                gui_test=False,
-            )
+
+        rxd, rx_t = run_pulseq(
+            seq_file=self.seq_file_path,
+            rf_center=cfg.LARMOR_FREQ,
+            tx_t=1,
+            grad_t=10,
+            tx_warmup=100,
+            shim_x=0,
+            shim_y=0,
+            shim_z=0,
+            grad_cal=False,
+            save_np=False,
+            save_mat=False,
+            save_msgs=False,
+            gui_test=False,
+        )
 
         # Debug 
         plt.figure()
@@ -214,10 +213,12 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     for avg in range(num_averages):
         seq.add_block(rf1)
         seq.add_block(gx_pre)
-        seq.add_block(pp.make_delay(tau1))
-        seq.add_block(rf2)
-        seq.add_block(pp.make_delay(tau2))
-        seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        # seq.add_block(pp.make_delay(tau1))
+        # seq.add_block(rf2)
+        # seq.add_block(pp.make_delay(tau2))
+        # seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        
+    seq.write('test.seq')
 
     # Check whether the timing of the sequence is correct
     if check_timing:
