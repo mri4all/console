@@ -38,6 +38,7 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Running sequence " + self.get_name())
 
         grad_axes = ["x", "y", "z"]
+        iter = 20
         for iterations in range (iter):
             for axis in grad_axes:
                 print("test")
