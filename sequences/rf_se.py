@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 from PyQt5 import uic
 
@@ -95,6 +96,11 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
+
+        # Debug 
+        plt.figure()
+        plt.plot(np.abs(rxd))
+        plt.show()
 
         log.info("Done running sequence " + self.get_name())
         return True
