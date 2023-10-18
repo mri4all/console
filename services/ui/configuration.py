@@ -32,31 +32,34 @@ class ConfigurationWindow(QDialog):
         self.saveButton.clicked.connect(self.save_clicked)
         self.cancelButton.clicked.connect(self.cancel_clicked)
         self.tree = self.findChild(QTreeWidget)
-
-
+        self.findChild(QPushButton,"deleteTargetButton").clicked.connect(self.delete_target_clicked)
+        self.findChild(QPushButton,"addTargetButton").clicked.connect(self.add_target_clicked)
+        
         self.config = Configuration.load_from_file()
         
         delegate = MyDelegate()
         self.tree.setItemDelegate(delegate)
         for n,target in enumerate(self.config.dicom_targets):
-            item = QTreeWidgetItem([target.name])
-            item.setData(0,1,"name")
-            item.setData(1,1,"name")
-            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
-            item.addChild(child := QTreeWidgetItem(["ip",target.ip]))
-            child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
-            item.addChild(child := QTreeWidgetItem(["port",str(target.port)]))
-            child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
-            item.addChild(child := QTreeWidgetItem(["aet_target",target.aet_target]))
-            child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
-
-            if target.aet_source is not None:
-                item.addChild(child:=QTreeWidgetItem(["aet_source",target.aet_source]))
-                child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
-
+            item = self.make_target_item(target)
             self.tree.insertTopLevelItem(n, item)
 
+    def make_target_item(self, target:DicomTarget):
+        item = QTreeWidgetItem([target.name])
+        item.setData(0,1,"name")
+        item.setData(1,1,"name")
+        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
+        item.addChild(child := QTreeWidgetItem(["ip",target.ip]))
+        child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
+        item.addChild(child := QTreeWidgetItem(["port",str(target.port)]))
+        child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
+        item.addChild(child := QTreeWidgetItem(["aet_target",target.aet_target]))
+        child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
 
+        if target.aet_source is not None:
+            item.addChild(child:=QTreeWidgetItem(["aet_source",target.aet_source]))
+            child.setFlags(child.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled)
+        return item 
+    
     def cancel_clicked(self):
         self.close()
 
@@ -75,3 +78,14 @@ class ConfigurationWindow(QDialog):
         self.config.dicom_targets = targets
         self.config.save_to_file()
         self.close()
+
+    def delete_target_clicked(self):
+        items = self.tree.selectedItems()
+        item = items[0]
+        if item.childCount() == 0:
+            item = item.parent()
+        index = self.tree.indexOfTopLevelItem(item)
+        self.tree.takeTopLevelItem(index)
+    def add_target_clicked(self):
+        item = self.make_target_item(DicomTarget(name="New Target",ip="", port=11112, aet_target="",aet_source=""))
+        self.tree.insertTopLevelItem(self.tree.topLevelItemCount(), item)

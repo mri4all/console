@@ -1,10 +1,23 @@
 import numpy as np
-import OCTOPUS as oc
-from typing import Optional, Any, Mapping
+from B0Correction import OCTOPUS as oc
+from typing import Optional, Any, Mapping, TypedDict
 
 import recon_utils
 
-class B0Corrector():
+
+class B0Params(TypedDict):
+    '''
+    Parameters for B0 correction. 
+    '''
+    Npoints: int
+    Nshots: int
+    N: int
+    dcf: np.ndarray
+    t_vector: np.ndarray
+    t_readout: float
+    
+
+class B0Corrector:
     '''
     B0 trajectory correction for reconstruction calling from OCTOPUS.
     
@@ -14,20 +27,16 @@ class B0Corrector():
                  Y: np.ndarray, 
                  kt: np.ndarray, 
                  df: np.ndarray, 
+                 Lx: int=1,
                  nonCart: Optional[bool]=None, 
-                 params: Optional[Mapping[str, Any]]=None):
+                 params: Optional[B0Params]=None):
         
         self.Y = Y  # raw k-space (rads)
         self.kt = kt  # k-space trajectory, acq times for each frequency encode (s) 
         self.df = df  # delta B0field map (Hz) 
+        self.Lx = Lx  # number of base images to use for conjugate phase methods
         self.nonCart = nonCart # non-Cartesian trajectory?
         self.params = params  # parameters for B0 correction
-        
-        if self.params is not None:
-            keys = ['Npoints', 'Nshots', 'N', 'dcf', 't_vector', 't_readout']
-            for key in keys:
-                if key not in self.params.keys():
-                    raise ValueError(f"Key {key} not found in params")
                     
     def __call__(self) -> np.ndarray:
         return self.correct_MFI()  # default method
@@ -82,4 +91,4 @@ class B0Corrector():
         M_hat : numpy.ndarray
             Corrected image data.
         '''
-        return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=1, nonCart=self.nonCart, params=self.params) 
+        return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=self.Lx, nonCart=self.nonCart, params=self.params) 
