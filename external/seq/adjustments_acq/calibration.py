@@ -855,7 +855,9 @@ if __name__ == "__main__":
                 grad_max_cal(channel=sys.argv[2], plot=True)
             else:
                 grad_max_cal(plot=True)
+        elif command == 'shim':
+            shim_cal(plot=True)
         else:
-            print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+            print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
-        print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+        print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
