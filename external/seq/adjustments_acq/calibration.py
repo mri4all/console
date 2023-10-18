@@ -276,7 +276,7 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
         dict: Dictionary of data
     """
     # Select seq file for 2 spin echoes
-    RF_PI2_DURATION = 50  # us, hardcoded from sequence
+    RF_PI2_DURATION = 100  # us, hardcoded from sequence
 
     # Make sure the TR units are right (in case someone puts in us rather than s)
     if (tr_spacing >= 30) and not force_tr:
@@ -475,15 +475,6 @@ def rf_duration_cal(rxd_list=[], points=25, zoom_factor=2, smooth=True, iteratio
         plt.ioff()
         plt.show()
 
-    # Saved data for visualization
-    data_dict = {
-                #  'rxd': rxd,
-                 'rx_arr': rx_arr,
-                #  'rx_t': rx_t,
-                 'rxd_list': rxd_list,
-                 'rf_max': rf_optimal_duration_val
-                 }
-
     return rf_optimal_duration_val, data_dict
 
 
@@ -499,7 +490,6 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     Calibrate gradient maximum using a phantom of known width
 
     Args:
-        channel (str): channel to calibrate
         phantom_width (float): [mm] Phantom width
         larmor_freq (float): [MHz] Scanner larmor frequency
         calibration_power (float): [arb.] Fractional power to evaluate at
@@ -508,10 +498,9 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         echo_duration (float): [us] Time between echo peaks
         readout_duration (float): [us] Readout window around echo peak
         rx_period (float): [us] Readout dwell time
+        gradient_overshoot (float): [us] Amount of time to hold the readout gradient on for longer than readout_duration
         RF_PI2_DURATION (float): [us] RF pi/2 pulse duration
         rf_max (float): [Hz] System RF max
-        trap_ramp_duration (int): [us] duration of the gradient ramps
-        trap_ramp_pts (int): points to include in ramp
         plot (bool): Default False, plot final data
 
     Returns:
@@ -648,7 +637,6 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
         axs[3].set_xlabel('Frequency (MHz)')
         plt.show()
     
-    # TODO need to actually update to config file 
     if channel=='x':
         cfg.GX_MAX = grad_max
     elif channel=='y':
@@ -660,18 +648,15 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal(seq_file=cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
-    Calibrate gradient shim values 
+    Calibrate RF maximum for pi/2 flip angle
 
 
     Args:
         larmor_freq (float): [MHz] Scanner larmor frequency
-        channel (str): channel's shim to calibrate
-        range (float): range of shim values to calibrate over, [-range, range]
-        shim_points (int): points to assess across range
         points (int): Points to plot per iteration
         iterations (int): Iterations to focus in
         zoom_factor (float): About to zoom in by each iteration -- must be greater than 1
@@ -681,7 +666,6 @@ def shim_cal(seq_file=cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.
         first_max (bool): Default False, changes search to find the first maximum instead of global
         smooth (bool): Default True, 3-wide running average on data
         plot (bool): Default False, plot final data
-        gui_test (bool): option to play with the gui
 
     Returns:
         float: Estimated RF max in Hz
@@ -692,6 +676,7 @@ def shim_cal(seq_file=cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
 
+    seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
     rxd_list = []
 
     if channel == 'x':
@@ -870,7 +855,9 @@ if __name__ == "__main__":
                 grad_max_cal(channel=sys.argv[2], plot=True)
             else:
                 grad_max_cal(plot=True)
+        elif command == 'shim':
+            shim_cal(plot=True)
         else:
-            print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+            print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
-        print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+        print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')

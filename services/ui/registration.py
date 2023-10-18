@@ -9,6 +9,7 @@ import qtawesome as qta  # type: ignore
 import common.runtime as rt
 from common.version import mri4all_version
 from common.helper import generate_uid
+import services.ui.configuration as configuration
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -49,6 +50,7 @@ class RegistrationWindow(QMainWindow):
         self.versionLabel.setText(f"Version {mri4all_version.get_version_string()}")
         self.versionLabel.setProperty("type", "dimmed")
 
+        self.actionConfiguration.triggered.connect(configuration.show_configuration)
         self.actionShutdown.triggered.connect(self.shutdown_clicked)
         self.actionAbout.triggered.connect(about.show_about)
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)

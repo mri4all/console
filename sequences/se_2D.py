@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import math
 import numpy as np
-
+import matplotlib.pyplot as plt
 from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
@@ -95,13 +95,41 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=0,
             shim_z=0,
             grad_cal=False,
-            save_np=True,
+            save_np=False,
             save_mat=False,
             save_msgs=False,
             gui_test=False,
         )
 
         log.info("Done running sequence " + self.get_name())
+
+        # test for recon testing
+        data = rxd.reshape((70,70))
+        plt.figure()
+        plt.subplot(131)
+        plt.imshow(np.abs(data))
+        plt.title('kspace, abs')
+        plt.subplot(132)
+        plt.imshow(np.real(data))
+        plt.title('real')
+        plt.subplot(133)
+        plt.imshow(np.imag(data))
+        plt.title('imag')
+        plt.show()
+
+        img = np.fft.fft2(data)
+        plt.figure()
+        plt.subplot(131)
+        plt.imshow(np.abs(img))
+        plt.title('image, abs')
+        plt.subplot(132)
+        plt.imshow(np.real(img))
+        plt.title('real')
+        plt.subplot(133)
+        plt.imshow(np.imag(img))
+        plt.title('imag')
+        plt.show()
+
         return True
 
 
@@ -125,7 +153,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="", visualize=True
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     num_averages = 1
-    BW = 20e3
+    BW = 32e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
