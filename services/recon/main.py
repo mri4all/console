@@ -62,26 +62,24 @@ def process_reconstruction(scan_name: str) -> bool:
 
     scan_task.journal.reconstruction_start = helper.get_datetime()
     task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
-
-    recon_success = False
     try:
-        recon_success = reconstruction.run_reconstruction(
+        if not reconstruction.run_reconstruction(
             mri4all_paths.DATA_RECON + "/" + scan_name, scan_task
-        )
+        ):
+            raise Exception("Reconstruction did not run successfully.")
     except:
         log.exception(f"Exception caught during recon of scan {scan_name}.")
-        recon_success = False
+        scan_task.journal.fail_stage = "reconstruction"
+        scan_task.journal.failed_at = helper.get_datetime()
+        task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
+        log.info("Reconstruction failed.")
+        move_to_fail(scan_name)
+        return False
 
     # Store the updated scan task
     # TODO: Add error handling
     scan_task.journal.reconstruction_end = helper.get_datetime()
     task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
-
-    if not recon_success:
-        log.info("Reconstruction failed.")
-        move_to_fail(scan_name)
-        return False
-
     log.info("Reconstruction completed.")
 
     if not queue.move_task(
@@ -90,6 +88,7 @@ def process_reconstruction(scan_name: str) -> bool:
         log.error(
             f"Failed to move scan {scan_name} to completed folder. Critical Error."
         )
+        return False
     return True
 
 
