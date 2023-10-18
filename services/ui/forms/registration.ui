@@ -788,6 +788,7 @@
     </property>
     <addaction name="actionSystem_Status"/>
     <addaction name="actionLog_Viewer"/>
+    <addaction name="actionStudy_Viewer"/>
     <addaction name="separator"/>
     <addaction name="actionConfiguration"/>
     <addaction name="separator"/>
@@ -825,6 +826,11 @@
   <action name="actionConfiguration">
    <property name="text">
     <string>Configuration...</string>
+   </property>
+  </action>
+  <action name="actionStudy_Viewer">
+   <property name="text">
+    <string>Study Viewer...</string>
    </property>
   </action>
  </widget>

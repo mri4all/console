@@ -9,6 +9,7 @@ import qtawesome as qta  # type: ignore
 import common.runtime as rt
 from common.version import mri4all_version
 from common.helper import generate_uid
+import services.ui.studyviewer as studyviewer
 import services.ui.configuration as configuration
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
@@ -55,6 +56,7 @@ class RegistrationWindow(QMainWindow):
         self.actionAbout.triggered.connect(about.show_about)
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
+        self.actionStudy_Viewer.triggered.connect(studyviewer.show_viewer)
 
         self.mrnEdit.installEventFilter(self)
 
@@ -100,7 +102,11 @@ class RegistrationWindow(QMainWindow):
             error = "Medical record number (MRN) missing"
 
         if error:
-            self.validationLabel.setText('<b><span style="color: #E5554F;">Error: </span>' + chr(0xA0) + f"{error}</b>")
+            self.validationLabel.setText(
+                '<b><span style="color: #E5554F;">Error: </span>'
+                + chr(0xA0)
+                + f"{error}</b>"
+            )
         else:
             ui_runtime.patient_information.first_name = self.firstnameEdit.text()
             ui_runtime.patient_information.last_name = self.lastnameEdit.text()

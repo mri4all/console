@@ -39,6 +39,10 @@ class PatientData(BaseModel):
 
 
 class StudyViewer(QDialog):
+    patientComboBox: QComboBox
+    examListWidget: QListWidget
+    scanListWidget: QListWidget
+
     def __init__(self):
         super(StudyViewer, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/studyviewer.ui", self)
@@ -50,7 +54,23 @@ class StudyViewer(QDialog):
         self.patientComboBox.addItems([p.id for p in self.patients])
         self.patientComboBox.currentIndexChanged.connect(self.patient_selected)
 
+        self.examListWidget.currentRowChanged.connect(self.exam_selected)
+        self.scanListWidget.currentRowChanged.connect(self.scan_selected)
+
         self.patient_selected(0)
+
+    def scan_selected(self, row):
+        pass
+
+    def exam_selected(self, row):
+        self.scanListWidget.clear()
+        the_patient = self.patients[self.patientComboBox.currentIndex()]
+        the_exam = the_patient.exams[row]
+
+        for scan_obj in the_exam.scans:
+            self.scanListWidget.addItem(scan_obj.metadata.protocol_name)
+        self.scanListWidget.setCurrentRow(0)
+        self.scan_selected(0)
 
     def patient_selected(self, index):
         self.examListWidget.clear()

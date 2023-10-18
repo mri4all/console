@@ -39,7 +39,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="scanListWidget"/>
+        <widget class="QListWidget" name="scanListWidget"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
