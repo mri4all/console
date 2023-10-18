@@ -10,6 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
+from sequences.common import view_traj
 import common.logger as logger
 
 log = logger.get_logger()
@@ -104,7 +105,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_se3D(inputs=None, check_timing=True, output_file="", visualize=True) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -161,13 +162,14 @@ def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use='refocusing'
     )
 
     # Define other gradients and ADC events
@@ -252,9 +254,13 @@ def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
-     # Visualize trajactory
-    [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
-    log.info("Completed calculating trajectory")
+    # Visualize trajactory
+    if visualize:
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+        log.info("Completed calculating trajectory")
+        log.info("Generating plots...")
+        seq.plot(time_range=(0, 2*TR))
+        view_traj.view_traj_3d(k_traj_adc, k_traj)
 
     # Save sequence
     log.debug(output_file)
@@ -268,7 +274,7 @@ def pypulseq_se3D(inputs=None, check_timing=True, output_file="") -> bool:
     return True
 
 # implement 3D radial stack-of-stars trajectory 
-def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="", visualize=True) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -423,8 +429,12 @@ def pypulseq_se3D_radial(inputs=None, check_timing=True, output_file="") -> bool
             [print(e) for e in error_report]
 
      # Visualize trajactory
-    [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
-    log.info("Completed calculating trajectory")
+    if visualize:
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+        log.info("Completed calculating trajectory")
+        log.info("Generating plots...")
+        seq.plot(time_range=(0, 2*TR))
+        view_traj.view_traj_3d(k_traj_adc, k_traj)
 
     # Save sequence
     log.debug(output_file)

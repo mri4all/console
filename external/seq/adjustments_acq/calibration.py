@@ -276,7 +276,7 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
         dict: Dictionary of data
     """
     # Select seq file for 2 spin echoes
-    RF_PI2_DURATION = 50  # us, hardcoded from sequence
+    RF_PI2_DURATION = 100  # us, hardcoded from sequence
 
     # Make sure the TR units are right (in case someone puts in us rather than s)
     if (tr_spacing >= 30) and not force_tr:
@@ -506,7 +506,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     Returns:
         float: Estimated gradient max in Hz/m
     """
-
+    print(channel)
     if channel not in {'x', 'y', 'z'}:
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
@@ -855,7 +855,9 @@ if __name__ == "__main__":
                 grad_max_cal(channel=sys.argv[2], plot=True)
             else:
                 grad_max_cal(plot=True)
+        elif command == 'shim':
+            shim_cal(plot=True)
         else:
-            print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+            print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
-        print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+        print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')

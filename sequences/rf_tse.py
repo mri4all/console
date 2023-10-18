@@ -8,6 +8,7 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 from external.seq.adjustments_acq.scripts import run_pulseq
+# from external.seq.adjustments_acq.util import reading_json_parameter
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
 from sequences import PulseqSequence
@@ -43,6 +44,9 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
 
+        # reading configuration data from config.json
+        # configuration_data=reading_json_parameter(file_name='config.json')
+
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
             rf_center=cfg.LARMOR_FREQ,
@@ -53,7 +57,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=0,
             shim_z=0,
             grad_cal=False,
-            save_np=True,
+            save_np=False,
             save_mat=False,
             save_msgs=False,
             gui_test=False,
@@ -72,6 +76,10 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         # ======
         # DEFAULTS              TODO: MOVE DEFAULTS TO UI
         # ======
+
+        # reading configuration data from config.json
+        # configuration_data=reading_json_parameter(file_name='config.json')
+
         LARMOR_FREQ = cfg.LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
         RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
@@ -116,13 +124,14 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use='refocusing'
     )
 
     # ======

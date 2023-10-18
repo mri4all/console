@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import math
 import numpy as np
-
+import matplotlib.pyplot as plt
 from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
@@ -95,17 +95,45 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=0,
             shim_z=0,
             grad_cal=False,
-            save_np=True,
+            save_np=False,
             save_mat=False,
             save_msgs=False,
             gui_test=False,
         )
 
         log.info("Done running sequence " + self.get_name())
+
+        # test for recon testing
+        data = rxd.reshape((70,70))
+        plt.figure()
+        plt.subplot(131)
+        plt.imshow(np.abs(data))
+        plt.title('kspace, abs')
+        plt.subplot(132)
+        plt.imshow(np.real(data))
+        plt.title('real')
+        plt.subplot(133)
+        plt.imshow(np.imag(data))
+        plt.title('imag')
+        plt.show()
+
+        img = np.fft.fft2(data)
+        plt.figure()
+        plt.subplot(131)
+        plt.imshow(np.abs(img))
+        plt.title('image, abs')
+        plt.subplot(132)
+        plt.imshow(np.real(img))
+        plt.title('real')
+        plt.subplot(133)
+        plt.imshow(np.imag(img))
+        plt.title('imag')
+        plt.show()
+
         return True
 
 
-def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_se2D(inputs=None, check_timing=True, output_file="", visualize=True) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -125,7 +153,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     num_averages = 1
-    BW = 20e3
+    BW = 32e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
@@ -237,10 +265,13 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="") -> bool:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
-     # Visualize trajactory
-    [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
-    log.info("Completed calculating trajectory")
-    view_traj.view_traj(k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc)
+     # Visualize trajactory and other things
+    if visualize:
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+        log.info("Completed calculating trajectory")
+        log.info("Generating plots...")
+        seq.plot(time_range=(0, 2*TR))
+        view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     # Save sequence
     log.debug(output_file)

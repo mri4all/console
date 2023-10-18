@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 from PyQt5 import uic
 
@@ -90,11 +91,16 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=0,
             shim_z=0,
             grad_cal=False,
-            save_np=True,
+            save_np=False,
             save_mat=False,
             save_msgs=False,
             gui_test=False,
         )
+
+        # Debug 
+        plt.figure()
+        plt.plot(np.abs(rxd))
+        plt.show()
 
         log.info("Done running sequence " + self.get_name())
         return True
@@ -154,13 +160,14 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use='refocusing'
     )
 
     # ======
