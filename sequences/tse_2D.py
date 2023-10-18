@@ -11,6 +11,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
 import common.logger as logger
+from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -105,7 +106,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_tse2D(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=True) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -160,13 +161,14 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="") -> bool:
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use='refocusing'
     )
 
     # Define other gradients and ADC events
@@ -241,6 +243,14 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="") -> bool:
         else:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
+
+    # Visualize trajactory and other things
+    if visualize:
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+        log.info("Completed calculating trajectory")
+        log.info("Generating plots...")
+        seq.plot(time_range=(0, 2*TR))
+        view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     log.debug(output_file)
     try:
