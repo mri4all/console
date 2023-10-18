@@ -38,6 +38,7 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Running sequence " + self.get_name())
 
         grad_axes = ["x", "y", "z"]
+<<<<<<< HEAD
         for iterations in range (iter):
             for axis in grad_axes:
                 print("test")
@@ -58,6 +59,28 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                     trap_ramp_pts=5,
                     plot=True,
                 )
+=======
+
+        for axis in grad_axes:
+            print("test")
+            log.info(f"Calibrating {axis} axis")
+            grad_max_cal(
+                channel=axis,
+                phantom_width=10,
+                larmor_freq=cfg.LARMOR_FREQ,
+                calibration_power=0.8,
+                trs=3,
+                tr_spacing=2e6,
+                echo_duration=5000,
+                readout_duration=500,
+                rx_period=25 / 3,
+                RF_PI2_DURATION=100,
+                rf_max=cfg.RF_MAX,
+                trap_ramp_duration=50,
+                trap_ramp_pts=5,
+                plot=True,
+            )
+>>>>>>> 09de7f749a57a0ec73cca3b500d31def96b16df6
 
         log.info("Done running sequence " + self.get_name())
         return True

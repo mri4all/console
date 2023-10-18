@@ -62,6 +62,7 @@ def create_task(
     scan_task.patient = patient_information
     scan_task.parameters = default_seq_parameters
     scan_task.other = {}
+    scan_task.journal.created_at = helper.get_datetime()
 
     try:
         with open(task_filename, "w") as task_file:
@@ -122,6 +123,8 @@ def write_task(folder, scan_task: ScanTask) -> bool:
     """
     task_filename = Path(folder) / mri4all_files.TASK
 
+    # Unless disabled, create an internal lock file to secure the scan task
+    # from other processes while writing it.
     lock_file = Path(folder) / mri4all_files.LOCK
     # Create lock file in the folder to prevent other services from accessing it
     try:

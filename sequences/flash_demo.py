@@ -23,7 +23,7 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
         Reads the settings from the UI into the sequence.
         """
         self.problem_list = []
-        self.problem_list.append("TR is too short")
-        self.problem_list.append("Gradient strength is too high")
+        # self.problem_list.append("TR is too short")
+        # self.problem_list.append("Gradient strength is too high")
 
-        return False
+        return True

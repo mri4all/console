@@ -67,6 +67,32 @@ class ProcessingConfig(BaseModel):
     kspace_ordering: str = ""  # TODO: Decide where this is coming from
 
 
+ResultTypes = Literal["dicom", "plot", "rawdata"]
+
+
+class ResultItem(BaseModel):
+    type: ResultTypes
+    name: str = ""
+    file_path: str = ""
+    autoload_viewer: int
+
+
+FailStages = Literal[
+    "preparation", "adjustment", "acquisition", "reconstruction", "other", "none"
+]
+
+
+class ScanJournal(BaseModel):
+    created_at: str = ""
+    prepared_at: str = ""
+    acquisition_start: str = ""
+    acquisition_end: str = ""
+    reconstruction_start: str = ""
+    reconstruction_end: str = ""
+    failed_at: str = ""
+    fail_stage: FailStages = "none"
+
+
 class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
@@ -79,6 +105,7 @@ class ScanTask(BaseModel):
     processing: ProcessingConfig = ProcessingConfig()
     other: dict = {}
     results: dict = {}  # TODO
+    journal: ScanJournal = ScanJournal()
 
 
 ScanStatesType = Literal[

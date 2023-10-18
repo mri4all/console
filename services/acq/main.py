@@ -1,5 +1,7 @@
+from asyncio.locks import _ContextManagerMixin
 import os
 import sys
+
 
 # sys.path.insert(0, ".")
 # sys.path.insert(0, "./external/")
@@ -14,6 +16,7 @@ import common.runtime as rt
 rt.set_service_name("acq")
 log = logger.get_logger()
 
+from common.ipc import Communicator
 import common.helper as helper
 from common.types import ScanTask
 import common.task as task
@@ -24,6 +27,8 @@ import common.queue as queue
 from common.constants import *
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
+
+communicator = Communicator(Communicator.ACQ)
 
 
 def move_to_fail(scan_name: str) -> bool:
@@ -158,6 +163,7 @@ def run():
 
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop
+
     main_loop = helper.AsyncTimer(0.1, run_acquisition_loop)
     try:
         main_loop.run_until_complete(helper.loop)

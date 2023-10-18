@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 sys.path.append("/opt/mri4all/console/external/")
 
 import signal
@@ -9,18 +10,23 @@ import time
 
 import common.logger as logger
 import common.runtime as rt
-import common.helper as helper
 
 rt.set_service_name("recon")
 log = logger.get_logger()
+
+import common.helper as helper
+from common.ipc import Communicator
 
 from common.version import mri4all_version
 import common.queue as queue
 from common.constants import *
 import common.task as task
 import services.recon.reconstruction as reconstruction
+from common.types import ScanTask
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
+
+communicator = Communicator(Communicator.ACQ)
 
 
 def move_to_fail(scan_name: str) -> bool:
@@ -54,6 +60,9 @@ def process_reconstruction(scan_name: str) -> bool:
         move_to_fail(scan_name)
         return False
 
+    scan_task.journal.reconstruction_start = helper.get_datetime()
+    task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
+
     recon_success = False
     try:
         recon_success = reconstruction.run_reconstruction(
@@ -62,6 +71,11 @@ def process_reconstruction(scan_name: str) -> bool:
     except:
         log.exception(f"Exception caught during recon of scan {scan_name}.")
         recon_success = False
+
+    # Store the updated scan task
+    # TODO: Add error handling
+    scan_task.journal.reconstruction_end = helper.get_datetime()
+    task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
 
     if not recon_success:
         log.info("Reconstruction failed.")
@@ -152,6 +166,7 @@ def run():
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop
     main_loop = helper.AsyncTimer(0.1, run_reconstruction_loop)
+    # communicator.send_user_alert("recon booting")
     try:
         main_loop.run_until_complete(helper.loop)
     except Exception as e:

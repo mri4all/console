@@ -1,4 +1,8 @@
 from datetime import datetime
+from multiprocessing import set_start_method
+import os
+import sys
+import threading
 import time
 import json
 
@@ -6,6 +10,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
 
@@ -14,6 +19,11 @@ import common.logger as logger
 import common.task as task
 from common.constants import *
 from common.types import ScanQueueEntry, ScanTask
+from common.ipc import Communicator
+import common.ipc as ipc
+import common.helper as helper
+
+from common.types import ScanQueueEntry, ScanTask, ResultItem
 import services.ui.ui_runtime as ui_runtime
 import services.ui.about as about
 import services.ui.logviewer as logviewer
@@ -61,6 +71,7 @@ class ExaminationWindow(QMainWindow):
     viewer2 = None
     viewer3 = None
 
+    status_overwrite = None
     updating_queue_widget = False
 
     def __init__(self):
@@ -195,9 +206,10 @@ class ExaminationWindow(QMainWindow):
             """
         )
 
-        self.viewer1Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
-        self.viewer2Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
-        self.viewer3Frame.setStyleSheet("QFrame:hover { border: 1px solid #E0A526; }")
+        viewer_styles = "QFrame:hover { border: 1px solid #E0A526; }"
+        self.viewer1Frame.setStyleSheet(viewer_styles)
+        self.viewer2Frame.setStyleSheet(viewer_styles)
+        self.viewer3Frame.setStyleSheet(viewer_styles)
 
         viewer1Layout = QHBoxLayout(self.viewer1Frame)
         viewer1Layout.setContentsMargins(0, 0, 0, 0)
@@ -205,7 +217,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer1.setProperty("id", "1")
         viewer1Layout.addWidget(self.viewer1)
         self.viewer1Frame.setLayout(viewer1Layout)
-        self.viewer1.configure()
 
         viewer2Layout = QHBoxLayout(self.viewer2Frame)
         viewer2Layout.setContentsMargins(0, 0, 0, 0)
@@ -213,7 +224,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer2.setProperty("id", "2")
         viewer2Layout.addWidget(self.viewer2)
         self.viewer2Frame.setLayout(viewer2Layout)
-        self.viewer2.configure()
 
         viewer3Layout = QHBoxLayout(self.viewer3Frame)
         viewer3Layout.setContentsMargins(0, 0, 0, 0)
@@ -221,7 +231,6 @@ class ExaminationWindow(QMainWindow):
         self.viewer3.setProperty("id", "3")
         viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
-        self.viewer3.configure()
 
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
@@ -229,9 +238,75 @@ class ExaminationWindow(QMainWindow):
 
         self.update_size()
 
+        self.recon_pipe = Communicator(Communicator.UI_RECON)
+        self.recon_pipe.received.connect(self.received_recon)
+        self.recon_pipe.listen()
+
+        self.acq_pipe = Communicator(Communicator.UI_ACQ)
+        self.acq_pipe.received.connect(self.received_acq)
+        self.acq_pipe.listen()
+
         self.monitorTimer = QTimer(self)
         self.monitorTimer.timeout.connect(self.update_monitor_status)
         self.monitorTimer.start(1000)
+
+    def received_recon(self, o):
+        self.received_message(o, self.recon_pipe)
+
+    def received_acq(self, o):
+        self.received_message(o, self.acq_pipe)
+
+    def received_message(self, o, pipe):
+        msg_value = o.value
+        if isinstance(msg_value, ipc.messages.UserQueryMessage):
+            try:
+                ok = False
+                value = None
+                dlg = None
+                while value is None:
+                    dlg = QInputDialog(self)
+                    dlg.setInputMode(
+                        dict(
+                            text=QInputDialog.TextInput,
+                            int=QInputDialog.IntInput,
+                            float=QInputDialog.DoubleInput,
+                        )[msg_value.input_type]
+                    )
+
+                    if msg_value.input_type == "int":
+                        dlg.setIntMinimum(int(msg_value.in_min))
+                        dlg.setIntMaximum(int(msg_value.in_max))
+                    if msg_value.input_type == "float":
+                        dlg.setDoubleMinimum(msg_value.in_min)
+                        dlg.setDoubleMaximum(msg_value.in_max)
+
+                    dlg.setLabelText(f"Enter {msg_value.request}")
+                    dlg.setWindowTitle(msg_value.request.capitalize())
+                    dlg.resize(500, 100)
+                    ok = dlg.exec_()
+                    get_value = dict(
+                        text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue
+                    )[msg_value.input_type]
+                    value = get_value()
+                pipe.send_user_response(response=value, error=False)
+
+            except Exception as e:
+                log.exception("Error")
+                pipe.send_user_response(error=True)
+        elif isinstance(msg_value, ipc.messages.UserAlertMessage):
+            msg = QMessageBox()
+            msg.setIcon(
+                dict(
+                    information=QMessageBox.Information,
+                    warning=QMessageBox.Warning,
+                    critical=QMessageBox.Critical,
+                )[msg_value.alert_type]
+            )
+            msg.setWindowTitle(msg_value.alert_type.capitalize())
+            msg.setText(msg_value.message)
+            msg.exec_()
+        elif isinstance(msg_value, ipc.messages.SetStatusMessage):
+            self.overwrite_status_message(msg_value.message)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
@@ -239,18 +314,41 @@ class ExaminationWindow(QMainWindow):
             self.set_status_message("Running scan...")
         elif ui_runtime.status_recon_active:
             self.set_status_message("Reconstruction data...")
-        else:
+        elif not self.status_overwrite:  # TODO: unset the overwritten status
             self.set_status_message("Scanner ready")
 
         if (
             ui_runtime.status_last_completed_scan
             != ui_runtime.status_viewer_last_autoload_scan
         ):
-            # TODO: Trigger autoload of the last case
-            self.viewer1.set_series_name(ui_runtime.status_last_completed_scan)
+            # Trigger autoload of the last case
             ui_runtime.status_viewer_last_autoload_scan = (
                 ui_runtime.status_last_completed_scan
             )
+
+            # Retrieving the list of result objects.
+            dummy_result_json = {
+                "results": [
+                    {
+                        "type": "dicom",
+                        "name": "temp1",
+                        "file_path": "/path/to/exact/folder/from/base/folder",
+                        "autoload_viewer": "1",
+                    },
+                    {
+                        "type": "plot",
+                        "name": "temp2",
+                        "file_path": "/path/to/exact/folder/from/base/folder",
+                        "autoload_viewer": "1",
+                    },
+                ]
+            }
+            result_item_objects = []
+            for result_item in dummy_result_json["results"]:
+                result_item_object = ResultItem(**result_item)
+                result_item_objects.append(result_item_object)
+
+            self.autoload_results_in_viewer(result_item_objects)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -287,6 +385,10 @@ class ExaminationWindow(QMainWindow):
 
     def set_status_message(self, message: str):
         self.statusLabel.setText(message)
+
+    def overwrite_status_message(self, message: str):
+        self.status_overwrite = message
+        self.set_status_message(message)
 
     def prepare_examination_ui(self):
         """
@@ -407,10 +509,48 @@ class ExaminationWindow(QMainWindow):
                 )
         widgetButton.setIconSize(QSize(24, 24))
         widgetButton.setStyleSheet("background-color: transparent;")
+
+        imageWidgetButton = QPushButton("")
+        imageWidgetButton.setContentsMargins(0, 0, 0, 0)
+        imageWidgetButton.setMaximumWidth(32)
+        imageWidgetButton.setFlat(True)
+        imageWidgetButton.setIcon(qta.icon(f"fa5s.image", color=widget_font_color))
+        imageWidgetButton.setIconSize(QSize(24, 24))
+        imageWidgetButton.setStyleSheet("background-color: transparent;")
+        image_button_menu = QMenu(self)
+        image_button_menu.addAction("Show in Viewer 1", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer1")
+        image_button_menu.addAction("Show in Viewer 2", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer2")
+        image_button_menu.addAction("Show in Viewer 3", self.load_result_in_viewer)
+        image_button_menu.setProperty("source", entry.folder_name)
+        image_button_menu.setProperty("target", "viewer3")
+        imageWidgetButton.setMenu(image_button_menu)
+        imageWidgetButton.setStyleSheet(
+            """QPushButton::menu-indicator {
+                                                image: none;
+                                                subcontrol-position: right top;
+                                                subcontrol-origin: padding;
+                                            }
+                QPushButton::hover {
+                    background-color: #FFF;
+                }     
+            """
+        )
         widgetLayout = QHBoxLayout()
         widgetLayout.addWidget(widgetText)
+        widgetLayout.addWidget(imageWidgetButton)
         widgetLayout.addWidget(widgetButton)
+
+        if entry.has_results:
+            imageWidgetButton.setVisible(True)
+        else:
+            imageWidgetButton.setVisible(False)
+
         widgetLayout.setContentsMargins(0, 0, 0, 0)
+        widgetLayout.setSpacing(0)
         widget.setLayout(widgetLayout)
         item.setSizeHint(widget.sizeHint())
         self.queueWidget.addItem(item)  # type: ignore
@@ -466,28 +606,36 @@ class ExaminationWindow(QMainWindow):
         )
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
+        selected_widget.layout().itemAt(1).widget().setIcon(
+            qta.icon(f"fa5s.image", color=widget_font_color)
+        )
+        if entry.has_results:
+            selected_widget.layout().itemAt(1).widget().setVisible(True)
+        else:
+            selected_widget.layout().itemAt(1).widget().setVisible(False)
+
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
-            if str(entry.state) != selected_widget.layout().itemAt(1).widget().property(
+            if str(entry.state) != selected_widget.layout().itemAt(2).widget().property(
                 "state"
             ):
                 if (entry.state != "acq") and (entry.state != "recon"):
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
                     )
                 else:
-                    selected_widget.layout().itemAt(1).widget().setIcon(
+                    selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(
                             f"fa5s.{widget_icon}",
                             color=widget_font_color,
                             animation=qta.Spin(
-                                selected_widget.layout().itemAt(1).widget()
+                                selected_widget.layout().itemAt(2).widget()
                             ),
                         )
                     )
         else:
-            selected_widget.layout().itemAt(1).widget().setIcon(QIcon())
-        selected_widget.layout().itemAt(1).widget().setProperty("state", entry.state)
+            selected_widget.layout().itemAt(2).widget().setIcon(QIcon())
+        selected_widget.layout().itemAt(2).widget().setProperty("state", entry.state)
 
     last_item_clicked = -1
 
@@ -616,6 +764,7 @@ class ExaminationWindow(QMainWindow):
             ui_runtime.editor_scantask.other = json.loads(
                 self.otherParametersTextEdit.toPlainText()
             )
+            ui_runtime.editor_scantask.journal.prepared_at = helper.get_datetime()
             task.write_task(scan_path, ui_runtime.editor_scantask)
             task.set_task_state(scan_path, mri4all_files.EDITING, False)
             task.set_task_state(scan_path, mri4all_files.PREPARED, True)
@@ -883,3 +1032,22 @@ class ExaminationWindow(QMainWindow):
         ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)
+
+    def load_result_in_viewer(self):
+        source_results = self.sender().property("source")
+        target_viewer = self.sender().property("source")
+        if target_viewer == "viewer1":
+            pass
+        elif target_viewer == "viewer2":
+            pass
+        elif target_viewer == "viewer3":
+            pass
+        else:
+            log.error("Invalid target viewer selected")
+
+    def autoload_results_in_viewer(self, result_item_objects):
+        for result_item_object in result_item_objects:
+            if result_item_object.type == ViewerMode.DICOM.value:
+                self.viewer1.view_data(result_item_object.file_path, ViewerMode.DICOM)
+            elif result_item_object.type == ViewerMode.PLOT.value:
+                self.viewer2.view_data(result_item_object.file_path, ViewerMode.PLOT)
