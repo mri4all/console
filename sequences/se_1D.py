@@ -179,8 +179,8 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
 
 
     delta_k = 1 / fov
-    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
+    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
     # Define ADC events
     # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
@@ -204,18 +204,19 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
     assert np.all(delay_TR >= 0)
-    
+
     # ======
     # CONSTRUCT SEQUENCE
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
         seq.add_block(rf1)
-        seq.add_block(gx_pre)
+        #seq.add_block(gx_pre)
         seq.add_block(pp.make_delay(tau1))
         seq.add_block(rf2)
-        seq.add_block(pp.make_delay(tau2))
-        seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        #seq.add_block(pp.make_delay(tau2))
+        #seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        seq.add_block(adc, pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct
     if check_timing:
