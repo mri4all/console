@@ -13,8 +13,8 @@ fpga_clk_freq_MHz = 122.88 # RP-122
 #fpga_clk_freq_MHz = 125.0 # RP-125
 
 ## Gradient board: uncomment one of the below to configure the gradient data format
-#grad_board = "gpa-fhdo"
-grad_board = "ocra1"     # "ocra1"
+grad_board = "gpa-fhdo"
+#grad_board = "ocra1"     # "ocra1"
 
 ## GPA-FHDO current per volt setting (determined by resistors)
 gpa_fhdo_current_per_volt = 2.5
