@@ -12,6 +12,7 @@ from common.types import (
 )
 import common.runtime as rt
 import common.logger as logger
+from services.ui.viewerwidget import ViewerWidget
 
 log = logger.get_logger()
 
@@ -57,6 +58,13 @@ class StudyViewer(QDialog):
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
 
+        viewerLayout = QHBoxLayout(self.viewerFrame)
+        viewerLayout.setContentsMargins(0, 0, 0, 0)
+        self.viewer = ViewerWidget()
+        # self.viewer1.setProperty("id", "1")
+        viewerLayout.addWidget(self.viewer)
+        self.viewerFrame.setLayout(viewerLayout)
+        self.viewer.plot_array()
         self.patient_selected(0)
 
     def scan_selected(self, row):
