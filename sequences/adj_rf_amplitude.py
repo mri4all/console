@@ -5,8 +5,8 @@ from external.seq.adjustments_acq.calibration import rf_max_cal
 
 import common.logger as logger
 
-from sequences import PulseqSequence
-from sequences.rf_se import pypulseq_rfse
+from sequences import PulseqSequence  # type: ignore
+from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 
 log = logger.get_logger()

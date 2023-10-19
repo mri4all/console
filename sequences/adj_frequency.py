@@ -2,12 +2,13 @@ from pathlib import Path
 
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
+
 # from external.seq.adjustments_acq.util import reading_json_parameter, writing_json_parameter
 
 import common.logger as logger
 
-from sequences import PulseqSequence
-from sequences.rf_se import pypulseq_rfse
+from sequences import PulseqSequence  # type: ignore
+from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 
 log = logger.get_logger()
@@ -30,18 +31,18 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
-    
+
         # Using external packages now: TODO: convert to classes later
-        
+
         # reading configuration data from config.json
-        #configuration_data=reading_json_parameter(file_name='config.json')
+        # configuration_data=reading_json_parameter(file_name='config.json')
 
         max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=cfg.LARMOR_FREQ,
             steps=30,
             step_bw_MHz=10e-3,
-            plot=True,      # For Debug
+            plot=True,  # For Debug
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
@@ -54,7 +55,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             step_search_center=max_snr_freq,
             steps=30,
             step_bw_MHz=5e-3,
-            plot=True,      # For Debug
+            plot=True,  # For Debug
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
@@ -69,7 +70,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             echo_count=1,
             step_size=0.6,
-            plot=True,      # For debug
+            plot=True,  # For debug
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
@@ -83,14 +84,14 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             echo_count=1,
             step_size=0.2,
-            plot=True,      # For debug
+            plot=True,  # For debug
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
             gui_test=False,
         )
 
-        print("Final Larmor frequency : " + str(calibrated_larmor_freq) + " MHz" )
+        print("Final Larmor frequency : " + str(calibrated_larmor_freq) + " MHz")
 
         # updating the Larmor frequency in the config.json file
         # configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq

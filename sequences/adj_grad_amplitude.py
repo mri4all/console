@@ -5,8 +5,8 @@ import external.seq.adjustments_acq.config as cfg
 
 import common.logger as logger
 
-from sequences import PulseqSequence
-from sequences.rf_se import pypulseq_rfse
+from sequences import PulseqSequence  # type: ignore
+from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 import configparser
 
