@@ -2,6 +2,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+import qtawesome as qta  # type: ignore
 from pydantic import ValidationError  # type: ignore
 
 from common.version import mri4all_version
@@ -42,7 +43,16 @@ class ConfigurationWindow(QDialog):
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/configuration.ui", self)
         self.setWindowTitle("Configuration")
         self.saveButton.clicked.connect(self.save_clicked)
+        self.saveButton.setProperty("type", "highlight")
+        self.saveButton.setIcon(qta.icon("fa5s.check"))
+        self.saveButton.setIconSize(QSize(20, 20))
+        self.saveButton.setText(" Save")
+
         self.cancelButton.clicked.connect(self.cancel_clicked)
+        self.cancelButton.setIcon(qta.icon("fa5s.times"))
+        self.cancelButton.setIconSize(QSize(20, 20))
+        self.cancelButton.setText(" Cancel")
+
         self.tree = self.findChild(QTreeWidget, "dicomTargetWidget")
         self.findChild(QPushButton, "deleteTargetButton").clicked.connect(
             self.delete_target_clicked
