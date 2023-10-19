@@ -10,7 +10,7 @@ from PyQt5.QtGui import *  # type: ignore
 class SequenceTSE(SequenceBase, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "3D TSE Demo"
+        return "UI Demo: 3D TSE"
 
     def setup_ui(self, widget) -> bool:
         """
@@ -35,9 +35,7 @@ class SequenceTSE(SequenceBase, registry_key=Path(__file__).stem):
         layout.addWidget(item2)
         value_label = QLabel("0 Hz/px")
         layout.addWidget(value_label)
-        item2.valueChanged.connect(
-            lambda value: value_label.setText(str(value) + " Hz/px")
-        )
+        item2.valueChanged.connect(lambda value: value_label.setText(str(value) + " Hz/px"))
         layout.addStretch()
         widget.setLayout(layout)
         return True

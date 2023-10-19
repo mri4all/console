@@ -18,7 +18,7 @@ log = logger.get_logger()
 class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Calibrate gradients"
+        return "Calibrate Gradients"
 
     @classmethod
     def get_description(self) -> str:
@@ -39,7 +39,7 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
         grad_axes = ["x", "y", "z"]
         iter = 20
-        for iterations in range (iter):
+        for iterations in range(iter):
             for axis in grad_axes:
                 print("test")
                 log.info(f"Calibrating {axis} axis")
@@ -59,6 +59,6 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                     trap_ramp_pts=5,
                     plot=True,
                 )
-                
+
         log.info("Done running sequence " + self.get_name())
         return True

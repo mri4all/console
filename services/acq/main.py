@@ -2,7 +2,6 @@ from asyncio.locks import _ContextManagerMixin
 import os
 import sys
 
-
 # sys.path.insert(0, ".")
 # sys.path.insert(0, "./external/")
 sys.path.append("/opt/mri4all/console/external/")
@@ -32,9 +31,7 @@ communicator = Communicator(Communicator.ACQ)
 
 
 def move_to_fail(scan_name: str) -> bool:
-    if not queue.move_task(
-        mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_FAILURE
-    ):
+    if not queue.move_task(mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_FAILURE):
         log.error(f"Failed to move scan {scan_name} to failure folder. Critical Error.")
         return False
     return True
@@ -44,12 +41,8 @@ def process_acquisition(scan_name: str) -> bool:
     log.info("Performing acquisition...")
 
     # Check if json file with task definition exists in the scan folder
-    if not os.path.isfile(
-        mri4all_paths.DATA_ACQ + "/" + scan_name + "/" + mri4all_files.TASK
-    ):
-        log.error(
-            f"Scan {scan_name} does not contain a scan.json file. Unable to process."
-        )
+    if not os.path.isfile(mri4all_paths.DATA_ACQ + "/" + scan_name + "/" + mri4all_files.TASK):
+        log.error(f"Scan {scan_name} does not contain a scan.json file. Unable to process.")
         move_to_fail(scan_name)
         return False
 
@@ -85,9 +78,7 @@ def process_acquisition(scan_name: str) -> bool:
         if not seq_instance.run_sequence():
             raise Exception("Sequence did not run successfully.")
     except:
-        log.error(
-            f"Failed to run sequence {scan_task.sequence}. Failure during step {current_step}."
-        )
+        log.error(f"Failed to run sequence {scan_task.sequence}. Failure during step {current_step}.")
         scan_task.journal.failed_at = helper.get_datetime()
         scan_task.journal.fail_stage = "acquisition"
         task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
@@ -98,9 +89,7 @@ def process_acquisition(scan_name: str) -> bool:
     task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
 
     log.info("Acquisition completed with success.")
-    if not queue.move_task(
-        mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_QUEUE_RECON
-    ):
+    if not queue.move_task(mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_paths.DATA_QUEUE_RECON):
         log.error(f"Failed to move scan {scan_name} to recon queue. Critical Error.")
     return True
 
@@ -114,12 +103,8 @@ def run_acquisition_loop():
         log.info(f"Processing scan: {selected_scan}")
         rt.set_current_task_id(selected_scan)
 
-        if not queue.move_task(
-            mri4all_paths.DATA_QUEUE_ACQ + "/" + selected_scan, mri4all_paths.DATA_ACQ
-        ):
-            log.error(
-                f"Failed to move scan {selected_scan} to acq folder. Unable to run acquisition."
-            )
+        if not queue.move_task(mri4all_paths.DATA_QUEUE_ACQ + "/" + selected_scan, mri4all_paths.DATA_ACQ):
+            log.error(f"Failed to move scan {selected_scan} to acq folder. Unable to run acquisition.")
         else:
             process_acquisition(selected_scan)
 
@@ -169,9 +154,7 @@ def run():
     # Register system signals to be caught
     signals = (signal.SIGTERM, signal.SIGINT)
     for s in signals:
-        helper.loop.add_signal_handler(
-            s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop))
-        )
+        helper.loop.add_signal_handler(s, lambda s=s: asyncio.create_task(terminate_process(s, helper.loop)))
 
     # Start the timer that will periodically trigger the scan of the task folder
     global main_loop

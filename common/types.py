@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 from typing_extensions import Literal
 from pathlib import Path
 from pydantic import BaseModel
@@ -67,20 +67,18 @@ class ProcessingConfig(BaseModel):
     kspace_ordering: str = ""  # TODO: Decide where this is coming from
 
 
-ResultTypes = Literal["dicom", "plot", "rawdata"]
+ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]
 
 
 class ResultItem(BaseModel):
-    type: ResultTypes
+    type: ResultTypes = "dicom"
     name: str = ""
     file_path: str = ""
-    autoload_viewer: int
+    autoload_viewer: int = 0
     primary: bool = False
 
 
-FailStages = Literal[
-    "preparation", "adjustment", "acquisition", "reconstruction", "other", "none"
-]
+FailStages = Literal["preparation", "adjustment", "acquisition", "reconstruction", "other", "none"]
 
 
 class ScanJournal(BaseModel):

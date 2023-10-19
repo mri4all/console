@@ -8,6 +8,7 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 from external.seq.adjustments_acq.scripts import run_pulseq
+
 # from external.seq.adjustments_acq.util import reading_json_parameter
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
@@ -21,7 +22,7 @@ log = logger.get_logger()
 class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "RF Turbo-Spin-Echo"
+        return "RF Turbo Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
         """
@@ -62,11 +63,11 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-        # Debug 
+        # Debug
         plt.figure()
         plt.plot(np.abs(rxd))
         plt.show()
-        
+
         log.info("Done running sequence " + self.get_name())
         return True
 
@@ -124,14 +125,16 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # ======
@@ -172,7 +175,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
 
     try:
         seq.write(output_file)
-        print(output_file) # Remove this later: for locally testing if not connected to Redpitaya
+        print(output_file)  # Remove this later: for locally testing if not connected to Redpitaya
         log.debug("Seq file stored")
     except:
         log.error("Could not write sequence file")

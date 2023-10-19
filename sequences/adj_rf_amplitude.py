@@ -15,7 +15,7 @@ log = logger.get_logger()
 class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Adjust Radio Frequency Amplitude"
+        return "Adjust RF Amplitude"
 
     def calculate_sequence(self) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
