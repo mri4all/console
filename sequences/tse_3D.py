@@ -69,14 +69,14 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian": # (default) 
+        # ToDo: if self.trajectory == "Cartesian": # (default)
         pypulseq_tse3D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        #)
+        # )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -120,23 +120,22 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
     fovx = 140e-3  # Define FOV and resolution
     fovy = 140e-3
     fovz = 140e-3
-    Nx = 70        # Targeting a resolution of 2 x 2 x 5mm3
-    Ny = 70  
-    Nz = 28     
+    Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
+    Ny = 70
+    Nz = 28
     dim0 = Ny
-    dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step  
+    dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     num_averages = 1
-    traj = 'center_out'
+    traj = "center_out"
     BW = 20e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
     ETL = 2
-    
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
@@ -167,20 +166,22 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # Define other gradients and ADC events
-    delta_kx = 1/fovx
-    delta_ky = 1/fovy
-    delta_kz = 1/fovz
+    delta_kx = 1 / fovx
+    delta_ky = 1 / fovy
+    delta_kz = 1 / fovz
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_kx, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
     gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system)
@@ -248,7 +249,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
                 seq.add_block(gx, adc)
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(gx_spoil, gy_pre, gz_pre)         # TODO: Figure if we need spoiling
+                seq.add_block(gx_spoil, gy_pre, gz_pre)  # TODO: Figure if we need spoiling
                 seq.add_block(pp.make_delay(tau2))
 
             seq.add_block(pp.make_delay(delay_TR))
@@ -271,6 +272,3 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
         return False
 
     return True
-
-
-

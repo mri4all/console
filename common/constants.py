@@ -52,12 +52,6 @@ class ServiceAction(Enum):
     KILL = "kill"
     STATUS = "status"
 
-class ViewerMode(Enum):
-    DICOM = "dicom"
-    PLOT = "plot"
-    RAWDATA = "rawdata"
-    COMPLEXDATA = "complex"
-
 
 class Scanner(Enum):
     # TODO: change for the actual IP

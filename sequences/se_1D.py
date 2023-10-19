@@ -23,7 +23,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     @classmethod
     def get_readable_name(self) -> str:
-        return "RF Spin-Echo"
+        return "1D Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -34,9 +34,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return {"TE": self.param_TE, "TR": self.param_TR}
 
     @classmethod
-    def get_default_parameters(
-        self
-    ) -> dict:
+    def get_default_parameters(self) -> dict:
         return {"TE": 70, "TR": 250}
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -97,7 +95,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
-        # Debug 
+        # Debug
         plt.figure()
         plt.plot(np.abs(rxd))
         plt.show()
@@ -168,16 +166,17 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
-
 
     delta_k = 1 / fov
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
@@ -185,7 +184,6 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # Define ADC events
     # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
-
 
     # ======
     # CALCULATE DELAYS

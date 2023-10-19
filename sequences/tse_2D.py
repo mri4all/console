@@ -70,14 +70,14 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian": # (default) 
+        # ToDo: if self.trajectory == "Cartesian": # (default)
         pypulseq_tse2D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        #)
+        # )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -161,14 +161,16 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # Define other gradients and ADC events
@@ -249,7 +251,7 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
         log.info("Completed calculating trajectory")
         log.info("Generating plots...")
-        seq.plot(time_range=(0, 2*TR))
+        seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     log.debug(output_file)
@@ -279,7 +281,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     fov = 224e-3  # Define FOV and resolution
     Nx = 128
     Ny = Nx
-    Nspokes = math.ceil(Nx * math.pi/2)
+    Nspokes = math.ceil(Nx * math.pi / 2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
@@ -365,7 +367,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     ) * seq.grad_raster_time
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
-    assert np.all(delay_TR >= np.max(pp.calc_duration(rf1, rf2))/2 )
+    assert np.all(delay_TR >= np.max(pp.calc_duration(rf1, rf2)) / 2)
 
     # ======
     # CONSTRUCT SEQUENCE
@@ -380,7 +382,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
             seq.add_block(rf1)
             for echo in range(ETL):
                 pe1_idx = (ETL * i) + echo
-                phi = pe1_idx * (math.pi/Nspokes) # linear increment for now (could add golden-angle)
+                phi = pe1_idx * (math.pi / Nspokes)  # linear increment for now (could add golden-angle)
                 gx_pre.amplitude = amp_pre_max * math.sin(phi)
                 gy_pre.amplitude = amp_pre_max * math.cos(phi)
                 seq.add_block(gx_pre, gy_pre)
@@ -394,7 +396,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
                 seq.add_block(pp.make_delay(tau2))
 
             seq.add_block(pp.make_delay(delay_TR))
-        seq.plot(time_range=[0,2*TR])
+        seq.plot(time_range=[0, 2 * TR])
 
     # Check whether the timing of the sequence is correct
     if check_timing:

@@ -8,7 +8,7 @@ from . import PulseqSequence
 class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "2D Flash Demo"
+        return "UI Demo: 2D Flash"
 
     def setup_ui(self, widget) -> bool:
         """

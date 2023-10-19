@@ -68,15 +68,14 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian": (default) 
+        # ToDo: if self.trajectory == "Cartesian": (default)
         pypulseq_se2D(
             inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         )
         # elif self.trajectory == "Radial":
         # pypulseq_se2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        #)
-
+        # )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -104,30 +103,30 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Done running sequence " + self.get_name())
 
         # test for recon testing
-        data = rxd.reshape((70,70))
+        data = rxd.reshape((70, 70))
         plt.figure()
         plt.subplot(131)
         plt.imshow(np.abs(data))
-        plt.title('kspace, abs')
+        plt.title("kspace, abs")
         plt.subplot(132)
         plt.imshow(np.real(data))
-        plt.title('real')
+        plt.title("real")
         plt.subplot(133)
         plt.imshow(np.imag(data))
-        plt.title('imag')
+        plt.title("imag")
         plt.show()
 
         img = np.fft.fft2(data)
         plt.figure()
         plt.subplot(131)
         plt.imshow(np.abs(img))
-        plt.title('image, abs')
+        plt.title("image, abs")
         plt.subplot(132)
         plt.imshow(np.real(img))
-        plt.title('real')
+        plt.title("real")
         plt.subplot(133)
         plt.imshow(np.imag(img))
-        plt.title('imag')
+        plt.title("imag")
         plt.show()
 
         return True
@@ -186,14 +185,16 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="", visualize=True
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # Define other gradients and ADC events
@@ -265,12 +266,12 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="", visualize=True
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
-     # Visualize trajactory and other things
+    # Visualize trajactory and other things
     if visualize:
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
         log.info("Completed calculating trajectory")
         log.info("Generating plots...")
-        seq.plot(time_range=(0, 2*TR))
+        seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     # Save sequence
@@ -283,6 +284,7 @@ def pypulseq_se2D(inputs=None, check_timing=True, output_file="", visualize=True
         return False
 
     return True
+
 
 # implement 2D radial trajectory (Ruoxun Zi)
 def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool:
@@ -300,7 +302,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     fov = 140e-3  # Define FOV and resolution
     Nx = 70
     Ny = Nx
-    Nspokes = math.ceil(Nx * math.pi/2)
+    Nspokes = math.ceil(Nx * math.pi / 2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
@@ -313,7 +315,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
-    spoke_inc = "golden_angle" # TODO: get from UI: GA or linear increment over 180
+    spoke_inc = "golden_angle"  # TODO: get from UI: GA or linear increment over 180
 
     # ======
     # INITIATE SEQUENCE
@@ -350,7 +352,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     )
 
     # Define other gradients and ADC events
-    delta_k = 1 / fov # frequency-oversampling is not implemented
+    delta_k = 1 / fov  # frequency-oversampling is not implemented
     gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
     adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
@@ -399,9 +401,9 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
             # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
             seq.add_block(rf1)
             if spoke_inc == "linear_increment":
-                phi = i * (math.pi/Nspokes) 
+                phi = i * (math.pi / Nspokes)
             elif spoke_inc == "golden_angle":
-                phi = i * (111.246117975/180*math.pi)
+                phi = i * (111.246117975 / 180 * math.pi)
             gx_pre.amplitude = amp_pre_max * math.sin(phi)
             gy_pre.amplitude = amp_pre_max * math.cos(phi)
             seq.add_block(gx_pre, gy_pre)
@@ -413,7 +415,7 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
             seq.add_block(gx, gy, adc)
             seq.add_block(gx_spoil, gy_spoil)  # TODO: Figure if we need spoiling
             seq.add_block(pp.make_delay(delay_TR))
-        seq.plot(time_range=[0,3*TR])
+        seq.plot(time_range=[0, 3 * TR])
 
     # Check whether the timing of the sequence is correct
     if check_timing:

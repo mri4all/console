@@ -102,7 +102,6 @@ class StudyViewer(QDialog):
         the_exam = the_patient.exams[self.examListWidget.currentRow()]
         self.selected_scan = the_exam.scans[row]
 
-        self.viewer.clear_view()
         has_dcms = self.viewer.view_scan(self.selected_scan.dir)
         if has_dcms:
             self.sendDicomsButton.setDisabled(False)

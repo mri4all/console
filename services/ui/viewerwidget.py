@@ -5,18 +5,17 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-from common.constants import ViewerMode
 import qtawesome as qta  # type: ignore
 
 import pyqtgraph as pg
 import pydicom
 import numpy as np
-import os
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import common.logger as logger
+from common.types import ResultTypes
 
 log = logger.get_logger()
 
@@ -32,25 +31,27 @@ class MplCanvas(FigureCanvasQTAgg):
 class ViewerWidget(QWidget):
     # layout: QBoxLayout
     widget: Optional[QWidget] = None
+    series_name = ""
 
     def __init__(self):
         super(ViewerWidget, self).__init__()
         self.setLayout(QVBoxLayout(self))
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
-
-    series_name = ""
+        self.set_empty_viewer()
 
     def set_series_name(self, name: str):
         self.series_name = name
         self.update()
 
-    def view_data(self, file_path: str, viewerMode: ViewerMode):
-        # TODO- use file_path to pick values from the specified folder.
-        if viewerMode == ViewerMode.DICOM:
-            self.visualize_dcm_files()
-        elif viewerMode == ViewerMode.PLOT:
-            self.plot_array()
+    def view_data(self, file_path: str, viewer_mode: ResultTypes):
+        self.clear_view()
+        if viewer_mode == "dicom":
+            self.load_dicoms()
+        elif viewer_mode == "plot":
+            self.load_plot()
+        else:
+            self.set_empty_viewer()
 
     def clear_view(self):
         if self.widget:
@@ -63,16 +64,17 @@ class ViewerWidget(QWidget):
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
         if list(dcm_path.glob("**/*.dcm")):
-            self.visualize_dcm_files(str(dcm_path))
+            self.load_dicoms(str(dcm_path))
             return True
         elif others := list(other_path.glob("*.json")):
-            self.plot_array(json.loads(others[0].read_text()))
+            self.load_plot(json.loads(others[0].read_text()))
             return False
 
-    def visualize_dcm_files(self, input_path="/vagrant/classDcm"):
+    def load_dicoms(self, input_path="/vagrant/classDcm"):
         lstFilesDCM = [str(p) for p in Path(input_path).glob("**/*.dcm")]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
+            self.set_empty_viewer()
             return
         ds = pydicom.dcmread(lstFilesDCM[0])
 
@@ -85,15 +87,15 @@ class ViewerWidget(QWidget):
             ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
 
         pg.setConfigOptions(imageAxisOrder="row-major")
-        widget = pg.image(ArrayDicom)
+        viewer_widget = pg.image(ArrayDicom)
 
-        widget.ui.histogram.hide()
-        widget.ui.roiBtn.hide()
-        widget.ui.menuBtn.hide()
+        viewer_widget.ui.histogram.hide()
+        viewer_widget.ui.roiBtn.hide()
+        viewer_widget.ui.menuBtn.hide()
 
         text = pg.LabelItem("Patient ID", color=(255, 255, 255), bold=True, size="18px")
         text.setPos(-30, -10)
-        widget.addItem(text)
+        viewer_widget.addItem(text)
 
         # Another option to display text
         # label = QLabel("Patient ID")
@@ -101,13 +103,18 @@ class ViewerWidget(QWidget):
         # label.setStyleSheet("background-color: #000;")
         # self.layout.addWidget(label)
 
-        self.layout().addWidget(widget)
-        self.widget = widget
+        self.layout().addWidget(viewer_widget)
+        self.widget = viewer_widget
 
-    def plot_array(self, array=None):
+    def load_plot(self, array=None):
         sc = MplCanvas(self)
         if array is None:
             array = np.random.normal(size=10)
         sc.axes.plot(array)
         self.layout().addWidget(sc)
         self.widget = sc
+
+    def set_empty_viewer(self):
+        self.widget = QWidget()
+        self.widget.setStyleSheet("background-color: #000;")
+        self.layout().addWidget(self.widget)
