@@ -25,20 +25,23 @@ def show_viewer():
 
 
 class ScanData(BaseModel):
-    id: str
-    dicom: list[float]
-    rawdata: list[float]
-    metadata: ScanTask
-    exam_dir: str
+    # id: str
+    task: ScanTask
+    # dicom: list[float]
+    # rawdata: list[float]
+    # metadata: ScanTask
+    dir: Path
 
 
 class ExamData(BaseModel):
     id: str
+    acc: str
     scans: list[ScanData]
 
 
 class PatientData(BaseModel):
-    id: str
+    name: str
+    mrn: str
     exams: list[ExamData]
 
 
@@ -58,7 +61,7 @@ class StudyViewer(QDialog):
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.patients = self.organize_scan_data_from_folders()
 
-        self.patientComboBox.addItems([p.id for p in self.patients])
+        self.patientComboBox.addItems([p.name for p in self.patients])
         self.patientComboBox.currentIndexChanged.connect(self.patient_selected)
 
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
@@ -82,7 +85,7 @@ class StudyViewer(QDialog):
 
         try:
             ui_runtime.send_dicoms(
-                self.selected_scan.exam_dir + "/dicom",
+                self.selected_scan.dir / "dicom",
                 ui_runtime.get_config().dicom_targets[
                     self.dicomTargetComboBox.currentIndex()
                 ],
@@ -100,66 +103,71 @@ class StudyViewer(QDialog):
         self.selected_scan = the_exam.scans[row]
 
         self.viewer.clear_view()
-        has_dcms = self.viewer.view_scan(self.selected_scan.exam_dir)
+        has_dcms = self.viewer.view_scan(self.selected_scan.dir)
         if has_dcms:
             self.sendDicomsButton.setDisabled(False)
         else:
             self.sendDicomsButton.setDisabled(True)
 
-    def exam_selected(self, row):
+    def exam_selected(self, row: int):
         self.scanListWidget.clear()
         the_patient = self.patients[self.patientComboBox.currentIndex()]
         the_exam = the_patient.exams[row]
 
         for scan_obj in the_exam.scans:
-            self.scanListWidget.addItem(scan_obj.metadata.protocol_name)
+            self.scanListWidget.addItem(scan_obj.task.protocol_name)
         self.scanListWidget.setCurrentRow(0)
 
     def patient_selected(self, index):
         self.examListWidget.clear()
         the_patient = self.patients[index]
         for exam_obj in the_patient.exams:
-            self.examListWidget.addItem(exam_obj.id)
+            self.examListWidget.addItem(exam_obj.acc or exam_obj.id)
         self.examListWidget.setCurrentRow(0)
 
-    def organize_scan_data_from_folders(self):
-        patients = []
+    def organize_scan_data_from_folders(self) -> List[PatientData]:
+        patients: List[PatientData] = []
         for exam_dir in self.archive_path.iterdir():
             if not exam_dir.is_dir():
                 continue
 
             exam_id, scan_num = str(exam_dir.name).split("#")
-            scan_task = read_task(exam_dir)
-            patient_id = (
+            scan_task: ScanTask = read_task(exam_dir)
+            patient_name = (
                 f"{scan_task.patient.last_name}, {scan_task.patient.first_name}"
             )
             # exam_id = scan_task["exam"]["id"] # should be same as id found in dir_name
             scan_id = scan_task.id
 
             # create a new patient object if not found
-            patient = next((p for p in patients if p.id == patient_id), None)
+            patient = next(
+                (p for p in patients if p.mrn == scan_task.patient.mrn), None
+            )
             if not patient:
-                patient = PatientData(id=patient_id, exams=[])
+                patient = PatientData(
+                    name=patient_name, mrn=scan_task.patient.mrn, exams=[]
+                )
                 patients.append(patient)
 
             # create a new exam object if not found
             exam = next((e for e in patient.exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=f"{scan_id}_{exam_id}", scans=[])
+                exam = ExamData(id=exam_id, acc=scan_task.patient.acc, scans=[])
                 patient.exams.append(exam)
 
             dicom_data = np.array([])
             rawdata = np.array([])
 
             scan = ScanData(
-                id=scan_id,
-                dicom=dicom_data,
-                rawdata=rawdata,
-                metadata=scan_task,
-                exam_dir=str(exam_dir),
+                # id=scan_id,
+                # dicom=dicom_data,
+                # rawdata=rawdata,
+                # metadata=scan_task,
+                task=scan_task,
+                dir=exam_dir,
             )
             exam.scans.append(scan)
-
+        log.info(patients)
         return patients
 
     def close_clicked(self):

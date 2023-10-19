@@ -58,10 +58,10 @@ class ViewerWidget(QWidget):
             self.widget.deleteLater()
             self.widget = None
 
-    def view_scan(self, file_path: str):
+    def view_scan(self, file_path: Path):
         self.clear_view()
-        dcm_path = Path(file_path) / "dicom"
-        other_path = Path(file_path) / "other"
+        dcm_path = file_path / "dicom"
+        other_path = file_path / "other"
         if list(dcm_path.glob("**/*.dcm")):
             self.visualize_dcm_files(str(dcm_path))
             return True

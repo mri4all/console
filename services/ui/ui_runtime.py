@@ -336,8 +336,8 @@ def handle_error(e, command):
     raise
 
 
-def send_dicoms(folder: str, target: DicomTarget):
-    command = _create_command(target, Path(folder))
+def send_dicoms(folder: Path, target: DicomTarget):
+    command = _create_command(target, folder)
     try:
         result = subprocess.check_output(
             command, encoding="utf-8", stderr=subprocess.STDOUT

@@ -94,7 +94,7 @@ def create_task(
     return str(scan_name)
 
 
-def read_task(folder) -> Any:
+def read_task(folder) -> ScanTask:
     """
     Reads the task file from the provided dictionary.
     """

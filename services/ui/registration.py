@@ -111,6 +111,7 @@ class RegistrationWindow(QMainWindow):
             ui_runtime.patient_information.first_name = self.firstnameEdit.text()
             ui_runtime.patient_information.last_name = self.lastnameEdit.text()
             ui_runtime.patient_information.mrn = self.mrnEdit.text()
+            ui_runtime.patient_information.acc = self.accEdit.text()
             ui_runtime.register_patient()
 
     def shutdown_clicked(self):
