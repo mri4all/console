@@ -122,12 +122,12 @@ class ViewerWidget(QWidget):
             text = StaticTextItem(
                 html=f"""<span style='font-size: 20px;'>
                     {task.patient.last_name}, {task.patient.first_name}<br/>
-                    {task.protocol_name}<br/>
                     {task.patient.mrn}<br/>
+                    {task.protocol_name}<br/>
                     </span><br/>""",
                 anchor=(0, 0),
             )
-            text.setPos(5, 5)
+            text.setPos(0, 0)  # todo: this only works with 0,0 position
             viewer_widget.addItem(text)
 
         # Another option to display text
