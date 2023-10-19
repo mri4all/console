@@ -54,7 +54,7 @@ class StaticTextItem(pg.TextItem):
 class ViewerWidget(QWidget):
     # layout: QBoxLayout
     widget: Optional[QWidget] = None
-    series_name = ""
+    viewed_scan_task: Optional[ScanTask] = None
 
     def __init__(self):
         super(ViewerWidget, self).__init__()
@@ -62,10 +62,6 @@ class ViewerWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
         self.set_empty_viewer()
-
-    def set_series_name(self, name: str):
-        self.series_name = name
-        self.update()
 
     def view_data(self, file_path: str, viewer_mode: ResultTypes):
         self.clear_view()
@@ -81,6 +77,7 @@ class ViewerWidget(QWidget):
             self.layout().removeWidget(self.widget)
             self.widget.deleteLater()
             self.widget = None
+            self.viewed_scan_task = None
 
     def view_scan(self, file_path: Path, task: Optional[ScanTask] = None):
         self.clear_view()
