@@ -10,12 +10,13 @@ import qtawesome as qta  # type: ignore
 import pyqtgraph as pg
 import pydicom
 import numpy as np
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import common.logger as logger
-from common.types import ResultTypes
+from common.types import ResultTypes, ScanTask
 
 log = logger.get_logger()
 
@@ -26,6 +27,28 @@ class MplCanvas(FigureCanvasQTAgg):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         super(MplCanvas, self).__init__(fig)
+
+
+class StaticTextItem(pg.TextItem):
+    """
+    Stays where you put it and ignores viewport translation/zoom.
+    """
+
+    def updateTransform(self, force=False):
+        if not self.isVisible():
+            return
+
+        p = self.parentItem()
+        if p is None:
+            pt = QtGui.QTransform()
+        else:
+            pt = p.sceneTransform()
+
+        if not force and pt == self._lastTransform:
+            return
+        self.setTransform(pt.inverted()[0])
+        self._lastTransform = pt
+        self.updateTextPos()
 
 
 class ViewerWidget(QWidget):
@@ -59,18 +82,20 @@ class ViewerWidget(QWidget):
             self.widget.deleteLater()
             self.widget = None
 
-    def view_scan(self, file_path: Path):
+    def view_scan(self, file_path: Path, task: Optional[ScanTask] = None):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
         if list(dcm_path.glob("**/*.dcm")):
-            self.load_dicoms(str(dcm_path))
+            self.load_dicoms(str(dcm_path), task)
             return True
         elif others := list(other_path.glob("*.json")):
             self.load_plot(json.loads(others[0].read_text()))
             return False
 
-    def load_dicoms(self, input_path="/vagrant/classDcm"):
+    def load_dicoms(
+        self, input_path="/vagrant/classDcm", task: Optional[ScanTask] = None
+    ):
         lstFilesDCM = [str(p) for p in Path(input_path).glob("**/*.dcm")]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
@@ -93,9 +118,17 @@ class ViewerWidget(QWidget):
         viewer_widget.ui.roiBtn.hide()
         viewer_widget.ui.menuBtn.hide()
 
-        # text = pg.LabelItem("Patient ID", color=(255, 255, 255), bold=True, size="18px")
-        # text.setPos(-30, -10)
-        # viewer_widget.addItem(text)
+        if task:
+            text = StaticTextItem(
+                html=f"""<span style='font-size: 20px;'>
+                    {task.patient.last_name}, {task.patient.first_name}<br/>
+                    {task.patient.mrn}<br/>
+                    {task.protocol_name}<br/>
+                    </span><br/>""",
+                anchor=(0, 0),
+            )
+            text.setPos(0, 0)  # todo: this only works with 0,0 position
+            viewer_widget.addItem(text)
 
         # Another option to display text
         # label = QLabel("Patient ID")
