@@ -93,9 +93,9 @@ class ViewerWidget(QWidget):
         viewer_widget.ui.roiBtn.hide()
         viewer_widget.ui.menuBtn.hide()
 
-        text = pg.LabelItem("Patient ID", color=(255, 255, 255), bold=True, size="18px")
-        text.setPos(-30, -10)
-        viewer_widget.addItem(text)
+        # text = pg.LabelItem("Patient ID", color=(255, 255, 255), bold=True, size="18px")
+        # text.setPos(-30, -10)
+        # viewer_widget.addItem(text)
 
         # Another option to display text
         # label = QLabel("Patient ID")

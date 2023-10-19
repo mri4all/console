@@ -40,7 +40,7 @@ class ConfigurationWindow(QDialog):
     def __init__(self):
         super(ConfigurationWindow, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/configuration.ui", self)
-        self.setWindowTitle("Console Configuration")
+        self.setWindowTitle("Configuration")
         self.saveButton.clicked.connect(self.save_clicked)
         self.cancelButton.clicked.connect(self.cancel_clicked)
         self.tree = self.findChild(QTreeWidget, "dicomTargetWidget")
@@ -70,11 +70,16 @@ class ConfigurationWindow(QDialog):
 
         self.tree.currentItemChanged.connect(self.start_edit)
         self.settingsWidget.currentItemChanged.connect(self.start_edit)
+        self.generalSettingsWidget.setStyleSheet(
+            "QLineEdit{background-color: #0C1123;}"
+        )
+        self.dicomTargetWidget.setStyleSheet("QLineEdit{background-color: #0C1123;}")
 
     def start_edit(self):
         tree: QTreeWidget = self.sender()
-        if tree.currentItem().childCount() == 0:
-            tree.edit(tree.currentIndex().siblingAtColumn(1))
+        if tree.currentItem():
+            if tree.currentItem().childCount() == 0:
+                tree.edit(tree.currentIndex().siblingAtColumn(1))
 
     def make_target_item(self, target: DicomTarget):
         item = editable(QTreeWidgetItem([target.name]))
@@ -132,6 +137,8 @@ class ConfigurationWindow(QDialog):
 
     def delete_target_clicked(self):
         items = self.tree.selectedItems()
+        if len(items) == 0:
+            return
         item = items[0]
         if item.childCount() == 0:
             item = item.parent()

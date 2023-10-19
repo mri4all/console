@@ -22,6 +22,7 @@ class mri4all_files:
     LOCK = "LOCK"
     PREPARED = "PREPARED"
     EDITING = "EDITING"
+    STOP = "STOP"
     TASK = "scan.json"
 
 

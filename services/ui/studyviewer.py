@@ -56,7 +56,15 @@ class StudyViewer(QDialog):
     def __init__(self):
         super(StudyViewer, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/studyviewer.ui", self)
-        self.setWindowTitle("Study Viewer")
+
+        screen_width, screen_height = ui_runtime.get_screen_size()
+        self.resize(int(screen_width * 0.9), int(screen_height * 0.8))
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+        self.setWindowTitle("Exam Viewer")
 
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.patients = self.organize_scan_data_from_folders()
@@ -132,6 +140,9 @@ class StudyViewer(QDialog):
 
             exam_id, scan_num = str(exam_dir.name).split("#")
             scan_task: ScanTask = read_task(exam_dir)
+            if not scan_task:
+                continue
+
             patient_name = (
                 f"{scan_task.patient.last_name}, {scan_task.patient.first_name}"
             )

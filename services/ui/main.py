@@ -79,6 +79,10 @@ def set_MRI4ALL_style(app):
     QMenu {
         border: 1px solid rgba(38, 44, 68, 255);
     }    
+    QTreeWidget QHeaderView::section {	    
+        background-color: #262C44;
+    }
+
     """
 
     qdarktheme.setup_theme(
