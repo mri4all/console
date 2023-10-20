@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
-import qtawesome as qta  # type: ignore
+import qtawesome as qta
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -34,6 +34,7 @@ import services.ui.taskviewer as taskviewer
 import services.ui.studyviewer as studyviewer
 from sequences import SequenceBase
 from services.ui.viewerwidget import MplCanvas, ViewerWidget
+from services.ui.customMessageBox import CustomMessageBox  # type: ignore
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -321,33 +322,24 @@ class ExaminationWindow(QMainWindow):
             self.overwrite_status_message(msg_value.message)
         elif isinstance(msg_value, ipc.messages.ShowPlotMessage):
             try:
-                dlg = QDialog(self)
-                widgetLayout = QHBoxLayout()
                 sc = MplCanvas(width=7, height=4)
-                widgetLayout.addWidget(sc)
-                dlg.setLayout(widgetLayout)
+                dlg = CustomMessageBox(self, sc)
                 msg_value.plot.show(sc.axes)
-                dlg.exec_()
+                result = dlg.exec_()
+                pipe.send_user_response(response=result)
             except:
                 pipe.send_user_response(error=True)
                 raise
-            else:
-                pipe.send_user_response(error=False)
         elif isinstance(msg_value, ipc.messages.ShowDicomMessage):
             try:
-                dlg = QDialog(self)
-                dlg.setMinimumSize(400, 400)
-                widgetLayout = QHBoxLayout()
                 w = ViewerWidget()
-                widgetLayout.addWidget(w)
-                dlg.setLayout(widgetLayout)
+                dlg = CustomMessageBox(self, w)
                 w.load_dicoms(msg_value.dicom_files)
-                dlg.exec_()
+                result = dlg.exec_()
+                pipe.send_user_response(response=result)
             except:
                 pipe.send_user_response(error=True)
                 raise
-            else:
-                pipe.send_user_response(error=False)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
