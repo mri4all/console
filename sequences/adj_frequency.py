@@ -2,7 +2,7 @@ from pathlib import Path
 
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
-from external.seq.adjustments_acq.util import reading_json_parameter, writing_json_parameter
+from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 import common.logger as logger
 
@@ -34,7 +34,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # Using external packages now: TODO: convert to classes later
 
         # reading configuration data from config.json
-        configuration_data=reading_json_parameter(file_name='./external/seq/adjustments_acq/config.json')
+        configuration_data=reading_json_parameter()
 
         max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
@@ -94,7 +94,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         # updating the Larmor frequency in the config.json file
         configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq
-        writing_json_parameter(config_data=configuration_data, file_name='./external/seq/adjustments_acq/config.json')
+        writing_json_parameter(config_data=configuration_data)
 
         log.info("Done running sequence " + self.get_name())
         return True

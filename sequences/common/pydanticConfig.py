@@ -25,8 +25,24 @@ class PathParameters(BaseModel):
     seq_path: str = "default seq_path"
     seq_path: str = "default seq_path"
 
+### path_parameters section
+class PathParameters(BaseModel):
+    mgh_path: str = "default mgh_path"
+    log_path: str = "default log_path"
+    seq_path: str = "default seq_path"
+    seq_path: str = "default seq_path"
 
-### definition of the configuration files
+### marcos_parameters section
+class PathParameters(BaseModel):
+    ip_adress: str = "default_ip_adress"
+    port: int = 0
+    fpga_clock_frequency_MHz: float = 0.0
+    gradient_board_type: str = "default gradient_board_type"
+    gpa_fhdo_current_per_volt: float = 2.5
+    flocra_pulseq_path: str = "default flocra_pulseq_path"
+
+##############################################
+### main definition of the configuration files
 class Config(BaseModel):
     rf_parameters: RfParameters
     gradients_parameters: GradientsParameters

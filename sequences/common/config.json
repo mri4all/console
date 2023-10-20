@@ -1,6 +1,6 @@
 {
     "rf_parameters": {
-        "larmor_frequency_MHz": 15.52,
+        "larmor_frequency_MHz": 15.58,
         "rf_maximum_amplitude_Hze": 0.0,
         "rf_pi2_fraction": 0.6744
     },
@@ -15,8 +15,11 @@
         "shim_z": 0.0
     },
     "path_parameters": {
-        "mgh_path": "/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq",
-        "log_path": "./server/log/",
-        "seq_path": "./server/scanner_control/seq/"
+        "ip_adress": "default_ip_adress",
+        "port": 0,
+        "fpga_clock_frequency_MHz": 0.0,
+        "gradient_board_type": "default gradient_board_type",
+        "gpa_fhdo_current_per_volt": 2.5,
+        "flocra_pulseq_path": "default flocra_pulseq_path"
     }
 }
