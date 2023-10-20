@@ -44,11 +44,6 @@
                     0, 
                     0]
     },
-    "path_parameters": {
-        "mgh_path": "/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq",
-        "log_path": "./server/log/",
-        "seq_path": "./server/scanner_control/seq/"
-    },
     "marcos_parameters": {
         "ip_adress": "10.42.0.251",
         "port": 11111,
