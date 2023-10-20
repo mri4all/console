@@ -22,7 +22,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+                              "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
