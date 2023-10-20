@@ -98,6 +98,10 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
+        # save the raw data file
+        self.raw_file_path = self.get_working_folder() + "/data/raw.npy"
+        np.save(self.raw_file_path, rxd)
+
         # Debug
         if 1>0: # TODO: set debug mode
             plt.figure()
