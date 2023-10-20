@@ -9,6 +9,11 @@ from sequences import PulseqSequence  # type: ignore
 from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 import configparser
+from sequences.common.util import reading_json_parameter
+
+# Extracting configuration
+configuration_data=reading_json_parameter()
+LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 
 
 log = logger.get_logger()
@@ -46,7 +51,7 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 grad_max_cal(
                     channel=axis,
                     phantom_width=10,
-                    larmor_freq=cfg.LARMOR_FREQ,
+                    larmor_freq=LARMOR_FREQ,
                     calibration_power=0.8,
                     trs=3,
                     tr_spacing=2e6,

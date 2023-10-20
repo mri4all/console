@@ -16,8 +16,13 @@ import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.flocra_pulseq.interpreter import PSInterpreter  # pylint: disable=import-error
 from utils import constants
 # from console.utils import constants
+from sequences.common.util import reading_json_parameter
 
-def run_pulseq(seq_file, rf_center=cfg.LARMOR_FREQ, rf_max=cfg.RF_MAX,
+# Extracting configuration
+configuration_data=reading_json_parameter()
+LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
+
+def run_pulseq(seq_file, rf_center=LARMOR_FREQ, rf_max=cfg.RF_MAX,
                gx_max=cfg.GX_MAX, gy_max=cfg.GY_MAX, gz_max=cfg.GZ_MAX,
                tx_t=1, grad_t=10, tx_warmup=100,
                shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
@@ -154,7 +159,7 @@ def shim(instructions, shim):
     return instructions
 
 
-def recon_0d(rxd, rx_t, trs=1, larmor_freq=cfg.LARMOR_FREQ):
+def recon_0d(rxd, rx_t, trs=1, larmor_freq=LARMOR_FREQ):
     """
     Reconstruct FFT data, pass data out to plotting or saving programs
 
@@ -188,7 +193,7 @@ def recon_0d(rxd, rx_t, trs=1, larmor_freq=cfg.LARMOR_FREQ):
     return out_dict
 
 
-def recon_1d(rxd, rx_t, trs=1, larmor_freq=cfg.LARMOR_FREQ):
+def recon_1d(rxd, rx_t, trs=1, larmor_freq=LARMOR_FREQ):
     """
     Reconstruct 1D data, pass data out to plotting or saving programs
 
@@ -222,7 +227,7 @@ def recon_1d(rxd, rx_t, trs=1, larmor_freq=cfg.LARMOR_FREQ):
     return out_dict
 
 
-def recon_2d(rxd, trs, larmor_freq=cfg.LARMOR_FREQ):
+def recon_2d(rxd, trs, larmor_freq=LARMOR_FREQ):
     """
     Reconstruct 2D data, pass data out to plotting or saving programs
 
@@ -324,7 +329,7 @@ if __name__ == "__main__":
             if len(sys.argv) == 4:
                 rxd = np.load(cfg.DATA_PATH + sys.argv[2])
                 tr_count = int(sys.argv[3])
-                plot_signal_2d(recon_2d(rxd, tr_count, larmor_freq=cfg.LARMOR_FREQ))
+                plot_signal_2d(recon_2d(rxd, tr_count, larmor_freq=LARMOR_FREQ))
             else:
                 print('Format arguments as "plot2d [2d_data_filename] [tr count]"')
         elif command == 'plot1d':

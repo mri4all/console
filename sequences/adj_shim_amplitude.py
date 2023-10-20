@@ -9,7 +9,11 @@ from sequences import PulseqSequence
 from sequences.rf_se import pypulseq_rfse, SequenceRF_SE
 
 import configparser
+from sequences.common.util import reading_json_parameter
 
+# Extracting configuration
+configuration_data=reading_json_parameter()
+LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 
 log = logger.get_logger()
 
@@ -42,7 +46,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             for channel in axes:
                 log.info(f"Updating {channel} linear shim")
                 shim_cal_linear(seq_file=self.seq_file_path,
-                        larmor_freq=cfg.LARMOR_FREQ,
+                        larmor_freq=LARMOR_FREQ,
                         channel=channel,
                         range=0.05,
                         shim_points=10,

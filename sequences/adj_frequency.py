@@ -13,7 +13,6 @@ from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 log = logger.get_logger()
 
-
 class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:

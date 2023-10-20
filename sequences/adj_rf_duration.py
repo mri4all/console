@@ -11,7 +11,11 @@ import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
 from sequences.rf_se import pypulseq_rfse  # type: ignore
+from sequences.common.util import reading_json_parameter
 
+# Extracting configuration
+configuration_data=reading_json_parameter()
+LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 
 log = logger.get_logger()
 
@@ -73,7 +77,7 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
             )
             rxd, rx_t = scr.run_pulseq(
                 seq_file,
-                rf_center=cfg.LARMOR_FREQ,
+                rf_center=LARMOR_FREQ,
                 tx_t=1,
                 grad_t=10,
                 tx_warmup=100,
