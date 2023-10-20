@@ -68,7 +68,7 @@ class StudyViewer(QDialog):
         self.move(qr.topLeft())
 
         self.setWindowTitle("Exam Viewer")
-              
+
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.exams = self.organize_scan_data_from_folders()
 
@@ -104,22 +104,31 @@ class StudyViewer(QDialog):
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
 
-        if not self.selected_scan:
+        checked_scans_numbers = []
+        for i in range(self.scanListWidget.count()):
+            item = self.scanListWidget.item(i)
+            if item.checkState():
+                checked_scans_numbers.append(i)
+        
+        if not checked_scans_numbers:
             return
-
-        try:
-            dicomexport.send_dicoms(
-                self.selected_scan.dir / "dicom",
-                ui_runtime.get_config().dicom_targets[
-                    self.dicomTargetComboBox.currentRow()
-                ],
-            )
-        except Exception as e:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle("Transfer error")
-            msg.setText(f"Error transferring dicoms: \n {e}")
-            msg.exec_()
+        
+        exam = self.exams[self.examListWidget.currentRow()]
+        for scan_number in checked_scans_numbers:
+            checked_scan = exam.scans[scan_number]
+            try:
+                dicomexport.send_dicoms(
+                    checked_scan.dir / "dicom",
+                    ui_runtime.get_config().dicom_targets[
+                        self.dicomTargetComboBox.currentIndex()
+                    ],
+                )
+            except Exception as e:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle("Transfer error")
+                msg.setText(f"Error transferring dicoms: \n {e}")
+                msg.exec_()
 
     def result_selected(self, row: int):
         exam = self.exams[self.examListWidget.currentRow()]
