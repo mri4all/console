@@ -94,7 +94,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         # updating the Larmor frequency in the config.json file
         configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq
-        writing_json_parameter(config_data=configuration_data, file_name='config.json')
+        writing_json_parameter(config_data=configuration_data, file_name='./external/seq/adjustments_acq/config.json')
 
         log.info("Done running sequence " + self.get_name())
         return True
