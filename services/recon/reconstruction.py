@@ -29,23 +29,35 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     
     ## data_loading{folder}
     log.info(f"Starting reconstruction.")
-    ## reshape ksapce using trajectory
-    ## if partial_fourier 
-    ## 
-    filterType = 'sine_bell'
-    kData = np.load('/vagrant/test_data_kspace_d1s1B0_shift49us.npy')
-    kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
-    log.info(f"kSpace {filterType} filtering finished.")
-    iData = b0correction.correct_Cartesian_basic(kData, kTraj, iB0map)
-    log.info(f"B0 correction finished.")
-    ## b0correction.correct_Cartesian_basiccorrect_MFI
-    DICOM.write_dicom(iData, task, folder)
-    log.info(f"DICOM writting finished.")
-
-    # To see what's available in the JSON, take a look at common/types.py
 
     if task.processing.recon_mode == "fake_dicoms":
         utils.generate_fake_dicoms(folder, task)
         time.sleep(2)
+        return True
+    
+    ## TO DO: Partial_fourier 
+    
+    # K-space filtering - TO DO
+    filterType = 'sine_bell'
+
+    kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
+
+    log.info(f"kSpace {filterType} filtering finished.")
+
+    # Use the trajectory information and B0 map
+    iData = b0correction.correct_Cartesian_basic(kData, kTraj, iB0map)
+    log.info(f"B0 correction finished.")
+
+    # Image denoising: TO DO
+
+    # Write the DICOM file to the folder 
+    DICOM.write_dicom(iData, task, folder)
+    log.info(f"DICOM writting finished.")
+
+    # Applicability
+
+    # To see what's available in the JSON, take a look at common/types.py
+
+
 
     return True
