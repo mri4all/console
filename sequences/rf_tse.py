@@ -85,7 +85,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         # reading configuration data from config.json
         # configuration_data=reading_json_parameter(file_name='config.json')
 
-        LARMOR_FREQ = LARMOR_FREQ
+        # LARMOR_FREQ = LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
         RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
         alpha1 = 90  # flip angle

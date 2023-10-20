@@ -12,8 +12,8 @@ import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-erro
 import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
-from sequences.common.util import reading_json_parameter
 from utils import constants
+from sequences.common.util import reading_json_parameter
 
 # Extracting configuration
 configuration_data=reading_json_parameter()
@@ -752,6 +752,10 @@ def shim_cal_multicoil(larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_po
     """
 
     seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
+
+    optimizer = BayesianOptimization(f=None, pbounds=None,
+                                     verbose=2, random_state=1)
+    utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
    
     for _ in range(n_bayopt_iter):
         next_point = optimizer.suggest(utility)

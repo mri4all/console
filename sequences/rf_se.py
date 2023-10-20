@@ -134,7 +134,7 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    LARMOR_FREQ = LARMOR_FREQ
+    # LARMOR_FREQ = LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
     alpha1 = 90  # flip angle
