@@ -116,16 +116,23 @@ class StudyViewer(QDialog):
             msg.exec_()
 
     def result_selected(self, row: int):
-        # TODO - Update the viewer acc to the result selected
-        pass
+        exam = self.exams[self.examComboBox.currentIndex()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+        if scan.task.results:
+            result_data = scan.task.results[row]
+            self.viewer.view_scan(result_data.file_path, result_data.type)
 
     def scan_selected(self, row: int):
         self.resultListWidget.clear()
         exam = self.exams[self.examComboBox.currentIndex()]
         scan = exam.scans[row]
 
-        for result in ["DICOM", "PLOT", "RAWDATA"]:
-            self.resultListWidget.addItem(result)
+        if not scan.task.results:
+            for result in ["DICOM", "PLOT", "RAWDATA"]:
+                self.resultListWidget.addItem(result)
+        else:
+            for result in scan.task.results:
+                self.resultListWidget.addItem(result.name + " - " + result.type)
         self.resultListWidget.setCurrentRow(0)
 
     def exam_selected(self, index):
