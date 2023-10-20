@@ -52,10 +52,10 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     nonCart = None
     params = None
     b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
-    iData = b0_corrector().correct_Cartesian_basic()
+    iData = b0_corrector()
     log.info(f"B0 correction finished.")
 
-    # TODO(Kranthi): Image denoising
+    # TODO(Kranthi): Image denoising (Gaussian)
     iData = denoise.apply_nl_means_denoise(iData)
     log.info(f"Finished image denoising.")
 
@@ -63,10 +63,7 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
-    # Applicability
-
-    # To see what's available in the JSON, take a look at common/types.py
-
-
+    # TODO(Radhika): Write ISMMRML file to the folder
+    # Should it be done on background?
 
     return True
