@@ -1,16 +1,10 @@
-import os
-from pathlib import Path
 import math
 import numpy as np
-import matplotlib.pyplot as plt
-
-from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
-from sequences import PulseqSequence
 import common.logger as logger
 
 log = logger.get_logger()
@@ -41,6 +35,7 @@ def pypulseq_1dse(
     adc_num_samples = 4096
     adc_duration = 6.4e-3
 
+    ch0 = "x"
     fov = 140e-3  # Define FOV and resolution
     Nx = 96
     BW = 32e3
@@ -98,10 +93,10 @@ def pypulseq_1dse(
 
     delta_k = 1 / fov
     gx = pp.make_trapezoid(
-        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel="x", area=gx.area / 2, duration=prephaser_duration, system=system
+        channel=ch0, area=gx.area / 2, duration=prephaser_duration, system=system
     )
     # Define ADC events
     # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
