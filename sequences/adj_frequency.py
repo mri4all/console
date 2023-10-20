@@ -34,7 +34,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # Using external packages now: TODO: convert to classes later
 
         # reading configuration data from config.json
-        #configuration_data=reading_json_parameter(file_name='config.json')
+        configuration_data=reading_json_parameter(file_name='./external/seq/adjustments_acq/config.json')
 
         max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
