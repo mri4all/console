@@ -91,7 +91,6 @@ class ViewerWidget(QWidget):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
-        log.info(type)
         if type == "dicom":
             dcm_path = file_path / "dicom"
             if next(dcm_path.glob("**/*.dcm"), None):
@@ -108,7 +107,15 @@ class ViewerWidget(QWidget):
             self.set_empty_viewer()
             return
 
-        lstFilesDCM = [str(name) for name in glob.glob(input_path + "*.dcm")]
+        lstFilesDCM = None
+        if isinstance(input_path, list):
+            lstFilesDCM = input_path
+        else:
+            path = Path(input_path)
+            if path.is_dir():
+                lstFilesDCM = [str(name) for name in path.glob("*.dcm")]
+            else:
+                lstFilesDCM = [input_path]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
             self.set_empty_viewer()

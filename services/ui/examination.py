@@ -333,6 +333,21 @@ class ExaminationWindow(QMainWindow):
                 raise
             else:
                 pipe.send_user_response(error=False)
+        elif isinstance(msg_value, ipc.messages.ShowDicomMessage):
+            try:
+                dlg = QDialog(self)
+                dlg.setMinimumSize(400, 400)
+                widgetLayout = QHBoxLayout()
+                w = ViewerWidget()
+                widgetLayout.addWidget(w)
+                dlg.setLayout(widgetLayout)
+                w.load_dicoms(msg_value.dicom_files)
+                dlg.exec_()
+            except:
+                pipe.send_user_response(error=True)
+                raise
+            else:
+                pipe.send_user_response(error=False)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
