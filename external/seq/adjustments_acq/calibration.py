@@ -14,7 +14,6 @@ from external.marcos_client.examples import trap_cent  # pylint: disable=import-
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from sequences.common.util import reading_json_parameter
 from utils import constants
-from bayes_opt import BayesianOptimization, UtilityFunction
 
 # Extracting configuration
 configuration_data=reading_json_parameter()

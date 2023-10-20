@@ -34,7 +34,6 @@ imageio~=2.19.3
 numpy==1.25
 tqdm~=4.66.1
 numba==0.58.0
-bayesian-optimization==1.4.3
 
 
 # Dependencies of the GUI service
