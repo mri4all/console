@@ -31,14 +31,14 @@ def pypulseq_1dse(
     TR = 2000e-3
     num_averages = 1
     adc_num_samples = 4096
-    adc_duration = 6.4e-3
+    #adc_duration = 6.4e-3
 
     ch0 = "y"
-    fov = 140e-3  # Define FOV and resolution
+    fov = 20e-3  # Define FOV and resolution
     Nx = 250
-    BW = 32e3
+    BW = 64e3
     adc_dwell = 1 / BW
-    adc_duration = Nx * adc_dwell  # 6.4e-3
+    #adc_duration = Nx * adc_dwell  # 6.4e-3
 
     prephaser_duration = 1e-3  # TODO: Need to define this behind the scenes and optimze
     rise_time = 200e-6
@@ -91,15 +91,15 @@ def pypulseq_1dse(
     )
 
     delta_k = 1 / fov
+    readout_time=2.5e-3 + (2*system.adc_dead_time)
     gx = pp.make_trapezoid(
-        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, rise_time=rise_time, system=system
+        channel=ch0, flat_area=Nx * delta_k, flat_time=readout_time, rise_time=rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
         channel=ch0, area=gx.area / 2, duration=prephaser_duration, rise_time=rise_time, system=system
     )
 
     # Define ADC events
-    readout_time=2.5e-3 + (2*system.adc_dead_time)
     adc = pp.make_adc(
         num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, phase_offset= np.pi/2, system=system
     )
