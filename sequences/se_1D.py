@@ -104,8 +104,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             plt.subplot(121)
             plt.plot(np.abs(rxd))
             plt.title("acq signal")
-            plt.show()
-
             plt.subplot(122)
             recon = np.fft.fft(np.fft.fftshift(rxd))
             plt.plot(np.abs(recon))
