@@ -33,26 +33,31 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self, scan_task) -> bool:
+    def run_sequence(self, scan_task, n_iter=1) -> bool:
+        
+        axes = ['x', 'y', 'z']
+        
         log.info("Running sequence " + self.get_name())
-
-        shim_cal_linear(seq_file=self.seq_file_path,
-                larmor_freq=cfg.LARMOR_FREQ,
-                channel='x',
-                range=0.01,
-                shim_points=3,
-                points=2,
-                iterations=1,
-                zoom_factor=2,
-                shim_x=cfg.SHIM_X,
-                shim_y=cfg.SHIM_Y,
-                shim_z=cfg.SHIM_Z,
-                tr_spacing=2,
-                force_tr=False,
-                first_max=False,
-                smooth=True,
-                plot=True,
-                gui_test=False)
+        for ii in range(n_iter):
+            
+            for channel in axes:
+                shim_cal_linear(seq_file=self.seq_file_path,
+                        larmor_freq=cfg.LARMOR_FREQ,
+                        channel=channel,
+                        range=0.01,
+                        shim_points=3,
+                        points=2,
+                        iterations=1,
+                        zoom_factor=2,
+                        shim_x=cfg.SHIM_X,
+                        shim_y=cfg.SHIM_Y,
+                        shim_z=cfg.SHIM_Z,
+                        tr_spacing=2,
+                        force_tr=False,
+                        first_max=False,
+                        smooth=True,
+                        plot=True,
+                        gui_test=False)
         
         log.info("Done running sequence " + self.get_name())
         return True
