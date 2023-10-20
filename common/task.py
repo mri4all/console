@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Any
 import shutil
+import glob
 
 import common.logger as logger
 
@@ -236,24 +237,20 @@ def clear_task_subfolder(folder: str, subfolder: str) -> bool:
         log.error(f"Task folder {folder} does not exist.")
         return False
 
-    # Make sure the subfolder exists. Otherwise, an invalid option has
-    # been provided.
+    # Make sure the subfolder exists. Otherwise, an invalid option has been provided.
     subfolder_path = Path(folder) / subfolder
     if not Path(subfolder_path).is_dir():
         log.error(f"Invalid subfolder {subfolder} selected for clearing.")
         return False
 
-    # Remove the old folder
-    if not shutil.rmtree(subfolder_path):
-        log.error(f"Unable to clear subfolder {subfolder}.")
-        return False
-
-    # And recreate it
+    # Remove content from folder
     try:
-        current_subfolder = Path(current_subfolder) / subfolder
-        os.mkdir(current_subfolder)
-    except Exception:
-        log.error(f"Unable to recreate subfolder in task {subfolder_path}")
+        files = glob.glob(str(subfolder_path) + "/*")
+        for f in files:
+            os.remove(f)
+    except:
+        log.error(f"Unable to clear subfolder {subfolder_path}.")
         return False
 
+    log.info(f"Cleared subfolder {subfolder_path}")
     return True

@@ -51,7 +51,7 @@ class PatientData(BaseModel):
 class StudyViewer(QDialog):
     examListWidget: QListWidget
     scanListWidget: QListWidget
-    scanListWidget: QListWidget
+    resultListWidget: QListWidget
     patients: List[PatientData]
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
@@ -68,9 +68,12 @@ class StudyViewer(QDialog):
         self.move(qr.topLeft())
 
         self.setWindowTitle("Exam Viewer")
-
+              
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.exams = self.organize_scan_data_from_folders()
+
+        if not self.exams:
+            return
 
         self.examListWidget.addItems(
             [e.patientName + " - " + e.acc for e in self.exams]
@@ -91,6 +94,7 @@ class StudyViewer(QDialog):
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
         self.exam_selected(0)
+        self.examListWidget.setCurrentRow(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setProperty("type", "highlight")
@@ -141,7 +145,10 @@ class StudyViewer(QDialog):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
-            self.scanListWidget.addItem(scan_obj.task.protocol_name)
+            item = QListWidgetItem(scan_obj.task.protocol_name)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.scanListWidget.addItem(item)
+
         self.scanListWidget.setCurrentRow(0)
 
     def organize_scan_data_from_folders(self) -> List[ExamData]:
