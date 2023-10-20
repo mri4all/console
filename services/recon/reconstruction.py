@@ -4,6 +4,7 @@ import numpy as np
 import recon.kspaceFiltering.kspace_filtering as kFilter
 from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
+from recon.image_filters import denoise
 log = logger.get_logger()
 
 import common.queue as queue
@@ -54,9 +55,11 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     iData = b0_corrector().correct_Cartesian_basic()
     log.info(f"B0 correction finished.")
 
-    # Image denoising: TO DO
+    # TODO(Kranthi): Image denoising
+    iData = denoise.apply_nl_means_denoise(iData)
+    log.info(f"Finished image denoising.")
 
-    # Write the DICOM file to the folder 
+    # TODO(Lavanya): Write the DICOM file to the folder 
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
