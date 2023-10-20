@@ -28,7 +28,7 @@ def pypulseq_1dse(
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
     TE = 20e-3
-    TR = 2000e-3
+    TR = 3000e-3
     num_averages = 1
     adc_num_samples = 4096
     #adc_duration = 6.4e-3
@@ -37,8 +37,8 @@ def pypulseq_1dse(
     fov = 20e-3  # Define FOV and resolution
     Nx = 250
     BW = 64e3
-    adc_dwell = 1 / BW
-    #adc_duration = Nx * adc_dwell  # 6.4e-3
+    # adc_dwell = 1 / BW
+    # adc_duration = Nx * adc_dwell  # 6.4e-3
 
     prephaser_duration = 1e-3  # TODO: Need to define this behind the scenes and optimze
     rise_time = 200e-6
@@ -125,7 +125,7 @@ def pypulseq_1dse(
         )
     ) * seq.grad_raster_time
 
-    delay_TR = TR - TE - (0.5 * adc_duration)
+    delay_TR = TR - TE - (0.5 * readout_time)
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
     assert np.all(delay_TR >= 0)
@@ -140,7 +140,8 @@ def pypulseq_1dse(
         seq.add_block(pp.make_delay(tau1))
         seq.add_block(rf2)
         seq.add_block(pp.make_delay(tau2))
-        seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        seq.add_block(gx, adc)
+        seq.add_block(pp.make_delay(delay_TR))
     seq.plot(time_range=[0,5*TR])
 
     # Check whether the timing of the sequence is correct
