@@ -2,7 +2,8 @@ from pathlib import Path
 
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
-from external.seq.adjustments_acq.util import reading_json_parameter, writing_json_parameter
+from sequences.common.util import reading_json_parameter, writing_json_parameter
+from sequences.common.pydanticConfig import Config
 
 import common.logger as logger
 
@@ -11,7 +12,6 @@ from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 
 log = logger.get_logger()
-
 
 class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
@@ -22,7 +22,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+                              "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -34,7 +35,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # Using external packages now: TODO: convert to classes later
 
         # reading configuration data from config.json
-        configuration_data=reading_json_parameter(file_name='./external/seq/adjustments_acq/config.json')
+        configuration_data=reading_json_parameter()
 
         max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
@@ -94,7 +95,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         # updating the Larmor frequency in the config.json file
         configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq
-        writing_json_parameter(config_data=configuration_data, file_name='./external/seq/adjustments_acq/config.json')
+        writing_json_parameter(config_data=configuration_data)
 
         log.info("Done running sequence " + self.get_name())
         return True

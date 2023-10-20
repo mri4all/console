@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
-import qtawesome as qta  # type: ignore
+import qtawesome as qta
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -33,7 +33,8 @@ import services.ui.systemstatus as systemstatus
 import services.ui.taskviewer as taskviewer
 import services.ui.studyviewer as studyviewer
 from sequences import SequenceBase
-from services.ui.viewerwidget import ViewerWidget
+from services.ui.viewerwidget import MplCanvas, ViewerWidget
+from services.ui.customMessageBox import CustomMessageBox  # type: ignore
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -301,19 +302,44 @@ class ExaminationWindow(QMainWindow):
                 log.exception("Error")
                 pipe.send_user_response(error=True)
         elif isinstance(msg_value, ipc.messages.UserAlertMessage):
-            msg = QMessageBox()
-            msg.setIcon(
-                dict(
-                    information=QMessageBox.Information,
-                    warning=QMessageBox.Warning,
-                    critical=QMessageBox.Critical,
-                )[msg_value.alert_type]
-            )
-            msg.setWindowTitle(msg_value.alert_type.capitalize())
-            msg.setText(msg_value.message)
-            msg.exec_()
+            try:
+                msg = QMessageBox()
+                msg.setIcon(
+                    dict(
+                        information=QMessageBox.Information,
+                        warning=QMessageBox.Warning,
+                        critical=QMessageBox.Critical,
+                    )[msg_value.alert_type]
+                )
+                msg.setWindowTitle(msg_value.alert_type.capitalize())
+                msg.setText(msg_value.message)
+                msg.exec_()
+            except:
+                pipe.send_user_response(error=True)
+            else:
+                pipe.send_user_response(error=False)
         elif isinstance(msg_value, ipc.messages.SetStatusMessage):
             self.overwrite_status_message(msg_value.message)
+        elif isinstance(msg_value, ipc.messages.ShowPlotMessage):
+            try:
+                sc = MplCanvas(width=7, height=4)
+                dlg = CustomMessageBox(self, sc)
+                msg_value.plot.show(sc.axes)
+                result = dlg.exec_()
+                pipe.send_user_response(response=result)
+            except:
+                pipe.send_user_response(error=True)
+                raise
+        elif isinstance(msg_value, ipc.messages.ShowDicomMessage):
+            try:
+                w = ViewerWidget()
+                dlg = CustomMessageBox(self, w)
+                w.load_dicoms(msg_value.dicom_files)
+                result = dlg.exec_()
+                pipe.send_user_response(response=result)
+            except:
+                pipe.send_user_response(error=True)
+                raise
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)

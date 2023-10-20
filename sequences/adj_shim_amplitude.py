@@ -6,10 +6,9 @@ import external.seq.adjustments_acq.config as cfg
 import common.logger as logger
 
 from sequences import PulseqSequence
-from sequences.rf_se import pypulseq_rfse
+from sequences.rf_se import pypulseq_rfse, SequenceRF_SE
 
 import configparser
-
 
 log = logger.get_logger()
 
@@ -26,8 +25,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
-
-        pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rfse(inputs=SequenceRF_SE.get_default_parameters(), check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -45,8 +43,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=cfg.LARMOR_FREQ,
                         channel=channel,
-                        range=0.01,
-                        shim_points=3,
+                        range=0.05,
+                        shim_points=10,
                         points=2,
                         iterations=1,
                         zoom_factor=2,

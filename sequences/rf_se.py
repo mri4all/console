@@ -133,27 +133,28 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    TR = 250.0
-    TE = 70.0
     alpha1 = 90  # flip angle
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
-    TE = 70e-3
-    TR = 250e-3
-    num_averages = 1
-    adc_num_samples = 4096
-    adc_duration = 6.4e-3
+    # adc_num_samples = 4096
+    # adc_duration = 6.4e-3
 
     # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
     # RF_MAX = ui_inputs["RF_MAX"]
     # RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
 
-    TR = inputs["TR"] / 1000
+    TR = inputs["TR"] / 1000 # ms to s
     TE = inputs["TE"] / 1000
+<<<<<<< HEAD
     NSA = inputs["NSA"]
     # adc_num_samples = inputs['ADC_samples']
     # adc_duration = inputs['ADC_duration']
+=======
+    num_averages = inputs["NSA"]
+    adc_num_samples = inputs['ADC_samples']
+    adc_duration = inputs['ADC_duration'] / 1e6 # us to s
+>>>>>>> 936a0a5a4adc9e221e890be11437140dc89baeb6
 
     # ======
     # INITIATE SEQUENCE

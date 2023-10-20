@@ -10,7 +10,6 @@ from sequences.rf_se import pypulseq_rfse  # type: ignore
 
 import configparser
 
-
 log = logger.get_logger()
 
 
@@ -54,7 +53,7 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                     readout_duration=500,
                     rx_period=25 / 3,
                     RF_PI2_DURATION=50,
-                    rf_max=cfg.RF_MAX,
+                    rf_max=RF_MAX,
                     trap_ramp_duration=50,
                     trap_ramp_pts=5,
                     plot=True,
