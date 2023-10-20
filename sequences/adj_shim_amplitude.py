@@ -33,14 +33,15 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self, scan_task, n_iter=1) -> bool:
+    def run_sequence(self, scan_task, n_iter_linear=1, refine_multicoil=False) -> bool:
         
+        # calculate the linear shim 
         axes = ['x', 'y', 'z']
-        
         log.info("Running sequence " + self.get_name())
-        for ii in range(n_iter):
+        for ii in range(n_iter_linear):
             
             for channel in axes:
+                log.info(f"Updating {channel} linear shim")
                 shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=cfg.LARMOR_FREQ,
                         channel=channel,
@@ -58,6 +59,10 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                         smooth=True,
                         plot=True,
                         gui_test=False)
+        
+        # refine the multicoil shim 
+        if refine_multicoil:
+            log.info("MC shimming selected, not yet implemented")
         
         log.info("Done running sequence " + self.get_name())
         return True
