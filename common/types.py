@@ -105,6 +105,7 @@ class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
     protocol_name: str = ""
+    scan_number: int = 0
     system: SystemInformation = SystemInformation()
     patient: PatientInformation = PatientInformation()
     exam: ExamInformation = ExamInformation()

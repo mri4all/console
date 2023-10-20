@@ -58,6 +58,7 @@ def create_task(
     scan_task.id = scan_id
     scan_task.sequence = sequence
     scan_task.protocol_name = default_protocol_name
+    scan_task.scan_number = scan_counter
     scan_task.system = system_information
     scan_task.exam = exam_information
     scan_task.patient = patient_information

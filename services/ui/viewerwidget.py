@@ -127,6 +127,7 @@ class ViewerWidget(QWidget):
                     {task.patient.last_name}, {task.patient.first_name}<br/>
                     {task.patient.mrn}<br/>
                     {task.protocol_name}<br/>
+                    Scan {task.scan_number}<br/>                    
                     </span><br/>""",
                 anchor=(0, 0),
             )
