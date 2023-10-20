@@ -29,7 +29,7 @@ def control_service(action: ServiceAction, service: Service) -> bool | None:
     else:
         if result.returncode != 0:
             log.warning(f"Failed to {action.value} {service.value}")
-            log.warning(f"Error: {result.stderr}")
+            log.warning(f"Reason: {result.stderr}")
     return None
 
 

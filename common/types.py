@@ -36,6 +36,7 @@ class PatientInformation(BaseModel):
 
 class ExamInformation(BaseModel):
     id: str = ""
+    registration_time: str = ""
     scan_counter: int = 0
     dicom_study_uid: str = ""
     patient_position: str = ""
@@ -43,6 +44,7 @@ class ExamInformation(BaseModel):
 
     def initialize(self):
         self.id = helper.generate_uid()
+        self.registration_time = helper.get_datetime()
         self.dicom_study_uid: str = pydicom.uid.generate_uid()  # type: ignore
         self.scan_counter = 0
         self.patient_position = ""

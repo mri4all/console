@@ -51,19 +51,9 @@ class SystemStatusWindow(QDialog):
         self.pingLabel.setText("")
         self.pingLabel.setFont(qta.font("fa", 16))
 
-        self.acquisitionLabel.setText(
-            '<span style="color: #40C1AC; font-size: 24px;"> '
-            + chr(0xF058)
-            + chr(0xA0)
-            + " </span> Running"
-        )
+        self.acquisitionLabel.setText("")
         self.acquisitionLabel.setFont(qta.font("fa", 16))
-        self.reconstructionLabel.setText(
-            '<span style="color: #40C1AC; font-size: 24px;"> '
-            + chr(0xF058)
-            + chr(0xA0)
-            + " </span> Running"
-        )
+        self.reconstructionLabel.setText("")
         self.reconstructionLabel.setFont(qta.font("fa", 16))
 
         self.softwareLabel.setText(

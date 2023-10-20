@@ -6,6 +6,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
+import qtawesome as qta  # type: ignore
 
 from common.task import read_task
 from common.types import (
@@ -89,6 +90,9 @@ class StudyViewer(QDialog):
         self.patient_selected(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
+        self.closeButton.setProperty("type", "highlight")
+        self.closeButton.setIcon(qta.icon("fa5s.check"))
+        self.closeButton.setIconSize(QSize(20, 20))
 
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
