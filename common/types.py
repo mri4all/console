@@ -79,6 +79,7 @@ ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]
 class ResultItem(BaseModel):
     type: ResultTypes = "dicom"
     name: str = ""
+    description: str = ""
     file_path: str = ""
     autoload_viewer: int = 0
     primary: bool = False
@@ -111,7 +112,7 @@ class ScanTask(BaseModel):
     adjustment: dict = {}  # TODO
     processing: ProcessingConfig = ProcessingConfig()
     other: dict = {}
-    results: dict = {}  # TODO
+    results: List[ResultItem] = []  # TODO
     journal: ScanJournal = ScanJournal()
 
 

@@ -27,6 +27,7 @@ class mri4all_files:
 
 
 class mri4all_taskdata:
+    SEQ = "seq"
     RAWDATA = "rawdata"
     DICOM = "dicom"
     OTHER = "other"

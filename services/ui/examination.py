@@ -464,9 +464,9 @@ class ExaminationWindow(QMainWindow):
             widget_icon = "wrench"
 
         item = QListWidgetItem()
-        tool_tip = f"Sequence class = {entry.sequence}"
+        tool_tip = f"Class = {entry.sequence}"
         if entry.description:
-            tool_tip += f"\n\n{entry.description}"
+            tool_tip = f"{entry.description}\n" + tool_tip
         item.setToolTip(tool_tip)
         item.setBackground(QColor(widget_background_color))
         widget = QWidget()
@@ -506,15 +506,21 @@ class ExaminationWindow(QMainWindow):
         imageWidgetButton.setIconSize(QSize(24, 24))
         imageWidgetButton.setStyleSheet("background-color: transparent;")
         image_button_menu = QMenu(self)
-        image_button_menu.addAction("Show in Viewer 1", self.load_result_in_viewer)
-        image_button_menu.setProperty("source", entry.folder_name)
-        image_button_menu.setProperty("target", "viewer1")
-        image_button_menu.addAction("Show in Viewer 2", self.load_result_in_viewer)
-        image_button_menu.setProperty("source", entry.folder_name)
-        image_button_menu.setProperty("target", "viewer2")
-        image_button_menu.addAction("Show in Viewer 3", self.load_result_in_viewer)
-        image_button_menu.setProperty("source", entry.folder_name)
-        image_button_menu.setProperty("target", "viewer3")
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 1", self.load_result_in_viewer
+        )
+        view_action.setProperty("source", str(entry.folder_name))
+        view_action.setProperty("target", "viewer1")
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 2", self.load_result_in_viewer
+        )
+        view_action.setProperty("source", str(entry.folder_name))
+        view_action.setProperty("target", "viewer2")
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 3", self.load_result_in_viewer
+        )
+        view_action.setProperty("source", str(entry.folder_name))
+        view_action.setProperty("target", "viewer3")
         imageWidgetButton.setMenu(image_button_menu)
         imageWidgetButton.setStyleSheet(
             """QPushButton::menu-indicator {
@@ -1033,25 +1039,47 @@ class ExaminationWindow(QMainWindow):
         self.sync_queue_widget(True)
 
     def clear_viewers(self):
-        self.viewer1.view_data("", "empty")
-        self.viewer2.view_data("", "empty")
-        self.viewer3.view_data("", "empty")
+        self.viewer1.view_data("", "empty", {})
+        self.viewer2.view_data("", "empty", {})
+        self.viewer3.view_data("", "empty", {})
 
     def load_result_in_viewer(self):
-        source_results = self.sender().property("source")
+        scan_folder = self.sender().property("source")
+        if not scan_folder:
+            log.warning("Unable to identify scan for viewers.")
+            return
+        scan_path = mri4all_paths.DATA_COMPLETE + "/" + scan_folder
+        scan_task = task.read_task(scan_path)
+        if not scan_task:
+            log.warning("Unable load scan task for viewers.")
+            return
+
+        result_item = None
+        for result in scan_task.results:
+            if result.primary:
+                result_item = result
+                break
+
+        if not result_item:
+            log.warning("Unable load scan task for viewers.")
+            return
+        result_path = scan_path + "/" + result_item.file_path
+
         target_viewer = self.sender().property("target")
         if target_viewer == "viewer1":
-            pass
+            self.viewer1.view_data(result_path, result_item.type, scan_task)
         elif target_viewer == "viewer2":
-            pass
+            self.viewer2.view_data(result_path, result_item.type, scan_task)
         elif target_viewer == "viewer3":
-            pass
+            self.viewer3.view_data(result_path, result_item.type, scan_task)
         else:
             log.error("Invalid target viewer selected")
 
     def autoload_results_in_viewer(self, scan_folder):
         if not scan_folder:
             return
+
+        log.info(f"Autoloading results for scan {scan_folder}")
 
         # Read scan_task for given queue item
         scan_path = mri4all_paths.DATA_COMPLETE + "/" + scan_folder
@@ -1062,12 +1090,13 @@ class ExaminationWindow(QMainWindow):
 
         # Loop over all results of the scan task
         for result_item in scan_task.results:
-            if result_item.autoload_viewer == 0:
-                self.viewer1.view_data(result_item.file_path, result_item.type)
-            elif result_item.autoload_viewer == 1:
-                self.viewer2.view_data(result_item.file_path, result_item.type)
+            result_path = scan_path + "/" + result_item.file_path
+            if result_item.autoload_viewer == 1:
+                self.viewer1.view_data(result_path, result_item.type, scan_task)
             elif result_item.autoload_viewer == 2:
-                self.viewer3.view_data(result_item.file_path, result_item.type)
+                self.viewer2.view_data(result_path, result_item.type, scan_task)
+            elif result_item.autoload_viewer == 3:
+                self.viewer3.view_data(result_path, result_item.type, scan_task)
             else:
                 log.warning("Invalid target viewer provided")
 

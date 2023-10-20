@@ -1,4 +1,6 @@
 import json
+import glob
+import sip  # type: ignore
 from pathlib import Path
 from typing import Optional
 from PyQt5 import uic
@@ -63,10 +65,10 @@ class ViewerWidget(QWidget):
         self.layout().setSpacing(0)
         self.set_empty_viewer()
 
-    def view_data(self, file_path: str, viewer_mode: ResultTypes):
+    def view_data(self, file_path: str, viewer_mode: ResultTypes, task):
         self.clear_view()
         if viewer_mode == "dicom":
-            self.load_dicoms()
+            self.load_dicoms(file_path, task)
         elif viewer_mode == "plot":
             self.load_plot()
         else:
@@ -74,8 +76,9 @@ class ViewerWidget(QWidget):
 
     def clear_view(self):
         if self.widget:
+            widget_to_delete = self.widget
             self.layout().removeWidget(self.widget)
-            self.widget.deleteLater()
+            sip.delete(widget_to_delete)
             self.widget = None
             self.viewed_scan_task = None
 
@@ -90,34 +93,37 @@ class ViewerWidget(QWidget):
             self.load_plot(json.loads(others[0].read_text()))
             return False
 
-    def load_dicoms(
-        self, input_path="/vagrant/classDcm", task: Optional[ScanTask] = None
-    ):
-        lstFilesDCM = [str(p) for p in Path(input_path).glob("**/*.dcm")]
+    def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
+        if not input_path:
+            self.set_empty_viewer()
+            return
+
+        lstFilesDCM = [str(name) for name in glob.glob(input_path + "*.dcm")]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
             self.set_empty_viewer()
             return
+
         ds = pydicom.dcmread(lstFilesDCM[0])
-
         ConstPixelDims = (len(lstFilesDCM), int(ds.Rows), int(ds.Columns))
-
         ArrayDicom = np.zeros(ConstPixelDims, dtype=ds.pixel_array.dtype)
-
         for filenameDCM in lstFilesDCM:
             ds = pydicom.dcmread(filenameDCM)
             ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
 
         pg.setConfigOptions(imageAxisOrder="row-major")
-        viewer_widget = pg.image(ArrayDicom)
 
-        viewer_widget.ui.histogram.hide()
-        viewer_widget.ui.roiBtn.hide()
-        viewer_widget.ui.menuBtn.hide()
+        self.widget = pg.ImageView()
+        self.widget.setImage(ArrayDicom)
+
+        # viewer_widget.ui.histogram.hide()
+        self.widget.ui.roiBtn.hide()
+        self.widget.ui.menuBtn.hide()
+        self.widget.autoRange()
 
         if task:
             text = StaticTextItem(
-                html=f"""<span style='font-size: 20px;'>
+                html=f"""<span style='font-size: 16px; color: #999;'>
                     {task.patient.last_name}, {task.patient.first_name}<br/>
                     {task.patient.mrn}<br/>
                     {task.protocol_name}<br/>
@@ -125,16 +131,9 @@ class ViewerWidget(QWidget):
                 anchor=(0, 0),
             )
             text.setPos(0, 0)  # todo: this only works with 0,0 position
-            viewer_widget.addItem(text)
+            self.widget.addItem(text)
 
-        # Another option to display text
-        # label = QLabel("Patient ID")
-        # label.move(0, 0)
-        # label.setStyleSheet("background-color: #000;")
-        # self.layout.addWidget(label)
-
-        self.layout().addWidget(viewer_widget)
-        self.widget = viewer_widget
+        self.layout().addWidget(self.widget)
 
     def load_plot(self, array=None):
         sc = MplCanvas(self)
