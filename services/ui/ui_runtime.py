@@ -104,7 +104,6 @@ def register_patient():
         return
 
     scan_queue_list.clear()
-    exam_information.initialize()
     examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)
     status_last_completed_scan = -1

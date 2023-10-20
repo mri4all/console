@@ -164,7 +164,7 @@ class StudyViewer(QDialog):
             # create a new exam object if not found
             exam = next((e for e in patient.exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=exam_id, acc=scan_task.patient.acc, scans=[])
+                exam = ExamData(id=exam_id, acc=scan_task.exam.acc, scans=[])
                 patient.exams.append(exam)
 
             dicom_data = np.array([])

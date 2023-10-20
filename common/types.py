@@ -14,11 +14,11 @@ class PatientInformation(BaseModel):
     first_name: str = ""
     last_name: str = ""
     mrn: str = ""
-    acc: str = ""
     birth_date: str = ""
     gender: str = ""
     weight_kg: int = 0
     height_cm: int = 0
+    age: int = 0
 
     def get_full_name(self):
         return f"{self.last_name}, {self.first_name}"
@@ -27,28 +27,33 @@ class PatientInformation(BaseModel):
         self.first_name = ""
         self.last_name = ""
         self.mrn = ""
-
-        self.acc = ""
-        birth_date = ""
-        gender = ""
-        weight_kg = 0
-        height_cm = 0
+        self.birth_date = ""
+        self.age = 0
+        self.gender = ""
+        self.weight_kg = 0
+        self.height_cm = 0
 
 
 class ExamInformation(BaseModel):
     id: str = ""
     scan_counter: int = 0
     dicom_study_uid: str = ""
+    patient_position: str = ""
+    acc: str = ""
 
     def initialize(self):
         self.id = helper.generate_uid()
         self.dicom_study_uid: str = pydicom.uid.generate_uid()
         self.scan_counter = 0
+        self.patient_position = ""
+        self.acc = ""
 
     def clear(self):
         self.id = ""
         self.scan_counter = 0
         self.dicom_study_uid = ""
+        self.patient_position = ""
+        self.acc = ""
 
 
 class SystemInformation(BaseModel):
@@ -78,7 +83,9 @@ class ResultItem(BaseModel):
     primary: bool = False
 
 
-FailStages = Literal["preparation", "adjustment", "acquisition", "reconstruction", "other", "none"]
+FailStages = Literal[
+    "preparation", "adjustment", "acquisition", "reconstruction", "other", "none"
+]
 
 
 class ScanJournal(BaseModel):

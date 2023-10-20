@@ -16,6 +16,10 @@ import services.ui.about as about
 import services.ui.logviewer as logviewer
 import services.ui.systemstatus as systemstatus
 
+import common.logger as logger
+
+log = logger.get_logger()
+
 
 class RegistrationWindow(QMainWindow):
     def __init__(self):
@@ -65,6 +69,10 @@ class RegistrationWindow(QMainWindow):
             self.mrnEdit.setFocus(Qt.MouseFocusReason)
             self.mrnEdit.setCursorPosition(0)
             return True
+        if source == self.accEdit and event.type() == QEvent.MouseButtonPress:
+            self.accEdit.setFocus(Qt.MouseFocusReason)
+            self.accEdit.setCursorPosition(0)
+            return True
         return super().eventFilter(source, event)
 
     def clear_form(self):
@@ -111,7 +119,39 @@ class RegistrationWindow(QMainWindow):
             ui_runtime.patient_information.first_name = self.firstnameEdit.text()
             ui_runtime.patient_information.last_name = self.lastnameEdit.text()
             ui_runtime.patient_information.mrn = self.mrnEdit.text()
-            ui_runtime.patient_information.acc = self.accEdit.text()
+
+            ui_runtime.patient_information.birth_date = self.dobEdit.date().toString(
+                "yyyyMMdd"
+            )
+
+            date_today = QDate.currentDate()
+            patient_age = date_today.year() - self.dobEdit.date().year()
+            if (
+                date_today.month() <= self.dobEdit.date().month()
+                and date_today.day() < self.dobEdit.date().day()
+            ):
+                patient_age = patient_age - 1
+            ui_runtime.patient_information.age = int(patient_age)
+
+            if self.genderComboBox.currentIndex() == 0:
+                ui_runtime.patient_information.gender = "M"
+            elif self.genderComboBox.currentIndex() == 1:
+                ui_runtime.patient_information.gender = "F"
+            else:
+                ui_runtime.patient_information.gender = "O"
+
+            ui_runtime.patient_information.weight_kg = self.weightSpinBox.value()
+            ui_runtime.patient_information.height_cm = self.heightSpinBox.value()
+
+            ui_runtime.exam_information.initialize()
+            ui_runtime.exam_information.acc = self.accEdit.text()
+            patient_position = self.patientPositionComboBox.currentText()
+
+            idx1 = patient_position.find("[")
+            idx2 = patient_position.find("]")
+            patient_position = patient_position[idx1 + 1 : idx2]
+            ui_runtime.exam_information.patient_position = patient_position
+
             ui_runtime.register_patient()
 
     def shutdown_clicked(self):

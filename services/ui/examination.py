@@ -185,6 +185,7 @@ class ExaminationWindow(QMainWindow):
         )
         self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet)
         self.scanParametersWidget.insertTab(0, QWidget(), "SEQUENCE")
+        self.scanParametersWidget.widget(0).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(False)
         self.scanParametersWidget.widget(1).setStyleSheet("background-color: #0C1123;")
