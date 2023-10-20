@@ -23,26 +23,25 @@ def pypulseq_1dse(
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    TR = 250.0
-    TE = 70.0
     alpha1 = 90  # flip angle
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
-    TE = 70e-3
-    TR = 250e-3
+    TE = 20e-3
+    TR = 2000e-3
     num_averages = 1
     adc_num_samples = 4096
     adc_duration = 6.4e-3
 
-    ch0 = "x"
+    ch0 = "y"
     fov = 140e-3  # Define FOV and resolution
-    Nx = 96
+    Nx = 250
     BW = 32e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
-    prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
+    prephaser_duration = 1e-3  # TODO: Need to define this behind the scenes and optimze
+    rise_time = 200e-6
 
     # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
     # RF_MAX = ui_inputs["RF_MAX"]
@@ -62,14 +61,14 @@ def pypulseq_1dse(
     # ======
 
     system = pp.Opts(
-        # max_grad=28,
+        max_grad=400,
         # grad_unit="mT/m",
-        # max_slew=150,
+        max_slew=4000,
         # slew_unit="T/m/s",
-        rf_ringdown_time=20e-6,
+        rf_ringdown_time=100e-6,
         rf_dead_time=100e-6,
         rf_raster_time=1e-6,
-        adc_dead_time=20e-6,
+        adc_dead_time=10e-6,
     )
 
     # ======
@@ -93,15 +92,16 @@ def pypulseq_1dse(
 
     delta_k = 1 / fov
     gx = pp.make_trapezoid(
-        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, rise_time=rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel=ch0, area=gx.area / 2, duration=prephaser_duration, system=system
+        channel=ch0, area=gx.area / 2, duration=prephaser_duration, rise_time=rise_time, system=system
     )
+
     # Define ADC events
-    # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    readout_time=2.5e-3 + (2*system.adc_dead_time)
     adc = pp.make_adc(
-        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, phase_offset= np.pi/2, system=system
     )
 
     # ======
@@ -120,7 +120,7 @@ def pypulseq_1dse(
 
     tau2 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre) - 2*rise_time)
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
@@ -141,6 +141,7 @@ def pypulseq_1dse(
         seq.add_block(rf2)
         seq.add_block(pp.make_delay(tau2))
         seq.add_block(gx, adc, pp.make_delay(delay_TR))
+    seq.plot(time_range=[0,5*TR])
 
     # Check whether the timing of the sequence is correct
     if check_timing:
