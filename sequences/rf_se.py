@@ -12,11 +12,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
 import common.logger as logger
-from sequences.common.util import reading_json_parameter
 
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 log = logger.get_logger()
 
 

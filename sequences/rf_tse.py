@@ -15,11 +15,7 @@ import matplotlib.pyplot as plt
 from sequences import PulseqSequence
 
 import common.logger as logger
-from sequences.common.util import reading_json_parameter
 
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 log = logger.get_logger()
 
 
@@ -54,7 +50,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
-            rf_center=LARMOR_FREQ,
+            rf_center=cfg.LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
@@ -85,7 +81,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         # reading configuration data from config.json
         # configuration_data=reading_json_parameter(file_name='config.json')
 
-        # LARMOR_FREQ = LARMOR_FREQ
+        LARMOR_FREQ = cfg.LARMOR_FREQ
         RF_MAX = cfg.RF_MAX
         RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
         alpha1 = 90  # flip angle
