@@ -8,6 +8,9 @@ from common.constants import *
 import common.task as task
 from common.types import ScanTask
 
+import services.recon.utils as utils
+import time
+
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
     """
@@ -21,5 +24,9 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"Access data in the JSON like this: {task.protocol_name}")
 
     # To see what's available in the JSON, take a look at common/types.py
+
+    if task.processing.recon_mode == "fake_dicoms":
+        utils.generate_fake_dicoms(folder, task)
+        time.sleep(2)
 
     return True

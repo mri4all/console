@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 from typing_extensions import Literal
 from pathlib import Path
 from pydantic import BaseModel
@@ -14,11 +14,11 @@ class PatientInformation(BaseModel):
     first_name: str = ""
     last_name: str = ""
     mrn: str = ""
-    acc: str = ""
     birth_date: str = ""
     gender: str = ""
     weight_kg: int = 0
     height_cm: int = 0
+    age: int = 0
 
     def get_full_name(self):
         return f"{self.last_name}, {self.first_name}"
@@ -27,28 +27,35 @@ class PatientInformation(BaseModel):
         self.first_name = ""
         self.last_name = ""
         self.mrn = ""
-
-        self.acc = ""
-        birth_date = ""
-        gender = ""
-        weight_kg = 0
-        height_cm = 0
+        self.birth_date = ""
+        self.age = 0
+        self.gender = ""
+        self.weight_kg = 0
+        self.height_cm = 0
 
 
 class ExamInformation(BaseModel):
     id: str = ""
+    registration_time: str = ""
     scan_counter: int = 0
     dicom_study_uid: str = ""
+    patient_position: str = ""
+    acc: str = ""
 
     def initialize(self):
         self.id = helper.generate_uid()
-        self.dicom_study_uid: str = pydicom.uid.generate_uid()
+        self.registration_time = helper.get_datetime()
+        self.dicom_study_uid: str = pydicom.uid.generate_uid()  # type: ignore
         self.scan_counter = 0
+        self.patient_position = ""
+        self.acc = ""
 
     def clear(self):
         self.id = ""
         self.scan_counter = 0
         self.dicom_study_uid = ""
+        self.patient_position = ""
+        self.acc = ""
 
 
 class SystemInformation(BaseModel):
@@ -63,18 +70,19 @@ TrajectoryType = Literal["cartesian", "radial"]
 
 class ProcessingConfig(BaseModel):
     trajectory: TrajectoryType = "cartesian"
-    kspace_dim: int = 0
-    kspace_ordering: str = ""  # TODO: Decide where this is coming from
+    recon_mode: str = ""
 
 
-ResultTypes = Literal["dicom", "plot", "rawdata"]
+ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]
 
 
 class ResultItem(BaseModel):
-    type: ResultTypes
+    type: ResultTypes = "dicom"
     name: str = ""
+    description: str = ""
     file_path: str = ""
-    autoload_viewer: int
+    autoload_viewer: int = 0
+    primary: bool = False
 
 
 FailStages = Literal[
@@ -97,6 +105,7 @@ class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
     protocol_name: str = ""
+    scan_number: int = 0
     system: SystemInformation = SystemInformation()
     patient: PatientInformation = PatientInformation()
     exam: ExamInformation = ExamInformation()
@@ -104,7 +113,7 @@ class ScanTask(BaseModel):
     adjustment: dict = {}  # TODO
     processing: ProcessingConfig = ProcessingConfig()
     other: dict = {}
-    results: dict = {}  # TODO
+    results: List[ResultItem] = []  # TODO
     journal: ScanJournal = ScanJournal()
 
 

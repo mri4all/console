@@ -22,10 +22,12 @@ class mri4all_files:
     LOCK = "LOCK"
     PREPARED = "PREPARED"
     EDITING = "EDITING"
+    STOP = "STOP"
     TASK = "scan.json"
 
 
 class mri4all_taskdata:
+    SEQ = "seq"
     RAWDATA = "rawdata"
     DICOM = "dicom"
     OTHER = "other"
@@ -51,12 +53,6 @@ class ServiceAction(Enum):
     STOP = "stop"
     KILL = "kill"
     STATUS = "status"
-
-class ViewerMode(Enum):
-    DICOM = "dicom"
-    PLOT = "plot"
-    RAWDATA = "rawdata"
-    COMPLEXDATA = "complex"
 
 
 class Scanner(Enum):

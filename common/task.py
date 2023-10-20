@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 from typing import Any
+import shutil
 
 import common.logger as logger
 
@@ -57,6 +58,7 @@ def create_task(
     scan_task.id = scan_id
     scan_task.sequence = sequence
     scan_task.protocol_name = default_protocol_name
+    scan_task.scan_number = scan_counter
     scan_task.system = system_information
     scan_task.exam = exam_information
     scan_task.patient = patient_information
@@ -123,8 +125,7 @@ def write_task(folder, scan_task: ScanTask) -> bool:
     """
     task_filename = Path(folder) / mri4all_files.TASK
 
-    # Unless disabled, create an internal lock file to secure the scan task
-    # from other processes while writing it.
+    # Create an internal lock file to secure the scan task from other processes while writing it.
     lock_file = Path(folder) / mri4all_files.LOCK
     # Create lock file in the folder to prevent other services from accessing it
     try:
@@ -145,6 +146,27 @@ def write_task(folder, scan_task: ScanTask) -> bool:
         lock.free()
     except Exception:
         log.error(f"Unable to remove lock file {lock_file}")
+        return False
+
+    return True
+
+
+def delete_task(folder) -> bool:
+    # Create an internal lock file to secure the scan task from other processes while writing it.
+    # Not using the helper lock class here, as the folder will be deleted, so that the destructor
+    # would trigger an exception.
+    lock_file = Path(folder) / mri4all_files.LOCK
+    try:
+        lock_file.touch(exist_ok=False)
+    except Exception:
+        log.error(f"Error locking folder to be deleted {folder}")
+        return False
+
+    # Delete the folder
+    try:
+        shutil.rmtree(folder)
+    except Exception:
+        log.error(f"Unable to delete task folder {folder}")
         return False
 
     return True

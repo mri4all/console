@@ -506,7 +506,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     Returns:
         float: Estimated gradient max in Hz/m
     """
-
+    print(channel)
     if channel not in {'x', 'y', 'z'}:
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
@@ -648,9 +648,10 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
-             tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
+             tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False, 
+             plotting=True):
     """
     Calibrate RF maximum for pi/2 flip angle
 
@@ -702,21 +703,26 @@ def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3
         rxd_list.append(rxd)
         time.sleep(tr_spacing)
 
-    plt.subplot(2, 1, 1)
-    for rx in rxd_list:
-        rx_fft = np.fft.fftshift(np.fft.fft(np.fft.fftshift(rx)))
-        # plt.plot(np.abs(k))
-        plt.plot(np.abs(rx_fft))
+    if plotting: 
+        plt.subplot(2, 1, 1)
+        for rx in rxd_list:
+            rx_fft = np.fft.fftshift(np.fft.fft(np.fft.fftshift(rx)))
+            # plt.plot(np.abs(k))
+            plt.plot(np.abs(rx_fft))
 
-    plt.legend(shim_range)
+        plt.legend(shim_range)
 
-    plt.subplot(2, 1, 2)
-    for rx in rxd_list:
-        plt.plot(np.abs(rx))
+        plt.subplot(2, 1, 2)
+        for rx in rxd_list:
+            plt.plot(np.abs(rx))
 
-    plt.legend(shim_range)
+        plt.legend(shim_range)
 
-    plt.show()
+        plt.show()
+    
+    # TODO: need some procedure to actually update the shim values. Need to determine which peak is the best,
+    # and set actual shim value to be that new value 
+    
     # import pdb;pdb.set_trace()
 
     # if False:
@@ -855,7 +861,9 @@ if __name__ == "__main__":
                 grad_max_cal(channel=sys.argv[2], plot=True)
             else:
                 grad_max_cal(plot=True)
+        elif command == 'shim':
+            shim_cal_linear(plot=True)
         else:
-            print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+            print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
-        print('Enter a calibration command from: [larmor, larmor_w, rf, grad]')
+        print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')

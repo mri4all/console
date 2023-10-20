@@ -2,7 +2,6 @@ from asyncio.locks import _ContextManagerMixin
 import os
 import sys
 
-
 # sys.path.insert(0, ".")
 # sys.path.insert(0, "./external/")
 sys.path.append("/opt/mri4all/console/external/")
@@ -18,7 +17,7 @@ log = logger.get_logger()
 
 from common.ipc import Communicator
 import common.helper as helper
-from common.types import ScanTask
+from common.types import ScanTask, ScanJournal
 import common.task as task
 from sequences import SequenceBase
 
@@ -66,6 +65,9 @@ def process_acquisition(scan_name: str) -> bool:
         move_to_fail(scan_name)
         return False
 
+    scan_task.journal.acquisition_start = helper.get_datetime()
+    task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
+
     current_step = ""
     try:
         current_step = "instantiation"
@@ -73,17 +75,26 @@ def process_acquisition(scan_name: str) -> bool:
         current_step = "set_working_folder"
         seq_instance.set_working_folder(str(mri4all_paths.DATA_ACQ + "/" + scan_name))
         current_step = "set_parameters"
-        seq_instance.set_parameters(scan_task.parameters, scan_task)
+        if not seq_instance.set_parameters(scan_task.parameters, scan_task):
+            raise Exception("Invalid protocol used to initialize sequence.")
         current_step = "calculate_sequence"
-        seq_instance.calculate_sequence()
+        if not seq_instance.calculate_sequence(scan_task):
+            raise Exception("Sequence did not calculate successfully.")
         current_step = "run_sequence"
-        seq_instance.run_sequence()
+        if not seq_instance.run_sequence(scan_task):
+            raise Exception("Sequence did not run successfully.")
     except:
         log.error(
             f"Failed to run sequence {scan_task.sequence}. Failure during step {current_step}."
         )
+        scan_task.journal.failed_at = helper.get_datetime()
+        scan_task.journal.fail_stage = "acquisition"
+        task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
         move_to_fail(scan_name)
         return False
+
+    scan_task.journal.acquisition_end = helper.get_datetime()
+    task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
 
     log.info("Acquisition completed with success.")
     if not queue.move_task(

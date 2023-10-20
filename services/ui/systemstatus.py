@@ -25,8 +25,8 @@ class SystemStatusWindow(QDialog):
         self.setWindowTitle("System Status")
 
         # State variables
-        self.acq_running = False
-        self.recon_running = False
+        self.acq_running = True
+        self.recon_running = True
 
         # Connect signals to slots
         self.closeButton.clicked.connect(self.close_clicked)
@@ -35,7 +35,7 @@ class SystemStatusWindow(QDialog):
         self.acqKillButton.clicked.connect(self.acqKillButton_clicked)
         self.reconKillButton.clicked.connect(self.reconKillButton_clicked)
         self.pingButton.clicked.connect(self.pingButton_clicked)
-        
+
         # Define widgets
         self.acqStartButton.setIcon(qta.icon("fa5s.stop"))
         self.acqStartButton.setText(" Stop")
@@ -48,18 +48,12 @@ class SystemStatusWindow(QDialog):
 
         self.pingButton.setIcon(qta.icon("fa5s.satellite-dish"))
         self.pingButton.setText(" Ping")
-        self.pingLabel.setText(
-            '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Responding"
-        )
+        self.pingLabel.setText("")
         self.pingLabel.setFont(qta.font("fa", 16))
 
-        self.acquisitionLabel.setText(
-            '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Running"
-        )
+        self.acquisitionLabel.setText("")
         self.acquisitionLabel.setFont(qta.font("fa", 16))
-        self.reconstructionLabel.setText(
-            '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Running"
-        )
+        self.reconstructionLabel.setText("")
         self.reconstructionLabel.setFont(qta.font("fa", 16))
 
         self.softwareLabel.setText(
@@ -68,7 +62,9 @@ class SystemStatusWindow(QDialog):
 
         diskspace = shutil.disk_usage(mri4all_paths.DATA)
         self.diskspaceBar.setValue(int(diskspace.used / diskspace.total * 100))
-        self.diskspaceFreeLabel.setText(f"{int(diskspace.free / 1024 / 1024 / 1024)} GB available")
+        self.diskspaceFreeLabel.setText(
+            f"{int(diskspace.free / 1024 / 1024 / 1024)} GB available"
+        )
         self.diskspaceFreeLabel.setStyleSheet("color: #424d76;")
 
         # Check services status periodically
@@ -78,7 +74,7 @@ class SystemStatusWindow(QDialog):
 
     def close_clicked(self):
         self.close()
-    
+
     def acqStartButton_clicked(self) -> None:
         # Update UI based on the new state
         if self.get_acq_service_status():
@@ -95,18 +91,24 @@ class SystemStatusWindow(QDialog):
 
     def acqKillButton_clicked(self) -> None:
         control_service(ServiceAction.KILL, Service.ACQ_SERVICE)
-    
+
     def reconKillButton_clicked(self) -> None:
         control_service(ServiceAction.KILL, Service.RECON_SERVICE)
 
     def pingButton_clicked(self) -> None:
         if ping(Scanner.IP.value):
             self.pingLabel.setText(
-                '<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Responding"
+                '<span style="color: #40C1AC; font-size: 24px;"> '
+                + chr(0xF058)
+                + chr(0xA0)
+                + " </span> Responding"
             )
         else:
             self.pingLabel.setText(
-                '<span style="color: #E5554F; font-size: 24px;"> ' + chr(0xF057) + chr(0xA0) + " </span> Not responding"
+                '<span style="color: #E5554F; font-size: 24px;"> '
+                + chr(0xF057)
+                + chr(0xA0)
+                + " </span> Not responding"
             )
 
     def get_acq_service_status(self) -> bool:
@@ -130,18 +132,38 @@ class SystemStatusWindow(QDialog):
         if status:
             self.acqStartButton.setText(" Stop")
             self.acqStartButton.setIcon(qta.icon("fa5s.stop"))
-            self.acquisitionLabel.setText('<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Running")
+            self.acquisitionLabel.setText(
+                '<span style="color: #40C1AC; font-size: 24px;"> '
+                + chr(0xF058)
+                + chr(0xA0)
+                + " </span> Running"
+            )
         else:
             self.acqStartButton.setText(" Start")
             self.acqStartButton.setIcon(qta.icon("fa5s.play"))
-            self.acquisitionLabel.setText('<span style="color: #E5554F; font-size: 24px;"> ' + chr(0xF057) + chr(0xA0) + " </span> Not running")
+            self.acquisitionLabel.setText(
+                '<span style="color: #E5554F; font-size: 24px;"> '
+                + chr(0xF057)
+                + chr(0xA0)
+                + " </span> Not running"
+            )
 
     def update_recon_ui(self, status):
         if status:
             self.reconStartButton.setText(" Stop")
             self.reconStartButton.setIcon(qta.icon("fa5s.stop"))
-            self.reconstructionLabel.setText('<span style="color: #40C1AC; font-size: 24px;"> ' + chr(0xF058) + chr(0xA0) + " </span> Running")
+            self.reconstructionLabel.setText(
+                '<span style="color: #40C1AC; font-size: 24px;"> '
+                + chr(0xF058)
+                + chr(0xA0)
+                + " </span> Running"
+            )
         else:
             self.reconStartButton.setText(" Start")
             self.reconStartButton.setIcon(qta.icon("fa5s.play"))
-            self.reconstructionLabel.setText('<span style="color: #E5554F; font-size: 24px;"> ' + chr(0xF057) + chr(0xA0) + " </span> Not running")
+            self.reconstructionLabel.setText(
+                '<span style="color: #E5554F; font-size: 24px;"> '
+                + chr(0xF057)
+                + chr(0xA0)
+                + " </span> Not running"
+            )

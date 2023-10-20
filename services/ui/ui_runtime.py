@@ -1,9 +1,9 @@
 import os
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 from typing import Tuple, Dict, List, cast
 from typing_extensions import Literal
-from pathlib import Path
 from typing import Any
 
 from common.types import (
@@ -23,7 +23,9 @@ import common.helper as helper
 import common.queue as queue
 import common.task as task
 from common.constants import *
+from common.config import Configuration, DicomTarget
 from sequences import SequenceBase
+
 
 app = None
 stacked_widget = None
@@ -45,6 +47,15 @@ status_acq_active = False
 status_recon_active = False
 status_last_completed_scan = ""
 status_viewer_last_autoload_scan = ""
+
+
+def get_config():
+    return config
+
+
+def load_config():
+    global config
+    config = Configuration.load_from_file()
 
 
 def get_screen_size() -> Tuple[int, int]:
@@ -91,7 +102,6 @@ def register_patient():
         return
 
     scan_queue_list.clear()
-    exam_information.initialize()
     examination_widget.prepare_examination_ui()
     stacked_widget.setCurrentIndex(1)
     status_last_completed_scan = -1
@@ -129,7 +139,7 @@ def close_patient():
             log.error("Error while clearing data folders.")
 
 
-def get_scan_queue_entry(index) -> Any:
+def get_scan_queue_entry(index: int) -> Any:
     global scan_queue_list
 
     if index < 0 or index >= len(scan_queue_list):

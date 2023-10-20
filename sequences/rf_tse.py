@@ -8,6 +8,7 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 from external.seq.adjustments_acq.scripts import run_pulseq
+
 # from external.seq.adjustments_acq.util import reading_json_parameter
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
@@ -21,7 +22,7 @@ log = logger.get_logger()
 class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "RF Turbo-Spin-Echo"
+        return "RF Turbo Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
         """
@@ -31,7 +32,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -41,7 +42,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         # reading configuration data from config.json
@@ -62,11 +63,11 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-        # Debug 
+        # Debug
         plt.figure()
         plt.plot(np.abs(rxd))
         plt.show()
-        
+
         log.info("Done running sequence " + self.get_name())
         return True
 
@@ -124,13 +125,20 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use="refocusing",
     )
 
     # ======
@@ -144,7 +152,9 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     assert np.all(delay_TR > 0)
 
     # Define ADC events
-    adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    adc = pp.make_adc(
+        num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system
+    )
 
     # ======
     # ======
@@ -171,7 +181,9 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
 
     try:
         seq.write(output_file)
-        print(output_file) # Remove this later: for locally testing if not connected to Redpitaya
+        print(
+            output_file
+        )  # Remove this later: for locally testing if not connected to Redpitaya
         log.debug("Seq file stored")
     except:
         log.error("Could not write sequence file")

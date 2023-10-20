@@ -66,7 +66,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.problem_list.append("TE cannot be longer than TR")
         return self.is_valid()
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -78,7 +78,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         rxd, rx_t = run_pulseq(
@@ -106,7 +106,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
+def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=50e-6) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -160,13 +160,14 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
+        use='refocusing'
     )
 
     # ======

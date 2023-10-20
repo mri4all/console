@@ -7,7 +7,7 @@ base_path = "/opt/mri4all"
 
 service_name = "unknown"
 current_task_id = ""
-
+config = None
 # Debugging function can be enabled by setting the environment variable MRI4ALL_DEBUG to "true"
 debugging_enabled = os.getenv("MRI4ALL_DEBUG", "").lower() == "true"
 

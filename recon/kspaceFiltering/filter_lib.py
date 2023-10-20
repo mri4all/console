@@ -1,90 +1,59 @@
 import numpy as np
 
-class filter_lib():
+def fermi_filter(shape, cutoff_radius_ratio=0.5, transition_width=10, isotropic=False):
+    '''
+    Create a Fermi filter for k-space data.
     
-    def kFilter_circFermi2D(matrix_size, rr, ww):
-        """ 
-        a kspace fermi filter mask 2D
-        JC
-        for default choice
-            ww = 0.7 radius
-            rr = 0.05 width
-        TODO: make it ratio
-        """
-        nx, ny = matrix_size
-        mask = np.zeros((nx, ny))
-        xv, yv = np.meshgrid(np.linspace(-1,1,nx),np.linspace(-1,1,ny) )
-
-        rv = xv**2+ yv**2
-        mask = 1/(1+np.exp((rv-ww)/rr))
-
-        return mask
+    Parameters:
+    - shape (tuple): Shape of the filter with length 3, in the form (x, y, z).
+    - cutoff_radius_ratio (float): Cutoff radius of the Fermi filter, ranging from 0 to 1. Default is 0.5.
+    - transition_width (float): Width of the transition band, controlling the sharpness of the Fermi filter. Default is 10.
+    - is_isotropic_3d (bool): Whether to apply the filter in 3D isotropic form or as a 2D filter repeated in each slice. Default is False.
     
-    def kFilter_cartFermi2D(matrix_size,  rr, wwx, wwy):
-        """ 
-        a kspace fermi filter mask 2D
-        JC
-        for default choice
-            wwx = 0.7 window width
-            wwy = 0.7 window width
-            rr = 0.1
-        TODO: make it ratio
-        """
-        nx, ny = matrix_size
-        mask = np.zeros((nx, ny))
-        xv, yv = np.meshgrid(np.linspace(-1,1,nx),np.linspace(-1,1,ny) )
-        mask = 1/(1+np.exp((xv**2-wwx)/rr))
-        mask = np.minimum(mask,1/(1+np.exp((yv**2-wwy)/rr)))
-
-        return mask
+    Returns:
+    - ndarray: The Fermi filter with shape (x, y, z).
+    '''
+    if not isinstance(shape, tuple) or len(shape) != 3:
+        raise ValueError("Matrix size must be a tuple of length 3.")
     
-    def kFilter_circFermi3D(matrix_size, rr, ww, wwz):
-        
-        """ 
-        a kspace fermi filter mask 2D
-        JC
-        for default choice
-            ww = 0.7 width
-            rr = 0.05 radius
-            wwz = 0.9 width
-        TODO: make it ratio
-        """
-        nx, ny, nz = matrix_size
-        mask = np.zeros((nx, ny, nz))
-        xv, yv, zv = np.meshgrid(np.linspace(-1,1,nx),np.linspace(-1,1,ny), np.linspace(-1,1,nz) )
+    if isotropic: # 3D isotropic Fermi filter
+        axes = [np.linspace(-dim/2, dim/2, dim) for dim in shape]
+        grid = np.meshgrid(*axes, indexing='xy')
+        pos = np.stack(grid, axis=-1)
+        filter = 1/(1+np.exp((np.linalg.norm(pos, axis=-1)-cutoff_radius_ratio*shape[0])/transition_width))
+    else: # 2D Fermi filter on each slice
+        axes = [np.linspace(-dim/2, dim/2, dim) for dim in shape[0:2]]
+        grid = np.meshgrid(*axes, indexing='xy')
+        pos = np.stack(grid, axis=-1)
+        filter = 1/(1+np.exp((np.linalg.norm(pos, axis=-1)-cutoff_radius_ratio*shape[0])/transition_width))
+        filter = np.repeat(filter[:,:,None], shape[2], axis=2)
+    return filter
 
-        rv = xv**2+ yv**2
-        mask = 1/(1+np.exp((rv-ww)/rr))
-        mask = np.mininum(mask, 1/(1+np.exp((zv**2-wwz)/rr)))
-
-        return mask
-        
-    def sine_bell_filter2D(matrix_size, a=1):
-        
-        """ 
-        a kspace sine bell filter mask 2D
-        JC
-        """
-        mask_1 = np.sin(np.pi * a * np.arange(matrix_size[0])/matrix_size[0])
-        mask_2 = np.sin(np.pi * a * np.arange(matrix_size[1])/matrix_size[1])
-
-        return np.outer(mask_1,mask_2)
+def sine_bell_filter(shape, isotropic=False):
+    '''
+    Create a sine bell filter.
     
-    def sine_bell_fermi3D(matrix_size, rr, wwz, a=1):
+    Parameters:
+    - shape (tuple): The shape of the filter, must be a tuple of length 3 (x, y, z).
+    - is_isotropic_3d (bool): Whether to apply the filter in 3D isotropic form or as a 2D filter repeated in each slice. Default is False.
+    
+    Returns:
+    - ndarray: The sine bell filter with shape (x, y, z).
+    '''
+    if not isinstance(shape, tuple) or len(shape) != 3:
+        raise ValueError("Matrix size must be a tuple of length 3.")
+    
+    if isotropic: # 3D isotropic sine bell filter
+        axes = [np.linspace(0, np.pi, dim) for dim in shape]
+        grid = np.meshgrid(*axes, indexing='xy')
+        filter = np.sin(grid[0])*np.sin(grid[1])*np.sin(grid[2])
+
+    else: # 2D sine bell filter on each slice
+        axes = [np.linspace(0, np.pi, dim) for dim in shape[0:2]]
+        grid = np.meshgrid(*axes, indexing='xy')
         
-        """ 
-        a kspace sine bell filter mask 2D
-        JC
-        """
-
-
-        nx, ny, nz = matrix_size
-        mask = np.zeros((nx, ny, nz))
-        xv, yv, zv = np.meshgrid(np.linspace(-1,1,nx),np.linspace(-1,1,ny), np.linspace(-1,1,nz) )
-        mask_1 = np.sin(np.pi * a * np.arange(matrix_size[0])/matrix_size[0])
-        mask_2 = np.sin(np.pi * a * np.arange(matrix_size[1])/matrix_size[1])
-        mask = np.outer(mask_1,mask_2)
-        mask = np.mininum(np.repeat(mask[:,:,None],nz,axis=2), 1/(1+np.exp((zv**2-wwz)/rr)))
-
-        return mask  
-        
+        # Calculate 2D sine-bell filter
+        filter = np.sin(grid[0])*np.sin(grid[1])
+        # repeat the 2D filter to 3D
+        filter = np.repeat(filter[:,:,None], shape[2], axis=2)
+    return filter
