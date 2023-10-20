@@ -51,7 +51,7 @@ class PatientData(BaseModel):
 class StudyViewer(QDialog):
     examListWidget: QListWidget
     scanListWidget: QListWidget
-    scanListWidget: QListWidget
+    resultListWidget: QListWidget
     patients: List[PatientData]
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
@@ -68,11 +68,16 @@ class StudyViewer(QDialog):
         self.move(qr.topLeft())
 
         self.setWindowTitle("Exam Viewer")
-
+              
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.exams = self.organize_scan_data_from_folders()
 
-        self.examListWidget.addItems([e.patientName + " - " + e.acc for e in self.exams])
+        if not self.exams:
+            return
+
+        self.examListWidget.addItems(
+            [e.patientName + " - " + e.acc for e in self.exams]
+        )
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
 
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
@@ -89,6 +94,7 @@ class StudyViewer(QDialog):
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
         self.exam_selected(0)
+        self.examListWidget.setCurrentRow(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setProperty("type", "highlight")
@@ -135,14 +141,17 @@ class StudyViewer(QDialog):
                 self.resultListWidget.addItem(result.name + " - " + result.type)
         self.resultListWidget.setCurrentRow(0)
 
-    def exam_selected(self, index):
+    def exam_selected(self, index: int):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
-            self.scanListWidget.addItem(scan_obj.task.protocol_name)
+            item = QListWidgetItem(scan_obj.task.protocol_name)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.scanListWidget.addItem(item)
+
         self.scanListWidget.setCurrentRow(0)
 
-    def organize_scan_data_from_folders(self) -> List[PatientData]:
+    def organize_scan_data_from_folders(self) -> List[ExamData]:
         exams: List[ExamData] = []
         for exam_dir in self.archive_path.iterdir():
             if not exam_dir.is_dir():
@@ -172,7 +181,12 @@ class StudyViewer(QDialog):
             # create a new exam object if not found
             exam = next((e for e in exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=exam_id, acc=scan_task.exam.acc, scans=[], patientName=patient_name)
+                exam = ExamData(
+                    id=exam_id,
+                    acc=scan_task.exam.acc,
+                    scans=[],
+                    patientName=patient_name,
+                )
                 exams.append(exam)
 
             dicom_data = np.array([])
