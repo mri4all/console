@@ -115,7 +115,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    LARMOR_FREQ = cfg.LARMOR_FREQ
+    # LARMOR_FREQ = LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
