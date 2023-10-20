@@ -20,7 +20,7 @@ path = Path(runtime.get_base_path()) / "config/config.json"
 
 
 class Configuration(BaseModel):
-    foo_string: str = ""
+    scanner_ip: str = "10.42.0.251"
     bar_string: str = ""
     foo_int: int = 0
     dicom_targets: List[DicomTarget] = []

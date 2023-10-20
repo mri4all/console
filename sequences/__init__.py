@@ -124,7 +124,7 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return self.problem_list
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         """
         Calculates the sequence instructions using the parameters previously provided to the
         sequence instance.
@@ -132,7 +132,7 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         """
         Executes the sequence instructions. This function is called after calculate_sequence.
         ** Must be implemented by the individual sequence. **

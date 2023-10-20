@@ -1,14 +1,18 @@
+from typing import Optional
+import typing
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from pydantic import ValidationError  # type: ignore
+import qtawesome as qta  # type: ignore
+from pydantic import BaseModel, ValidationError  # type: ignore
 
 from common.version import mri4all_version
 
 from common.config import Configuration, DicomTarget
 import common.runtime as rt
 import common.logger as logger
+from services.ui import ui_runtime
 
 log = logger.get_logger()
 
@@ -39,9 +43,18 @@ class ConfigurationWindow(QDialog):
     def __init__(self):
         super(ConfigurationWindow, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/configuration.ui", self)
-        self.setWindowTitle("Console Configuration")
+        self.setWindowTitle("Configuration")
         self.saveButton.clicked.connect(self.save_clicked)
+        self.saveButton.setProperty("type", "highlight")
+        self.saveButton.setIcon(qta.icon("fa5s.check"))
+        self.saveButton.setIconSize(QSize(20, 20))
+        self.saveButton.setText(" Save")
+
         self.cancelButton.clicked.connect(self.cancel_clicked)
+        self.cancelButton.setIcon(qta.icon("fa5s.times"))
+        self.cancelButton.setIconSize(QSize(20, 20))
+        self.cancelButton.setText(" Cancel")
+
         self.tree = self.findChild(QTreeWidget, "dicomTargetWidget")
         self.findChild(QPushButton, "deleteTargetButton").clicked.connect(
             self.delete_target_clicked
@@ -50,7 +63,7 @@ class ConfigurationWindow(QDialog):
             self.add_target_clicked
         )
 
-        self.config = Configuration.load_from_file()
+        self.config = ui_runtime.get_config()
 
         delegate = MyDelegate()
         self.tree.setItemDelegate(delegate)
@@ -61,19 +74,33 @@ class ConfigurationWindow(QDialog):
         self.settingsWidget = self.findChild(QTreeWidget, "generalSettingsWidget")
         self.settingsWidget.setItemDelegate(delegate)
 
-        for n, (key, value) in enumerate(Configuration.model_fields.items()):
-            if value.annotation in (str, int):
+        n = 0
+        for key, value in Configuration.model_fields.items():
+            if value.annotation in (str, int, float):
                 self.settingsWidget.insertTopLevelItem(
                     n, editable(QTreeWidgetItem([key, str(getattr(self.config, key))]))
                 )
-
+                n = n + 1
+            # elif typing.get_origin(value.annotation) == typing.Union:
+            #     log.info(issubclass(typing.get_args(value.annotation)[0], BaseModel))
+            #     if issubclass(typing.get_args(value.annotation)[0], BaseModel):
+            #         log.info("asdfasdf")
+            #         self.settingsWidget.insertTopLevelItem(
+            #             n, QTreeWidgetItem([key, ""])
+            #         )
+            #     n = n + 1
         self.tree.currentItemChanged.connect(self.start_edit)
         self.settingsWidget.currentItemChanged.connect(self.start_edit)
+        self.generalSettingsWidget.setStyleSheet(
+            "QLineEdit{background-color: #0C1123;}"
+        )
+        self.dicomTargetWidget.setStyleSheet("QLineEdit{background-color: #0C1123;}")
 
     def start_edit(self):
         tree: QTreeWidget = self.sender()
-        if tree.currentItem().childCount() == 0:
-            tree.edit(tree.currentIndex().siblingAtColumn(1))
+        if tree.currentItem():
+            if tree.currentItem().childCount() == 0:
+                tree.edit(tree.currentIndex().siblingAtColumn(1))
 
     def make_target_item(self, target: DicomTarget):
         item = editable(QTreeWidgetItem([target.name]))
@@ -131,6 +158,8 @@ class ConfigurationWindow(QDialog):
 
     def delete_target_clicked(self):
         items = self.tree.selectedItems()
+        if len(items) == 0:
+            return
         item = items[0]
         if item.childCount() == 0:
             item = item.parent()

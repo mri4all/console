@@ -66,24 +66,26 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             self.problem_list.append("TE cannot be longer than TR")
         return self.is_valid()
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian": # (default) 
+        # ToDo: if self.trajectory == "Cartesian": # (default)
         pypulseq_tse2D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
+            inputs={"TE": self.param_TE, "TR": self.param_TR},
+            check_timing=True,
+            output_file=self.seq_file_path,
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        #)
+        # )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         rxd, rx_t = run_pulseq(
@@ -106,7 +108,9 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=True) -> bool:
+def pypulseq_tse2D(
+    inputs=None, check_timing=True, output_file="", visualize=True
+) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -140,7 +144,9 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
     # ======
 
     seq = pp.Sequence()
-    n_shots = int(Ny / ETL)  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
+    n_shots = int(
+        Ny / ETL
+    )  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
 
     # ======
     # SET SYSTEM CONFIG TODO --> ?
@@ -161,21 +167,33 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # Define other gradients and ADC events
     delta_k = 1 / fov
-    gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
-    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
-    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system)
+    gx = pp.make_trapezoid(
+        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+    )
+    adc = pp.make_adc(
+        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+    )
+    gx_pre = pp.make_trapezoid(
+        channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
+    )
 
     phase_areas = -(np.arange(Ny) - Ny / 2) * delta_k
 
@@ -187,18 +205,31 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
     # ======
     tau1 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            (
+                TE / 2
+                - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
+                - pp.calc_duration(gx_pre)
+            )
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
 
     tau2 = (
-        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
     ) * seq.grad_raster_time
 
     delay_TR = (
         math.ceil(
-            (TR - TE - pp.calc_duration(gx_pre) - np.max(pp.calc_duration(gx_spoil, gx_pre))) / seq.grad_raster_time
+            (
+                TR
+                - TE
+                - pp.calc_duration(gx_pre)
+                - np.max(pp.calc_duration(gx_spoil, gx_pre))
+            )
+            / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
     assert np.all(tau1 >= 0)
@@ -249,7 +280,7 @@ def pypulseq_tse2D(inputs=None, check_timing=True, output_file="", visualize=Tru
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
         log.info("Completed calculating trajectory")
         log.info("Generating plots...")
-        seq.plot(time_range=(0, 2*TR))
+        seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     log.debug(output_file)
@@ -279,7 +310,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     fov = 224e-3  # Define FOV and resolution
     Nx = 128
     Ny = Nx
-    Nspokes = math.ceil(Nx * math.pi/2)
+    Nspokes = math.ceil(Nx * math.pi / 2)
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
@@ -299,7 +330,9 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     # ======
 
     seq = pp.Sequence()
-    n_shots = int(Ny / ETL)  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
+    n_shots = int(
+        Ny / ETL
+    )  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
 
     # ======
     # SET SYSTEM CONFIG TODO --> ?
@@ -320,7 +353,12 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     # CREATE EVENTS
     # ======
     # Create non-selective RF pulses for excitation and refocusing
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system)
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
@@ -331,11 +369,21 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
 
     # Define other gradients and ADC events
     delta_k = 1 / fov
-    gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
-    gy = pp.make_trapezoid(channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
-    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
-    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system)
-    gy_pre = pp.make_trapezoid(channel="y", area=gy.area / 2, duration=pp.calc_duration(gy) / 2, system=system)
+    gx = pp.make_trapezoid(
+        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+    )
+    gy = pp.make_trapezoid(
+        channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+    )
+    adc = pp.make_adc(
+        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+    )
+    gx_pre = pp.make_trapezoid(
+        channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
+    )
+    gy_pre = pp.make_trapezoid(
+        channel="y", area=gy.area / 2, duration=pp.calc_duration(gy) / 2, system=system
+    )
 
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
@@ -349,23 +397,36 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
     # ======
     tau1 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            (
+                TE / 2
+                - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
+                - pp.calc_duration(gx_pre)
+            )
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
 
     tau2 = (
-        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
     ) * seq.grad_raster_time
 
     delay_TR = (
         math.ceil(
-            (TR - TE - pp.calc_duration(gx_pre) - np.max(pp.calc_duration(gx_spoil, gx_pre))) / seq.grad_raster_time
+            (
+                TR
+                - TE
+                - pp.calc_duration(gx_pre)
+                - np.max(pp.calc_duration(gx_spoil, gx_pre))
+            )
+            / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
-    assert np.all(delay_TR >= np.max(pp.calc_duration(rf1, rf2))/2 )
+    assert np.all(delay_TR >= np.max(pp.calc_duration(rf1, rf2)) / 2)
 
     # ======
     # CONSTRUCT SEQUENCE
@@ -380,7 +441,9 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
             seq.add_block(rf1)
             for echo in range(ETL):
                 pe1_idx = (ETL * i) + echo
-                phi = pe1_idx * (math.pi/Nspokes) # linear increment for now (could add golden-angle)
+                phi = pe1_idx * (
+                    math.pi / Nspokes
+                )  # linear increment for now (could add golden-angle)
                 gx_pre.amplitude = amp_pre_max * math.sin(phi)
                 gy_pre.amplitude = amp_pre_max * math.cos(phi)
                 seq.add_block(gx_pre, gy_pre)
@@ -394,7 +457,7 @@ def pypulseq_tse2D_radial(inputs=None, check_timing=True, output_file="") -> boo
                 seq.add_block(pp.make_delay(tau2))
 
             seq.add_block(pp.make_delay(delay_TR))
-        seq.plot(time_range=[0,2*TR])
+        seq.plot(time_range=[0, 2 * TR])
 
     # Check whether the timing of the sequence is correct
     if check_timing:
