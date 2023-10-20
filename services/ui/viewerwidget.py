@@ -2,7 +2,7 @@ import json
 import glob
 import sip  # type: ignore
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -82,15 +82,15 @@ class ViewerWidget(QWidget):
             self.widget = None
             self.viewed_scan_task = None
 
-    def view_scan(self, file_path: Path, task: Optional[ScanTask] = None):
+    def view_scan(self, file_path: Path, type: Literal["dicom","plot", "raw"], task: Optional[ScanTask] = None):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
-        if list(dcm_path.glob("**/*.dcm")):
+        if next(dcm_path.glob("**/*.dcm"),None):
             self.load_dicoms(str(dcm_path), task)
             return True
-        elif others := list(other_path.glob("*.json")):
-            self.load_plot(json.loads(others[0].read_text()))
+        elif other := next(other_path.glob("*.json"),None):
+            self.load_plot(json.loads(other.read_text()))
             return False
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):

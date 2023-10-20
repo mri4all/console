@@ -122,7 +122,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=50e-6) -> bool:
+def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
