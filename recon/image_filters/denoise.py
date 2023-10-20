@@ -1,6 +1,10 @@
 import common.logger as logger
 import numpy as np
-from skimage.restoration import denoise_nl_means, denoise_bilateral, denoise_tv_chambolle
+from skimage.restoration import (
+    denoise_nl_means,
+    denoise_bilateral,
+    denoise_tv_chambolle,
+)
 
 log = logger.get_logger()
 
@@ -84,9 +88,7 @@ def apply_total_variation_denoise(image, weight=0.1, channel_axis=-1):
         log.info("Extracting magnitude of complex image")
         image = np.abs(image)
 
-    log.info(
-        f"Applying total variation denoising with weight={weight}"
-    )
+    log.info(f"Applying total variation denoising with weight={weight}")
     image_tv_chambolle = denoise_tv_chambolle(
         image,
         weight=weight,
