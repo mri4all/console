@@ -36,7 +36,13 @@ class CommunicatorEnvelope(BaseModel):
 
     id: str = str(uuid.uuid1())
     value: Union[
-        UserResponseMessage, UserQueryMessage, UserAlertMessage, SetStatusMessage
+        UserResponseMessage,
+        UserQueryMessage,
+        UserAlertMessage,
+        SetStatusMessage,
+        ShowPlotMessage,
+        ShowDicomMessage,
+        IntensityMapResult,
     ]
     error: bool = False
 
@@ -112,6 +118,7 @@ class Communicator(QObject, Helper):
             return False
         with open(self.out_file, "w") as f:
             f.write(CommunicatorEnvelope(value=obj, error=error).model_dump_json())
+            f.write("\n")
         return True
 
     def _query(self, obj):
@@ -120,12 +127,16 @@ class Communicator(QObject, Helper):
 
         result = next(self._listen())
         if result.error:
-            raise Exception()
+            raise Exception("IPC query failed")
         return result.value
 
     def parse(self, line):
-        print(json.loads(line))
-        return CommunicatorEnvelope(**json.loads(line))
+        try:
+            result = json.loads(line)
+        except:
+            log.info(line)
+            raise
+        return CommunicatorEnvelope(**result)
 
     def mkfifo(self, FIFO):
         try:
@@ -148,5 +159,20 @@ class Communicator(QObject, Helper):
 
 if __name__ == "__main__":
     k = Communicator(Communicator.RECON)
-    result = k.query_user(request="test request", input_type="float")
-    k.send_user_alert(message=f"You typed {result}")
+    # result = k.query_user(request="test request", input_type="float")
+    # r = k.show_plot(
+    #     xlabel="x axis",
+    #     ylabel="y axis",
+    #     title="title",
+    #     data=[[x**y for x in range(-10, 11)] for y in range(2, 4)],
+    # )
+    r = k.show_dicoms([str(x) for x in Path("/vagrant/SE000000").glob("*.dcm")])
+    print(r)
+    # k.show_image(
+    #     data=[
+    #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+    #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+    #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+    #     ]
+    # )
+    # k.send_user_alert(message=f"You typed {result}")

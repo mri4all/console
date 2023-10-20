@@ -39,6 +39,7 @@ class ExamData(BaseModel):
     id: str
     acc: str
     scans: list[ScanData]
+    patientName: str
 
 
 class PatientData(BaseModel):
@@ -48,9 +49,9 @@ class PatientData(BaseModel):
 
 
 class StudyViewer(QDialog):
-    patientComboBox: QComboBox
     examListWidget: QListWidget
     scanListWidget: QListWidget
+    resultListWidget: QListWidget
     patients: List[PatientData]
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
@@ -69,13 +70,18 @@ class StudyViewer(QDialog):
         self.setWindowTitle("Exam Viewer")
 
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
-        self.patients = self.organize_scan_data_from_folders()
+        self.exams = self.organize_scan_data_from_folders()
 
-        self.patientComboBox.addItems([p.name for p in self.patients])
-        self.patientComboBox.currentIndexChanged.connect(self.patient_selected)
+        if not self.exams:
+            return
 
+        self.examListWidget.addItems(
+            [e.patientName + " - " + e.acc for e in self.exams]
+        )
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
+
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
+        self.resultListWidget.currentRowChanged.connect(self.result_selected)
 
         self.dicomTargetComboBox.addItems(
             [t.name for t in ui_runtime.get_config().dicom_targets]
@@ -87,7 +93,8 @@ class StudyViewer(QDialog):
         # self.viewer1.setProperty("id", "1")
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
-        self.patient_selected(0)
+        self.exam_selected(0)
+        self.examListWidget.setCurrentRow(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setProperty("type", "highlight")
@@ -97,54 +104,64 @@ class StudyViewer(QDialog):
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
 
-        if not self.selected_scan:
+        checked_scans_numbers = []
+        for i in range(self.scanListWidget.count()):
+            item = self.scanListWidget.item(i)
+            if item.checkState():
+                checked_scans_numbers.append(i)
+        
+        if not checked_scans_numbers:
             return
+        
+        exam = self.exams[self.examListWidget.currentRow()]
+        for scan_number in checked_scans_numbers:
+            checked_scan = exam.scans[scan_number]
+            try:
+                dicomexport.send_dicoms(
+                    checked_scan.dir / "dicom",
+                    ui_runtime.get_config().dicom_targets[
+                        self.dicomTargetComboBox.currentIndex()
+                    ],
+                )
+            except Exception as e:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle("Transfer error")
+                msg.setText(f"Error transferring dicoms: \n {e}")
+                msg.exec_()
 
-        try:
-            dicomexport.send_dicoms(
-                self.selected_scan.dir / "dicom",
-                ui_runtime.get_config().dicom_targets[
-                    self.dicomTargetComboBox.currentIndex()
-                ],
-            )
-        except Exception as e:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle("Transfer error")
-            msg.setText(f"Error transferring dicoms: \n {e}")
-            msg.exec_()
+    def result_selected(self, row: int):
+        exam = self.exams[self.examListWidget.currentRow()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+        if scan.task.results:
+            result_data = scan.task.results[row]
+            self.viewer.view_scan(result_data.file_path, result_data.type)
 
     def scan_selected(self, row: int):
-        the_patient = self.patients[self.patientComboBox.currentIndex()]
-        the_exam = the_patient.exams[self.examListWidget.currentRow()]
-        self.selected_scan = the_exam.scans[row]
+        self.resultListWidget.clear()
+        exam = self.exams[self.examListWidget.currentRow()]
+        scan = exam.scans[row]
 
-        has_dcms = self.viewer.view_scan(
-            self.selected_scan.dir, self.selected_scan.task
-        )
-        if has_dcms:
-            self.sendDicomsButton.setDisabled(False)
+        if not scan.task.results:
+            for result in ["DICOM", "PLOT", "RAWDATA"]:
+                self.resultListWidget.addItem(result)
         else:
-            self.sendDicomsButton.setDisabled(True)
+            for result in scan.task.results:
+                self.resultListWidget.addItem(result.name + " - " + result.type)
+        self.resultListWidget.setCurrentRow(0)
 
-    def exam_selected(self, row: int):
+    def exam_selected(self, index: int):
         self.scanListWidget.clear()
-        the_patient = self.patients[self.patientComboBox.currentIndex()]
-        the_exam = the_patient.exams[row]
+        exam = self.exams[index]
+        for scan_obj in exam.scans:
+            item = QListWidgetItem(scan_obj.task.protocol_name)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.scanListWidget.addItem(item)
 
-        for scan_obj in the_exam.scans:
-            self.scanListWidget.addItem(scan_obj.task.protocol_name)
         self.scanListWidget.setCurrentRow(0)
 
-    def patient_selected(self, index):
-        self.examListWidget.clear()
-        the_patient = self.patients[index]
-        for exam_obj in the_patient.exams:
-            self.examListWidget.addItem(exam_obj.acc or exam_obj.id)
-        self.examListWidget.setCurrentRow(0)
-
-    def organize_scan_data_from_folders(self) -> List[PatientData]:
-        patients: List[PatientData] = []
+    def organize_scan_data_from_folders(self) -> List[ExamData]:
+        exams: List[ExamData] = []
         for exam_dir in self.archive_path.iterdir():
             if not exam_dir.is_dir():
                 continue
@@ -161,20 +178,25 @@ class StudyViewer(QDialog):
             scan_id = scan_task.id
 
             # create a new patient object if not found
-            patient = next(
-                (p for p in patients if p.mrn == scan_task.patient.mrn), None
-            )
-            if not patient:
-                patient = PatientData(
-                    name=patient_name, mrn=scan_task.patient.mrn, exams=[]
-                )
-                patients.append(patient)
+            # patient = next(
+            #     (p for p in patients if p.mrn == scan_task.patient.mrn), None
+            # )
+            # if not patient:
+            #     patient = PatientData(
+            #         name=patient_name, mrn=scan_task.patient.mrn, exams=[]
+            #     )
+            #     patients.append(patient)
 
             # create a new exam object if not found
-            exam = next((e for e in patient.exams if e.id == exam_id), None)
+            exam = next((e for e in exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=exam_id, acc=scan_task.exam.acc, scans=[])
-                patient.exams.append(exam)
+                exam = ExamData(
+                    id=exam_id,
+                    acc=scan_task.exam.acc,
+                    scans=[],
+                    patientName=patient_name,
+                )
+                exams.append(exam)
 
             dicom_data = np.array([])
             rawdata = np.array([])
@@ -188,7 +210,7 @@ class StudyViewer(QDialog):
                 dir=exam_dir,
             )
             exam.scans.append(scan)
-        return patients
+        return exams
 
     def close_clicked(self):
         self.close()

@@ -2,7 +2,7 @@ import json
 import glob
 import sip  # type: ignore
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -18,7 +18,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import common.logger as logger
-from common.types import ResultTypes, ScanTask
+from common.types import ResultTypes, ScanTask, TimeSeriesResult
 
 log = logger.get_logger()
 
@@ -82,23 +82,40 @@ class ViewerWidget(QWidget):
             self.widget = None
             self.viewed_scan_task = None
 
-    def view_scan(self, file_path: Path, task: Optional[ScanTask] = None):
+    def view_scan(
+        self,
+        file_path: Path,
+        type: Literal["dicom", "plot", "raw"],
+        task: Optional[ScanTask] = None,
+    ):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
-        if list(dcm_path.glob("**/*.dcm")):
-            self.load_dicoms(str(dcm_path), task)
-            return True
-        elif others := list(other_path.glob("*.json")):
-            self.load_plot(json.loads(others[0].read_text()))
-            return False
+        if type == "dicom":
+            dcm_path = file_path / "dicom"
+            if next(dcm_path.glob("**/*.dcm"), None):
+                self.load_dicoms(str(dcm_path), task)
+                return True
+        elif type == "plot":
+            if path := next(other_path.glob("**/*.json"), None):
+                self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
+        else:
+            pass
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
         if not input_path:
             self.set_empty_viewer()
             return
 
-        lstFilesDCM = [str(name) for name in glob.glob(input_path + "*.dcm")]
+        lstFilesDCM = None
+        if isinstance(input_path, list):
+            lstFilesDCM = input_path
+        else:
+            path = Path(input_path)
+            if path.is_dir():
+                lstFilesDCM = [str(name) for name in path.glob("*.dcm")]
+            else:
+                lstFilesDCM = [input_path]
         lstFilesDCM.sort()
         if len(lstFilesDCM) < 1:
             self.set_empty_viewer()
@@ -138,11 +155,12 @@ class ViewerWidget(QWidget):
 
         self.layout().addWidget(self.widget)
 
-    def load_plot(self, array=None):
+    def load_plot(self, result: Optional[TimeSeriesResult] = None):
         sc = MplCanvas(self)
-        if array is None:
-            array = np.random.normal(size=10)
-        sc.axes.plot(array)
+        if result is None:
+            result = TimeSeriesResult(data=np.random.normal(size=10).tolist())
+
+        result.show(sc.axes)
         self.layout().addWidget(sc)
         self.widget = sc
 

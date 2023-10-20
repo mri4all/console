@@ -1,5 +1,7 @@
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel
+
+from common.types import IntensityMapResult, TimeSeriesResult
 
 
 class FifoMessageType(BaseModel):
@@ -29,13 +31,58 @@ class UserResponseMessage(FifoMessageType):
     response: Optional[Union[float, int, str]] = None
 
 
-class UserAlertMessage(BaseModel):
+class UserAlertMessage(FifoMessageType):
     type: Literal["user_alert"] = "user_alert"
     message: str
     alert_type: Literal["information", "warning", "critical"] = "information"
 
 
+class ShowPlotMessage(FifoMessageType):
+    type: Literal["show_plot"] = "show_plot"
+    plot: Union[TimeSeriesResult, IntensityMapResult]
+
+
+class ShowDicomMessage(FifoMessageType):
+    type: Literal["show_dicom"] = "show_dicom"
+    dicom_files: List[str]
+
+
 class Helper:
+    def show_dicoms(self, dicoms: List[str]):
+        return self._query(ShowDicomMessage(dicom_files=dicoms))
+
+    def show_image(
+        self,
+        plot: Optional[IntensityMapResult] = None,
+        *,
+        xlabel: str = "",
+        ylabel: str = "",
+        title: str = "",
+        data: Union[List[List[Any]], List[List[List[Any]]]],
+        fmt: Union[str, list[str]] = []
+    ):
+        if not plot:
+            plot = IntensityMapResult(
+                xlabel=xlabel, ylabel=ylabel, title=title, data=data
+            )
+        return self._query(ShowPlotMessage(plot=plot))
+
+    def show_plot(
+        self,
+        plot: Optional[TimeSeriesResult] = None,
+        *,
+        xlabel: str = "",
+        ylabel: str = "",
+        title: str = "",
+        data: Union[List[List[float]], List[float]],
+        fmt: Union[str, list[str]] = []
+    ):
+        if not plot:
+            plot = TimeSeriesResult(
+                xlabel=xlabel, ylabel=ylabel, title=title, data=data, fmt=fmt
+            )
+        return self._query(ShowPlotMessage(plot=plot))
+
     def send_user_response(self, response=None, error=False):
         """
         Sends the user's response from the UI.
@@ -51,7 +98,7 @@ class Helper:
         Present the user with an alert box.
         type: Whether the alert looks like an infobox, warning, or critical error
         """
-        return self._send(UserAlertMessage(message=message, alert_type=type))
+        return self._query(UserAlertMessage(message=message, alert_type=type))
 
     def query_user(
         self,
@@ -80,8 +127,8 @@ class Helper:
     def send_status(self, message: str):
         return self._send(SetStatusMessage(message=message))
 
-    def _send(self, x, error=False):
+    def _send(self, x: FifoMessageType, error=False):
         pass
 
-    def _query(self, x):
+    def _query(self, x: FifoMessageType):
         pass

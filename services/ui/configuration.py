@@ -1,9 +1,11 @@
+from typing import Optional
+import typing
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import qtawesome as qta  # type: ignore
-from pydantic import ValidationError  # type: ignore
+from pydantic import BaseModel, ValidationError  # type: ignore
 
 from common.version import mri4all_version
 
@@ -72,12 +74,21 @@ class ConfigurationWindow(QDialog):
         self.settingsWidget = self.findChild(QTreeWidget, "generalSettingsWidget")
         self.settingsWidget.setItemDelegate(delegate)
 
-        for n, (key, value) in enumerate(Configuration.model_fields.items()):
-            if value.annotation in (str, int):
+        n = 0
+        for key, value in Configuration.model_fields.items():
+            if value.annotation in (str, int, float):
                 self.settingsWidget.insertTopLevelItem(
                     n, editable(QTreeWidgetItem([key, str(getattr(self.config, key))]))
                 )
-
+                n = n + 1
+            # elif typing.get_origin(value.annotation) == typing.Union:
+            #     log.info(issubclass(typing.get_args(value.annotation)[0], BaseModel))
+            #     if issubclass(typing.get_args(value.annotation)[0], BaseModel):
+            #         log.info("asdfasdf")
+            #         self.settingsWidget.insertTopLevelItem(
+            #             n, QTreeWidgetItem([key, ""])
+            #         )
+            #     n = n + 1
         self.tree.currentItemChanged.connect(self.start_edit)
         self.settingsWidget.currentItemChanged.connect(self.start_edit)
         self.generalSettingsWidget.setStyleSheet(

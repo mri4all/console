@@ -20,6 +20,10 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 70
     param_TR: int = 250
+    param_NSA: int = 1
+    param_ADC_samples: int = 4096
+    param_ADC_duration: int = 6400
+
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -31,19 +35,23 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR}
+        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration} # , 
 
     @classmethod
     def get_default_parameters(
         self
     ) -> dict:
-        return {"TE": 70, "TR": 250}
+        return {"TE": 70, "TR": 250, "NSA": 1, "ADC_samples": 4096, "ADC_duration": 6400}
+
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
             self.param_TR = parameters["TR"]
+            self.param_NSA = parameters["NSA"]
+            self.param_ADC_samples = parameters["ADC_samples"]
+            self.param_ADC_duration = parameters["ADC_duration"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -52,12 +60,19 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
+        widget.NSA_SpinBox.setValue(self.param_NSA)
+        widget.ADC_samples_SpinBox.setValue(self.param_ADC_samples)
+        widget.ADC_duration_SpinBox.setValue(self.param_ADC_duration)
+        
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
+        self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
+        self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -71,8 +86,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         pypulseq_rfse(
-            inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        )
+            inputs={"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, 
+            "ADC_samples":self.param_ADC_samples, "ADC_duration":self.param_ADC_duration}, check_timing=True, output_file=self.seq_file_path
+        ) # 
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -106,7 +122,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=50e-6) -> bool:
+def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -117,24 +133,22 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=50
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    TR = 250.0
-    TE = 70.0
     alpha1 = 90  # flip angle
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
-    TE = 70e-3
-    TR = 250e-3
-    num_averages = 1
-    adc_num_samples = 4096
-    adc_duration = 6.4e-3
+    # adc_num_samples = 4096
+    # adc_duration = 6.4e-3
 
     # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
     # RF_MAX = ui_inputs["RF_MAX"]
     # RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
 
-    # TR = inputs["TR"] / 1000
-    # TE = inputs["TE"] / 1000
+    TR = inputs["TR"] / 1000 # ms to s
+    TE = inputs["TE"] / 1000
+    num_averages = inputs["NSA"]
+    adc_num_samples = inputs['ADC_samples']
+    adc_duration = inputs['ADC_duration'] / 1e6 # us to s
 
     # ======
     # INITIATE SEQUENCE

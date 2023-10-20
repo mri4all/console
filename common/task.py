@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Any
 import shutil
+import glob
 
 import common.logger as logger
 
@@ -76,9 +77,13 @@ def create_task(
     # Create the sub-folders for the scan task
     current_subfolder = Path(folder_name)
     try:
+        current_subfolder = Path(folder_name) / mri4all_taskdata.SEQ
+        os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.RAWDATA
         os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.DICOM
+        os.mkdir(current_subfolder)
+        current_subfolder = Path(folder_name) / mri4all_taskdata.TEMP
         os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.OTHER
         os.mkdir(current_subfolder)
@@ -224,4 +229,28 @@ def set_task_state(folder: str, state: str, value: bool) -> bool:
         log.error(f"Unable to remove lock file {lock_file}")
         return False
 
+    return True
+
+
+def clear_task_subfolder(folder: str, subfolder: str) -> bool:
+    if not Path(folder).is_dir():
+        log.error(f"Task folder {folder} does not exist.")
+        return False
+
+    # Make sure the subfolder exists. Otherwise, an invalid option has been provided.
+    subfolder_path = Path(folder) / subfolder
+    if not Path(subfolder_path).is_dir():
+        log.error(f"Invalid subfolder {subfolder} selected for clearing.")
+        return False
+
+    # Remove content from folder
+    try:
+        files = glob.glob(str(subfolder_path) + "/*")
+        for f in files:
+            os.remove(f)
+    except:
+        log.error(f"Unable to clear subfolder {subfolder_path}.")
+        return False
+
+    log.info(f"Cleared subfolder {subfolder_path}")
     return True

@@ -1,0 +1,55 @@
+{
+    "rf_parameters": {
+        "larmor_frequency_MHz": 15.58,
+        "rf_maximum_amplitude_Hze": 0.0,
+        "rf_pi2_fraction": 0.6744
+    },
+    "gradients_parameters": {
+        "gx_maximum": 8000000.0,
+        "gy_maximum": 9000000.0,
+        "gz_maximum": 10000000.0
+    },
+    "shim_parameters": {
+        "shim_x": 0.0,
+        "shim_y": 0.0,
+        "shim_z": 0.0,
+        "shim_mc": [0.0,
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    0.0]
+    },
+    "marcos_parameters": {
+        "ip_adress": "10.42.0.251",
+        "port": 11111,
+        "fpga_clock_frequency_MHz": 122.8,
+        "gradient_board_type": "gpa-fhdo",
+        "gpa_fhdo_current_per_volt": 2.5,
+        "flocra_pulseq_path": "./external/flocra_pulseq"
+    }
+}

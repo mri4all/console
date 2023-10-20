@@ -648,16 +648,18 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
-             tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False, 
-             plotting=True):
+             tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False,):
     """
-    Calibrate RF maximum for pi/2 flip angle
+    Calibrate linear shims (offset for linear gradients)
 
 
     Args:
         larmor_freq (float): [MHz] Scanner larmor frequency
+        channel (str): gradient axis to shim
+        range (float): range to optimize over
+        shim_points (int): number of shim points in range
         points (int): Points to plot per iteration
         iterations (int): Iterations to focus in
         zoom_factor (float): About to zoom in by each iteration -- must be greater than 1
@@ -676,9 +678,9 @@ def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_p
     if channel not in {'x', 'y', 'z'}:
         print(f"Invalid channel '{channel}' -- Expected 'x', 'y', or 'z'")
         return -1
-
-    seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
+    
     rxd_list = []
+    fwhm_list = []
 
     if channel == 'x':
         shim_centre = shim_x
@@ -702,8 +704,16 @@ def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_p
                                    grad_cal=False, save_np=False, save_mat=False, save_msgs=False, gui_test=gui_test)
         rxd_list.append(rxd)
         time.sleep(tr_spacing)
-
-    if plotting: 
+        
+        # get peaks, find fwhm 
+        peak_index = np.argmax(np.abs(rxd))
+        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        
+    # determine best, and update config file with the best
+    best_shim_index = np.argmin(fwhm_list)
+    best_shim = shim_range[best_shim_index]
+    
+    if plot: 
         plt.subplot(2, 1, 1)
         for rx in rxd_list:
             rx_fft = np.fft.fftshift(np.fft.fft(np.fft.fftshift(rx)))
@@ -717,8 +727,49 @@ def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_p
             plt.plot(np.abs(rx))
 
         plt.legend(shim_range)
-
+        
         plt.show()
+    
+    return best_shim
+    
+def shim_cal_multicoil(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+             shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
+             tr_spacing=2, n_bayopt_iter=20):
+    """
+    Calibrate MC shim weights. Approach is to use Bayesian optimization to minimize the standard deviation 
+    of the received signal as a function of the 30 MC coil weights 
+
+
+    Args:
+        larmor_freq (float): [MHz] Scanner larmor frequency
+        points (int): Points to plot per iteration
+        iterations (int): Iterations to focus in
+        zoom_factor (float): About to zoom in by each iteration -- must be greater than 1
+        shim_x, shim_y, shim_z (float): Shim value, defaults to config SHIM_ values, must be less than 1 magnitude
+        tr_spacing (float): [us] Time between repetitions
+        force_tr (bool): Default False, forces long TR times that would otherwise throw an error
+        first_max (bool): Default False, changes search to find the first maximum instead of global
+        smooth (bool): Default True, 3-wide running average on data
+        plot (bool): Default False, plot final data
+
+    Returns:
+        float: Estimated RF max in Hz
+        dict: Dictionary of data
+    """
+
+    seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
+   
+    for _ in range(n_bayopt_iter):
+        next_point = optimizer.suggest(utility)
+        rxd, rx_t = scr.run_pulseq(seq_file, rf_center=larmor_freq,
+                                    tx_t=1, grad_t=10, tx_warmup=100,
+                                    shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
+                                    grad_cal=False, save_np=False, save_mat=False, save_msgs=False, gui_test=gui_test)
+        # TODO: WHAT exactly are we maximizing? Should replace None
+        optimizer.register(params=next_point, target=None)
+        time.sleep(tr_spacing)
+
+
     
     # TODO: need some procedure to actually update the shim values. Need to determine which peak is the best,
     # and set actual shim value to be that new value 
