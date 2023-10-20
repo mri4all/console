@@ -19,7 +19,21 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QComboBox" name="examComboBox"/>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Exams</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="examListWidget"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Scans</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QListWidget" name="scanListWidget">
