@@ -15,11 +15,16 @@
         "shim_z": 0.0
     },
     "path_parameters": {
-        "ip_adress": "default_ip_adress",
-        "port": 0,
-        "fpga_clock_frequency_MHz": 0.0,
-        "gradient_board_type": "default gradient_board_type",
+        "mgh_path": "/Users/sairamgeethanath/Documents/Projects/Tools/Low_field/OSI/console/seq",
+        "log_path": "./server/log/",
+        "seq_path": "./server/scanner_control/seq/"
+    },
+    "marcos_parameters": {
+        "ip_adress": "10.42.0.251",
+        "port": 11111,
+        "fpga_clock_frequency_MHz": 122.8,
+        "gradient_board_type": "gpa-fhdo",
         "gpa_fhdo_current_per_volt": 2.5,
-        "flocra_pulseq_path": "default flocra_pulseq_path"
+        "flocra_pulseq_path": "./external/flocra_pulseq"
     }
 }

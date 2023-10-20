@@ -33,7 +33,7 @@ class PathParameters(BaseModel):
     seq_path: str = "default seq_path"
 
 ### marcos_parameters section
-class PathParameters(BaseModel):
+class MarcosParameters(BaseModel):
     ip_adress: str = "default_ip_adress"
     port: int = 0
     fpga_clock_frequency_MHz: float = 0.0
@@ -48,3 +48,4 @@ class Config(BaseModel):
     gradients_parameters: GradientsParameters
     shim_parameters: ShimParameters
     path_parameters: PathParameters
+    marcos_parameters: MarcosParameters()
