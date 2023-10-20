@@ -146,15 +146,9 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
 
     TR = inputs["TR"] / 1000 # ms to s
     TE = inputs["TE"] / 1000
-<<<<<<< HEAD
-    NSA = inputs["NSA"]
-    # adc_num_samples = inputs['ADC_samples']
-    # adc_duration = inputs['ADC_duration']
-=======
     num_averages = inputs["NSA"]
     adc_num_samples = inputs['ADC_samples']
     adc_duration = inputs['ADC_duration'] / 1e6 # us to s
->>>>>>> 936a0a5a4adc9e221e890be11437140dc89baeb6
 
     # ======
     # INITIATE SEQUENCE
