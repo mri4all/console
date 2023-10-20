@@ -117,25 +117,28 @@ class StudyViewer(QDialog):
 
     def result_selected(self, row: int):
         # TODO - Update the viewer acc to the result selected
+        if not self.selected_scan:
+            return
+        self.viewer.view_scan(self.selected_scan.dir, "plot", self.selected_scan.task)
         pass
 
     def scan_selected(self, row: int):
         self.resultListWidget.clear()
         exam = self.exams[self.examComboBox.currentIndex()]
-        scan = exam.scans[row]
+        self.selected_scan = exam.scans[row]
 
         for result in ["DICOM", "PLOT", "RAWDATA"]:
             self.resultListWidget.addItem(result)
         self.resultListWidget.setCurrentRow(0)
 
-    def exam_selected(self, index):
+    def exam_selected(self, index: int):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
             self.scanListWidget.addItem(scan_obj.task.protocol_name)
         self.scanListWidget.setCurrentRow(0)
 
-    def organize_scan_data_from_folders(self) -> List[PatientData]:
+    def organize_scan_data_from_folders(self) -> List[ExamData]:
         exams: List[ExamData] = []
         for exam_dir in self.archive_path.iterdir():
             if not exam_dir.is_dir():
@@ -165,7 +168,12 @@ class StudyViewer(QDialog):
             # create a new exam object if not found
             exam = next((e for e in exams if e.id == exam_id), None)
             if not exam:
-                exam = ExamData(id=exam_id, acc=scan_task.exam.acc, scans=[], patientName=patient_name)
+                exam = ExamData(
+                    id=exam_id,
+                    acc=scan_task.exam.acc,
+                    scans=[],
+                    patientName=patient_name,
+                )
                 exams.append(exam)
 
             dicom_data = np.array([])

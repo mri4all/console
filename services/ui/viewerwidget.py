@@ -18,7 +18,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import common.logger as logger
-from common.types import ResultTypes, ScanTask
+from common.types import ResultTypes, ScanTask, TimeSeriesResult
 
 log = logger.get_logger()
 
@@ -82,15 +82,20 @@ class ViewerWidget(QWidget):
             self.widget = None
             self.viewed_scan_task = None
 
-    def view_scan(self, file_path: Path, type: Literal["dicom","plot", "raw"], task: Optional[ScanTask] = None):
+    def view_scan(
+        self,
+        file_path: Path,
+        type: Literal["dicom", "plot", "raw"],
+        task: Optional[ScanTask] = None,
+    ):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
-        if next(dcm_path.glob("**/*.dcm"),None):
+        if next(dcm_path.glob("**/*.dcm"), None):
             self.load_dicoms(str(dcm_path), task)
             return True
-        elif other := next(other_path.glob("*.json"),None):
-            self.load_plot(json.loads(other.read_text()))
+        elif other := next(other_path.glob("*.json"), None):
+            self.load_plot(TimeSeriesResult(**json.loads(other.read_text())))
             return False
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
@@ -138,11 +143,12 @@ class ViewerWidget(QWidget):
 
         self.layout().addWidget(self.widget)
 
-    def load_plot(self, array=None):
+    def load_plot(self, result: Optional[TimeSeriesResult] = None):
         sc = MplCanvas(self)
-        if array is None:
-            array = np.random.normal(size=10)
-        sc.axes.plot(array)
+        if result is None:
+            result = TimeSeriesResult(data=np.random.normal(size=10).tolist())
+
+        result.show(sc.axes)
         self.layout().addWidget(sc)
         self.widget = sc
 

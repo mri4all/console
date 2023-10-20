@@ -33,7 +33,7 @@ import services.ui.systemstatus as systemstatus
 import services.ui.taskviewer as taskviewer
 import services.ui.studyviewer as studyviewer
 from sequences import SequenceBase
-from services.ui.viewerwidget import ViewerWidget
+from services.ui.viewerwidget import MplCanvas, ViewerWidget
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -301,19 +301,38 @@ class ExaminationWindow(QMainWindow):
                 log.exception("Error")
                 pipe.send_user_response(error=True)
         elif isinstance(msg_value, ipc.messages.UserAlertMessage):
-            msg = QMessageBox()
-            msg.setIcon(
-                dict(
-                    information=QMessageBox.Information,
-                    warning=QMessageBox.Warning,
-                    critical=QMessageBox.Critical,
-                )[msg_value.alert_type]
-            )
-            msg.setWindowTitle(msg_value.alert_type.capitalize())
-            msg.setText(msg_value.message)
-            msg.exec_()
+            try:
+                msg = QMessageBox()
+                msg.setIcon(
+                    dict(
+                        information=QMessageBox.Information,
+                        warning=QMessageBox.Warning,
+                        critical=QMessageBox.Critical,
+                    )[msg_value.alert_type]
+                )
+                msg.setWindowTitle(msg_value.alert_type.capitalize())
+                msg.setText(msg_value.message)
+                msg.exec_()
+            except:
+                pipe.send_user_response(error=True)
+            else:
+                pipe.send_user_response(error=False)
         elif isinstance(msg_value, ipc.messages.SetStatusMessage):
             self.overwrite_status_message(msg_value.message)
+        elif isinstance(msg_value, ipc.messages.ShowPlotMessage):
+            try:
+                dlg = QDialog(self)
+                widgetLayout = QHBoxLayout()
+                sc = MplCanvas(width=7, height=4)
+                widgetLayout.addWidget(sc)
+                dlg.setLayout(widgetLayout)
+                msg_value.plot.show(sc.axes)
+                dlg.exec_()
+            except:
+                pipe.send_user_response(error=True)
+                raise
+            else:
+                pipe.send_user_response(error=False)
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
