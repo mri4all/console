@@ -42,6 +42,7 @@ class CommunicatorEnvelope(BaseModel):
         SetStatusMessage,
         ShowPlotMessage,
         ShowDicomMessage,
+        IntensityMapResult,
     ]
     error: bool = False
 
@@ -161,4 +162,11 @@ if __name__ == "__main__":
         data=[[x**y for x in range(-10, 11)] for y in range(2, 4)],
     )
     k.show_dicoms([str(x) for x in Path("/vagrant/SE000000").glob("*.dcm")])
+    k.show_image(
+        data=[
+            [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+            [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+            [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
+        ]
+    )
     # k.send_user_alert(message=f"You typed {result}")
