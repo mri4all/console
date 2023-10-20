@@ -3,7 +3,7 @@ import common.runtime as rt
 import numpy as np
 import recon.kspaceFiltering.kspace_filtering as kFilter
 import recon.B0Correction.B0Corrector as b0correction
-from recon.DICOM import DICOM_utils as DICOM
+import recon.DICOM.DICOM_utils as DICOM
 log = logger.get_logger()
 
 import common.queue as queue
@@ -28,9 +28,10 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
 
     
     ## data_loading{folder}
+    log.info(f"Starting reconstruction.")
     ## reshape ksapce using trajectory
     ## if partial_fourier 
-    ## test 
+    ## 
     filterType = 'sine_bell'
     kData = np.load('/vagrant/test_data_kspace_d1s1B0_shift49us.npy')
     kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
