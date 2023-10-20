@@ -3,6 +3,7 @@ from pathlib import Path
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
 from sequences.common.util import reading_json_parameter, writing_json_parameter
+from sequences.common.pydanticConfig import Config
 
 import common.logger as logger
 
