@@ -35,7 +35,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration}
+        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration} # , 
 
     @classmethod
     def get_default_parameters(
@@ -70,7 +70,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
-        self.param_NSA = widget.NSASpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
         self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
         self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
         self.validate_parameters(scan_task)
@@ -88,7 +88,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         pypulseq_rfse(
             inputs={"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, 
             "ADC_samples":self.param_ADC_samples, "ADC_duration":self.param_ADC_duration}, check_timing=True, output_file=self.seq_file_path
-        )
+        ) # 
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -152,8 +152,8 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
     NSA = inputs["NSA"]
-    adc_num_samples = inputs['ADC_samples']
-    adc_duration = inputs['ADC_duration']
+    # adc_num_samples = inputs['ADC_samples']
+    # adc_duration = inputs['ADC_duration']
 
     # ======
     # INITIATE SEQUENCE
