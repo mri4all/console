@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel
 
-from common.types import TimeSeriesResult
+from common.types import IntensityMapResult, TimeSeriesResult
 
 
 class FifoMessageType(BaseModel):
@@ -39,7 +39,7 @@ class UserAlertMessage(FifoMessageType):
 
 class ShowPlotMessage(FifoMessageType):
     type: Literal["show_plot"] = "show_plot"
-    plot: TimeSeriesResult
+    plot: Union[TimeSeriesResult, IntensityMapResult]
 
 
 class ShowDicomMessage(FifoMessageType):
@@ -50,6 +50,22 @@ class ShowDicomMessage(FifoMessageType):
 class Helper:
     def show_dicoms(self, dicoms: List[str]):
         return self._query(ShowDicomMessage(dicom_files=dicoms))
+
+    def show_image(
+        self,
+        plot: Optional[IntensityMapResult] = None,
+        *,
+        xlabel: str = "",
+        ylabel: str = "",
+        title: str = "",
+        data: Union[List[List[Any]], List[List[List[Any]]]],
+        fmt: Union[str, list[str]] = []
+    ):
+        if not plot:
+            plot = IntensityMapResult(
+                xlabel=xlabel, ylabel=ylabel, title=title, data=data
+            )
+        return self._query(ShowPlotMessage(plot=plot))
 
     def show_plot(
         self,

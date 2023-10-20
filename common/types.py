@@ -7,6 +7,9 @@ import pydicom.uid
 
 import common.helper as helper
 from common.constants import *
+import common.logger as logger
+
+log = logger.get_logger()
 
 
 class PatientInformation(BaseModel):
@@ -140,7 +143,25 @@ class ScanQueueEntry(BaseModel):
     description: str = ""
 
 
+class IntensityMapResult(BaseModel):
+    type: Literal["intensity_map"] = "intensity_map"
+    data: Union[List[List[float]], List[List[List[float]]]]
+    xlabel: str = ""
+    ylabel: str = ""
+    title: str = ""
+
+    def show(self, axes_in=None):
+        axes = axes_in
+        if not axes:
+            axes = plt.axes()
+        axes.set_xlabel(self.xlabel)
+        axes.set_ylabel(self.ylabel)
+        axes.set_title(self.title)
+        axes.imshow(self.data)
+
+
 class TimeSeriesResult(BaseModel):
+    type: Literal["time_series_result"] = "time_series_result"
     xlabel: str = ""
     ylabel: str = ""
     title: str = ""

@@ -48,7 +48,7 @@ pylibjpeg-libjpeg
 # Global dependencies
 rpyc~=5.3.1
 mypy~=1.6.0
-pydantic
+pydantic~=2.4.2
 
 # Recon dependences
 ismrmrd~=1.14.0

@@ -51,7 +51,7 @@ class PatientData(BaseModel):
 class StudyViewer(QDialog):
     examListWidget: QListWidget
     scanListWidget: QListWidget
-    scanListWidget: QListWidget
+    resultListWidget: QListWidget
     patients: List[PatientData]
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
@@ -72,6 +72,9 @@ class StudyViewer(QDialog):
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.exams = self.organize_scan_data_from_folders()
 
+        if not self.exams:
+            return
+
         self.examListWidget.addItems(
             [e.patientName + " - " + e.acc for e in self.exams]
         )
@@ -91,6 +94,7 @@ class StudyViewer(QDialog):
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
         self.exam_selected(0)
+        self.examListWidget.setCurrentRow(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setProperty("type", "highlight")
@@ -100,22 +104,31 @@ class StudyViewer(QDialog):
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
 
-        if not self.selected_scan:
+        checked_scans_numbers = []
+        for i in range(self.scanListWidget.count()):
+            item = self.scanListWidget.item(i)
+            if item.checkState():
+                checked_scans_numbers.append(i)
+        
+        if not checked_scans_numbers:
             return
-
-        try:
-            dicomexport.send_dicoms(
-                self.selected_scan.dir / "dicom",
-                ui_runtime.get_config().dicom_targets[
-                    self.dicomTargetComboBox.currentRow()
-                ],
-            )
-        except Exception as e:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle("Transfer error")
-            msg.setText(f"Error transferring dicoms: \n {e}")
-            msg.exec_()
+        
+        exam = self.exams[self.examListWidget.currentRow()]
+        for scan_number in checked_scans_numbers:
+            checked_scan = exam.scans[scan_number]
+            try:
+                dicomexport.send_dicoms(
+                    checked_scan.dir / "dicom",
+                    ui_runtime.get_config().dicom_targets[
+                        self.dicomTargetComboBox.currentIndex()
+                    ],
+                )
+            except Exception as e:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle("Transfer error")
+                msg.setText(f"Error transferring dicoms: \n {e}")
+                msg.exec_()
 
     def result_selected(self, row: int):
         exam = self.exams[self.examListWidget.currentRow()]
@@ -141,7 +154,10 @@ class StudyViewer(QDialog):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
-            self.scanListWidget.addItem(scan_obj.task.protocol_name)
+            item = QListWidgetItem(scan_obj.task.protocol_name)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.scanListWidget.addItem(item)
+
         self.scanListWidget.setCurrentRow(0)
 
     def organize_scan_data_from_folders(self) -> List[ExamData]:
