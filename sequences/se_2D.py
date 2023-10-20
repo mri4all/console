@@ -88,7 +88,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
-            rf_center=LARMOR_FREQ,
+            rf_center=cfg.LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
