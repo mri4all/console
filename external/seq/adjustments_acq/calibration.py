@@ -752,10 +752,6 @@ def shim_cal_multicoil(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shi
     """
 
     seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
-
-    optimizer = BayesianOptimization(f=None, pbounds=None,
-                                     verbose=2, random_state=1)
-    utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
    
     for _ in range(n_bayopt_iter):
         next_point = optimizer.suggest(utility)
