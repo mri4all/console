@@ -17,7 +17,8 @@ class GradientsParameters(BaseModel):
 class ShimParameters(BaseModel):
     shim_x: float = 0.0
     shim_y: float = 0.0
-    shim_z: List[float] = []
+    shim_z: float = 0.0
+    shim_mc: List[float] = []
 
 ### marcos_parameters section
 class MarcosParameters(BaseModel):
