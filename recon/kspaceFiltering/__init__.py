@@ -3,9 +3,23 @@ from .kspace_filtering import *
 from .utils import *
 
 
-
-## for debugging filtering algorithm locally using the provided demo kspace data or image data
 def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fermi', **kwargs):
+    '''
+    Debug filtering algorithms locally using the provided demo k-space data or image data.
+    example usage:
+        debug_filter_on_demo_data('data/demo_img.npy', slc=18, isimg=True, filter_type='fermi', radius=0.5, width=10)
+        debug_filter_on_demo_data('data/demo_kspace.npy', slc=18, isimg=False, filter_type='sin_bell')
+    
+    Parameters:
+    - file_name (str): The name of the file containing the k-space or image data.
+    - slc (int): The slice index to focus on for debugging. Default is 18.
+    - isimg (bool): Flag to indicate if the input file contains image data. If True, image data is loaded; otherwise, k-space data is loaded. Default is True.
+    - filter_type (str): Type of filter to apply ('fermi', 'sine_bell', etc.). Default is 'fermi'.
+    - **kwargs (dict): Additional keyword arguments for specifying filter parameters.
+    
+    Returns:
+    None. This function generates plots for visualization.
+    '''
     import matplotlib.pyplot as plt
     import matplotlib.gridspec as gridspec
 
@@ -23,13 +37,10 @@ def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fe
     # 2. center correction
     kspace_center = kspace_center_correction(kspace)
     # 3. filtering
-    x,y,z = kspace_center.shape
-    # kwg = { 'radius':x//2, 'sharpness':10}
-    # kwg = { 'radius':0.5, 'sharpness':10}
     kspace_center_filtered, mask = kspace_filtering(kspace_center, filter_type, center_correction=False, return_mask=True, **kwargs)
     # 4. back to image
     output = get_img_from_ksp(kspace_center_filtered)
-    # 5. compare the original image and the filtered image
+    # 5. visualization: compare the original image and the filtered image
 
     fig = plt.figure(figsize=(20, 6))
     gs = gridspec.GridSpec(1, 4, [1,1,1,3])  # 4 columns, the last one is twice as wide
