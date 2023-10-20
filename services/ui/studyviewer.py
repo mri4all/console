@@ -49,7 +49,7 @@ class PatientData(BaseModel):
 
 
 class StudyViewer(QDialog):
-    examComboBox: QComboBox
+    examListWidget: QListWidget
     scanListWidget: QListWidget
     scanListWidget: QListWidget
     patients: List[PatientData]
@@ -72,8 +72,10 @@ class StudyViewer(QDialog):
         self.archive_path = Path(rt.get_base_path()) / "data/archive"
         self.exams = self.organize_scan_data_from_folders()
 
-        self.examComboBox.addItems([e.patientName + " - " + e.acc for e in self.exams])
-        self.examComboBox.currentIndexChanged.connect(self.exam_selected)
+        self.examListWidget.addItems(
+            [e.patientName + " - " + e.acc for e in self.exams]
+        )
+        self.examListWidget.currentRowChanged.connect(self.exam_selected)
 
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
         self.resultListWidget.currentRowChanged.connect(self.result_selected)
@@ -105,7 +107,7 @@ class StudyViewer(QDialog):
             dicomexport.send_dicoms(
                 self.selected_scan.dir / "dicom",
                 ui_runtime.get_config().dicom_targets[
-                    self.dicomTargetComboBox.currentIndex()
+                    self.dicomTargetComboBox.currentRow()
                 ],
             )
         except Exception as e:
@@ -116,19 +118,23 @@ class StudyViewer(QDialog):
             msg.exec_()
 
     def result_selected(self, row: int):
-        # TODO - Update the viewer acc to the result selected
-        if not self.selected_scan:
-            return
-        self.viewer.view_scan(self.selected_scan.dir, "plot", self.selected_scan.task)
-        pass
+        exam = self.exams[self.examListWidget.currentRow()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+        if scan.task.results:
+            result_data = scan.task.results[row]
+            self.viewer.view_scan(result_data.file_path, result_data.type)
 
     def scan_selected(self, row: int):
         self.resultListWidget.clear()
-        exam = self.exams[self.examComboBox.currentIndex()]
-        self.selected_scan = exam.scans[row]
+        exam = self.exams[self.examListWidget.currentRow()]
+        scan = exam.scans[row]
 
-        for result in ["DICOM", "PLOT", "RAWDATA"]:
-            self.resultListWidget.addItem(result)
+        if not scan.task.results:
+            for result in ["DICOM", "PLOT", "RAWDATA"]:
+                self.resultListWidget.addItem(result)
+        else:
+            for result in scan.task.results:
+                self.resultListWidget.addItem(result.name + " - " + result.type)
         self.resultListWidget.setCurrentRow(0)
 
     def exam_selected(self, index: int):
