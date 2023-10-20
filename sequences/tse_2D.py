@@ -122,7 +122,7 @@ def pypulseq_tse2D(
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    LARMOR_FREQ = LARMOR_FREQ
+    # LARMOR_FREQ = LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
