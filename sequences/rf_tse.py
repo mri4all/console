@@ -32,7 +32,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -42,7 +42,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         # reading configuration data from config.json
@@ -126,7 +126,11 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     # CREATE EVENTS
     # ======
     rf1 = pp.make_block_pulse(
-        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
     )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
@@ -148,7 +152,9 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     assert np.all(delay_TR > 0)
 
     # Define ADC events
-    adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    adc = pp.make_adc(
+        num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system
+    )
 
     # ======
     # ======
@@ -175,7 +181,9 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
 
     try:
         seq.write(output_file)
-        print(output_file)  # Remove this later: for locally testing if not connected to Redpitaya
+        print(
+            output_file
+        )  # Remove this later: for locally testing if not connected to Redpitaya
         log.debug("Seq file stored")
     except:
         log.error("Could not write sequence file")

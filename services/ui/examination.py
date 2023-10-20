@@ -1049,12 +1049,12 @@ class ExaminationWindow(QMainWindow):
         else:
             log.error("Invalid target viewer selected")
 
-    def autoload_results_in_viewer(self, scans_queue_item):
-        # Read scan_task for given queue item
-        scan_path = ui_runtime.get_scan_location(scans_queue_item)
-        if not scan_path:
-            log.warning("Unable to find images to be loaded into viewers.")
+    def autoload_results_in_viewer(self, scan_folder):
+        if not scan_folder:
             return
+
+        # Read scan_task for given queue item
+        scan_path = mri4all_paths.DATA_COMPLETE + "/" + scan_folder
         scan_task = task.read_task(scan_path)
         if not scan_task:
             log.warning("Unable load scan task for viewers.")

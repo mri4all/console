@@ -23,7 +23,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def get_description(self) -> str:
         return "Adjust Shim Sequence."
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -33,7 +33,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         shim_cal(

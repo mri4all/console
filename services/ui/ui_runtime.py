@@ -139,7 +139,7 @@ def close_patient():
             log.error("Error while clearing data folders.")
 
 
-def get_scan_queue_entry(index) -> Any:
+def get_scan_queue_entry(index: int) -> Any:
     global scan_queue_list
 
     if index < 0 or index >= len(scan_queue_list):

@@ -70,8 +70,7 @@ TrajectoryType = Literal["cartesian", "radial"]
 
 class ProcessingConfig(BaseModel):
     trajectory: TrajectoryType = "cartesian"
-    kspace_dim: int = 0
-    kspace_ordering: str = ""  # TODO: Decide where this is coming from
+    recon_mode: str = ""
 
 
 ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]

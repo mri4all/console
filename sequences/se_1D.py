@@ -64,19 +64,21 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.problem_list.append("TE cannot be longer than TR")
         return self.is_valid()
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
         pypulseq_1dse(
-            inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
+            inputs={"TE": self.param_TE, "TR": self.param_TR},
+            check_timing=True,
+            output_file=self.seq_file_path,
         )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         rxd, rx_t = run_pulseq(
@@ -104,7 +106,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
+def pypulseq_1dse(
+    inputs=None, check_timing=True, output_file="", rf_duration=100e-6
+) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -167,7 +171,11 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # CREATE EVENTS
     # ======
     rf1 = pp.make_block_pulse(
-        flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use="excitation"
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
     )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
@@ -179,24 +187,37 @@ def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=10
     )
 
     delta_k = 1 / fov
-    gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
-    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
+    gx = pp.make_trapezoid(
+        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+    )
+    gx_pre = pp.make_trapezoid(
+        channel="x", area=gx.area / 2, duration=prephaser_duration, system=system
+    )
     # Define ADC events
     # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
-    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
+    adc = pp.make_adc(
+        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+    )
 
     # ======
     # CALCULATE DELAYS
     # ======
     tau1 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            (
+                TE / 2
+                - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
+                - pp.calc_duration(gx_pre)
+            )
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
 
     tau2 = (
-        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
     ) * seq.grad_raster_time
 
     delay_TR = TR - TE - (0.5 * adc_duration)

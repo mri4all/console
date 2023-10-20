@@ -19,7 +19,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     def get_readable_name(self) -> str:
         return "Adjust Frequency"
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -29,7 +29,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         # Using external packages now: TODO: convert to classes later
