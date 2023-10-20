@@ -99,7 +99,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
-            rf_center=cfg.LARMOR_FREQ,
+            rf_center=LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
@@ -130,7 +130,7 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    LARMOR_FREQ = cfg.LARMOR_FREQ
+    # LARMOR_FREQ = LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
     alpha1 = 90  # flip angle

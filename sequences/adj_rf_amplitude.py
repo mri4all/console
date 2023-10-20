@@ -8,7 +8,6 @@ import common.logger as logger
 from sequences import PulseqSequence  # type: ignore
 from sequences.rf_se import pypulseq_rfse  # type: ignore
 
-
 log = logger.get_logger()
 
 
