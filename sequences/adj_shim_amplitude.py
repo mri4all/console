@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from external.seq.adjustments_acq.calibration import shim_cal
+from external.seq.adjustments_acq.calibration import shim_cal_linear
 import external.seq.adjustments_acq.config as cfg
 
 import common.logger as logger
@@ -36,7 +36,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
 
-        shim_cal(seq_file=self.seq_file_path,
+        shim_cal_linear(seq_file=self.seq_file_path,
                 larmor_freq=cfg.LARMOR_FREQ,
                 channel='x',
                 range=0.01,

@@ -648,7 +648,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False, 
              plotting=True):
@@ -862,7 +862,7 @@ if __name__ == "__main__":
             else:
                 grad_max_cal(plot=True)
         elif command == 'shim':
-            shim_cal(plot=True)
+            shim_cal_linear(plot=True)
         else:
             print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
