@@ -6,7 +6,7 @@ from common import runtime
 ### rf_parameters section
 class RfParameters(BaseModel):
     larmor_frequency_MHz: float = 15.58
-    rf_maximum_amplitude_Hze: float = 0.0
+    rf_maximum_amplitude_Hze: float = 7661.29
     rf_pi2_fraction: float = 0.6744
 
 ### gradients_parameters section
@@ -24,10 +24,9 @@ class ShimParameters(BaseModel):
 
 ### marcos_parameters section
 class MarcosParameters(BaseModel):
-    ip_adress: str = "10.42.0.251"
     port: int = 11111
     fpga_clock_frequency_MHz: float = 122.8
-    gradient_board_type: str = "gpa_fhdo"
+    gradient_board_type: str = "gpa-fhdo"
     gpa_fhdo_current_per_volt: float = 2.5
     flocra_pulseq_path: str = "./external/flocra_pulseq"
 

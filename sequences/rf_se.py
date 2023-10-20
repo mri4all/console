@@ -12,11 +12,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
 import common.logger as logger
-from sequences.common.util import reading_json_parameter
 
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 log = logger.get_logger()
 
 
@@ -39,7 +35,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration}
+        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration} # , 
 
     @classmethod
     def get_default_parameters(
@@ -74,7 +70,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
-        self.param_NSA = widget.NSASpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
         self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
         self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
         self.validate_parameters(scan_task)
@@ -92,7 +88,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         pypulseq_rfse(
             inputs={"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, 
             "ADC_samples":self.param_ADC_samples, "ADC_duration":self.param_ADC_duration}, check_timing=True, output_file=self.seq_file_path
-        )
+        ) # 
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -103,7 +99,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
-            rf_center=LARMOR_FREQ,
+            rf_center=cfg.LARMOR_FREQ,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
@@ -134,7 +130,7 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    # LARMOR_FREQ = LARMOR_FREQ
+    LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
     alpha1 = 90  # flip angle

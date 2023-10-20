@@ -9,7 +9,7 @@ from sequences import PulseqSequence
 from sequences.rf_se import pypulseq_rfse, SequenceRF_SE
 
 import configparser
-from sequences.common.util import reading_json_parameter
+from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 # Extracting configuration
 configuration_data=reading_json_parameter()
@@ -45,11 +45,11 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             
             for channel in axes:
                 log.info(f"Updating {channel} linear shim")
-                shim_cal_linear(seq_file=self.seq_file_path,
+                shim_weight =shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=LARMOR_FREQ,
                         channel=channel,
                         range=0.05,
-                        shim_points=10,
+                        shim_points=5,
                         points=2,
                         iterations=1,
                         zoom_factor=2,
@@ -62,6 +62,15 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                         smooth=True,
                         plot=True,
                         gui_test=False)
+                
+                # write to config file
+                if channel == 'x':
+                    configuration_data.shim_parameters.shim_x = shim_weight
+                elif channel == 'y':
+                    configuration_data.shim_parameters.shim_y = shim_weight   
+                elif channel == 'z':
+                    configuration_data.shim_parameters.shim_z = shim_weight
+                writing_json_parameter(config_data=configuration_data)
         
         # refine the multicoil shim 
         if refine_multicoil:

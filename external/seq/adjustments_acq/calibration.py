@@ -13,13 +13,8 @@ import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
-from sequences.common.util import reading_json_parameter
 
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
-
-def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
+def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
@@ -123,7 +118,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     return max_freq, data_dict
 
 
-def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
+def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
                step_size=0.6, plot=False, shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, gui_test=False):
     """
     Run a gradient descent search from a starting larmor frequency, optimizing to find the frequency
@@ -258,7 +253,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=LARMOR
     return larmor_freq, data_dict
 
 
-def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
+def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
                shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
                tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
@@ -485,7 +480,7 @@ def rf_duration_cal(rxd_list=[], points=25, zoom_factor=2, smooth=True, iteratio
 
 # TODO Add gui test functionality
 # TODO Comment
-def grad_max_cal(channel='x', phantom_width=10, larmor_freq=LARMOR_FREQ, calibration_power=0.8,
+def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, calibration_power=0.8,
                  trs=3, tr_spacing=2e6, echo_duration=5000,
                  readout_duration=500, rx_period=25 / 3,
                  RF_PI2_DURATION=50, rf_max=cfg.RF_MAX,
@@ -653,7 +648,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=LARMOR_FREQ, calibra
     return grad_max
 
 
-def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False,):
     """
@@ -685,6 +680,7 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         return -1
     
     rxd_list = []
+    fwhm_list = []
 
     if channel == 'x':
         shim_centre = shim_x
@@ -708,7 +704,15 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
                                    grad_cal=False, save_np=False, save_mat=False, save_msgs=False, gui_test=gui_test)
         rxd_list.append(rxd)
         time.sleep(tr_spacing)
-
+        
+        # get peaks, find fwhm 
+        peak_index = np.argmax(np.abs(rxd))
+        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        
+    # determine best, and update config file with the best
+    best_shim_index = np.argmin(fwhm_list)
+    best_shim = shim_range[best_shim_index]
+    
     if plot: 
         plt.subplot(2, 1, 1)
         for rx in rxd_list:
@@ -723,10 +727,12 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
             plt.plot(np.abs(rx))
 
         plt.legend(shim_range)
-
+        
         plt.show()
-
-def shim_cal_multicoil(larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+    
+    return best_shim
+    
+def shim_cal_multicoil(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, n_bayopt_iter=20):
     """
@@ -752,10 +758,6 @@ def shim_cal_multicoil(larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_po
     """
 
     seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
-
-    optimizer = BayesianOptimization(f=None, pbounds=None,
-                                     verbose=2, random_state=1)
-    utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
    
     for _ in range(n_bayopt_iter):
         next_point = optimizer.suggest(utility)

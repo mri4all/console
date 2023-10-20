@@ -1,7 +1,7 @@
 import numpy as np
 
 def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'center_out',
-                    pf: np.ndarray = [8/8, 8/8], save_pe_order: bool = True) -> np.ndarray:
+                    pf: np.ndarray = [8/8, 8/8], save_pe_order: bool = True, save_path: str = 'pe_order.npy') -> np.ndarray:
     
     """
     Choose k-space trajectory for Cartesian acquisition: 2D or 3D.
@@ -120,7 +120,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
 
 
     if save_pe_order is True:
-        np.save('pe_order.npy', pe_order)
+        np.save(save_path, pe_order)
 
     # print(pe_order) # - For debug
     return pe_order
