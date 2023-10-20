@@ -1,6 +1,6 @@
 import common.logger as logger
 import numpy as np
-from skimage.restoration import denoise_nl_means, denoise_bilateral
+from skimage.restoration import denoise_nl_means, denoise_bilateral, denoise_tv_chambolle
 
 log = logger.get_logger()
 
@@ -65,3 +65,31 @@ def apply_nl_means_denoise(
         channel_axis=channel_axis,
     )
     return image_nl_means
+
+
+def apply_total_variation_denoise(image, weight=0.1, channel_axis=-1):
+    """
+    Applies total variation denoising to the input image.
+
+    Parameters:
+    image (numpy.ndarray): The input image to be denoised. If the image is complex, its magnitude is extracted before denoising.
+    weight (float, optional): The denoising weight. Default is 0.1.
+    channel_axis (int, optional): The axis of the color channel. Default is -1 (the last dimension).
+
+    Returns:
+    numpy.ndarray: The denoised image.
+    """
+
+    if np.iscomplexobj(image):
+        log.info("Extracting magnitude of complex image")
+        image = np.abs(image)
+
+    log.info(
+        f"Applying total variation denoising with weight={weight}"
+    )
+    image_tv_chambolle = denoise_tv_chambolle(
+        image,
+        weight=weight,
+        channel_axis=channel_axis,
+    )
+    return image_tv_chambolle
