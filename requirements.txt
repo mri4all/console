@@ -34,6 +34,7 @@ imageio~=2.19.3
 numpy==1.25
 tqdm~=4.66.1
 numba==0.58.0
+bayesian-optimization==1.4.3
 
 
 # Dependencies of the GUI service
@@ -48,7 +49,7 @@ pylibjpeg-libjpeg
 # Global dependencies
 rpyc~=5.3.1
 mypy~=1.6.0
-pydantic
+pydantic~=2.4.2
 
 # Recon dependences
 ismrmrd~=1.14.0
