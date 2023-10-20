@@ -68,6 +68,11 @@ def process_acquisition(scan_name: str) -> bool:
     scan_task.journal.acquisition_start = helper.get_datetime()
     task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
 
+    # Clear the seq subfolder to remove any .seq file from previous test runs
+    task.clear_task_subfolder(
+        mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_taskdata.SEQ
+    )
+
     current_step = ""
     try:
         current_step = "instantiation"
@@ -95,6 +100,11 @@ def process_acquisition(scan_name: str) -> bool:
 
     scan_task.journal.acquisition_end = helper.get_datetime()
     task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
+
+    # Clear the tmp subfolder to remove any temporary files from interactive scanning
+    task.clear_task_subfolder(
+        mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_taskdata.TEMP
+    )
 
     log.info("Acquisition completed with success.")
     if not queue.move_task(

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 ### rf_parameters section
 class RfParameters(BaseModel):
@@ -17,20 +18,7 @@ class ShimParameters(BaseModel):
     shim_x: float = 0.0
     shim_y: float = 0.0
     shim_z: float = 0.0
-
-### path_parameters section
-class PathParameters(BaseModel):
-    mgh_path: str = "default mgh_path"
-    log_path: str = "default log_path"
-    seq_path: str = "default seq_path"
-    seq_path: str = "default seq_path"
-
-### path_parameters section
-class PathParameters(BaseModel):
-    mgh_path: str = "default mgh_path"
-    log_path: str = "default log_path"
-    seq_path: str = "default seq_path"
-    seq_path: str = "default seq_path"
+    shim_mc: List[float] = []
 
 ### marcos_parameters section
 class MarcosParameters(BaseModel):
@@ -47,5 +35,4 @@ class Config(BaseModel):
     rf_parameters: RfParameters
     gradients_parameters: GradientsParameters
     shim_parameters: ShimParameters
-    path_parameters: PathParameters
     marcos_parameters: MarcosParameters()
