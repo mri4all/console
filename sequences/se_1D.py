@@ -36,7 +36,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     @classmethod
     def get_default_parameters(self) -> dict:
-        return {"TE": 70, "TR": 250}
+        return {"TE": 20, "TR": 3000}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
