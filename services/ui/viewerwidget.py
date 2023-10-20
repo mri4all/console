@@ -115,6 +115,8 @@ class ViewerWidget(QWidget):
 
         self.widget = pg.ImageView()
         self.widget.setImage(ArrayDicom)
+        self.widget.timeLine.setPen(color=(200, 200, 200), width=8)
+        self.widget.timeLine.setHoverPen(color=(255, 255, 255), width=8)
 
         # viewer_widget.ui.histogram.hide()
         self.widget.ui.roiBtn.hide()
