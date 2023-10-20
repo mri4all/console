@@ -76,9 +76,13 @@ def create_task(
     # Create the sub-folders for the scan task
     current_subfolder = Path(folder_name)
     try:
+        current_subfolder = Path(folder_name) / mri4all_taskdata.SEQ
+        os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.RAWDATA
         os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.DICOM
+        os.mkdir(current_subfolder)
+        current_subfolder = Path(folder_name) / mri4all_taskdata.TEMP
         os.mkdir(current_subfolder)
         current_subfolder = Path(folder_name) / mri4all_taskdata.OTHER
         os.mkdir(current_subfolder)
@@ -222,6 +226,34 @@ def set_task_state(folder: str, state: str, value: bool) -> bool:
         lock.free()
     except Exception:
         log.error(f"Unable to remove lock file {lock_file}")
+        return False
+
+    return True
+
+
+def clear_task_subfolder(folder: str, subfolder: str) -> bool:
+    if not Path(folder).is_dir():
+        log.error(f"Task folder {folder} does not exist.")
+        return False
+
+    # Make sure the subfolder exists. Otherwise, an invalid option has
+    # been provided.
+    subfolder_path = Path(folder) / subfolder
+    if not Path(subfolder_path).is_dir():
+        log.error(f"Invalid subfolder {subfolder} selected for clearing.")
+        return False
+
+    # Remove the old folder
+    if not shutil.rmtree(subfolder_path):
+        log.error(f"Unable to clear subfolder {subfolder}.")
+        return False
+
+    # And recreate it
+    try:
+        current_subfolder = Path(current_subfolder) / subfolder
+        os.mkdir(current_subfolder)
+    except Exception:
+        log.error(f"Unable to recreate subfolder in task {subfolder_path}")
         return False
 
     return True
