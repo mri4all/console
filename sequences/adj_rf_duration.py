@@ -6,6 +6,7 @@ import time
 import external.seq.adjustments_acq.config as cfg
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from external.seq.adjustments_acq.calibration import rf_duration_cal
+from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 import common.logger as logger
 
@@ -39,6 +40,9 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self) -> bool:
         log.info("Running RF calibration sequences ")
 
+        # reading configuration data from config.json
+        configuration_data=reading_json_parameter()
+
         points = 25 # number of steps, to be added as a parameter
         tr_spacing = 2 # [us] Time between repetitions
 
@@ -68,7 +72,9 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
         rf_duration_cal(rdx_list=rxd_list, points=points)
 
         
-        
+        # updating the Larmor frequency in the config.json file
+        # configuration_data.rf_parameters.rf_maximum_amplitude_Hze = rf_duration 
+        # writing_json_parameter(config_data=configuration_data)
         
 
         log.info("Done RF calibration sequences ")
