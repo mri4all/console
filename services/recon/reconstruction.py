@@ -35,13 +35,13 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
     
-    ## TO DO: Partial_fourier 
-    
-    # K-space filtering - TO DO
+    # TODO: Load the k-space data
+    kData = np.load(folder + 'rawdata' + '/kSpace.npy')
+
+
+    # TODO(Bingyu): K-space filtering
     filterType = 'sine_bell'
-
     kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
-
     log.info(f"kSpace {filterType} filtering finished.")
 
     # Use the trajectory information and B0 map
