@@ -9,7 +9,7 @@ from sequences import PulseqSequence
 from sequences.rf_se import pypulseq_rfse, SequenceRF_SE
 
 import configparser
-from sequences.common.util import reading_json_parameter
+from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 # Extracting configuration
 configuration_data=reading_json_parameter()
