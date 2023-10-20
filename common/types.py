@@ -1,8 +1,8 @@
-from typing import Any, List
+from typing import Any, List, Union
 from typing_extensions import Literal
 from pathlib import Path
 from pydantic import BaseModel
-
+import matplotlib.pyplot as plt
 import pydicom.uid
 
 import common.helper as helper
@@ -138,3 +138,40 @@ class ScanQueueEntry(BaseModel):
     has_results: bool = False
     folder_name: str = ""
     description: str = ""
+
+
+class TimeSeriesResult(BaseModel):
+    xlabel: str = ""
+    ylabel: str = ""
+    title: str = ""
+    data: Union[List[List[float]], List[float]]
+    fmt: Union[str, list[str]] = []
+
+    def show(self, axes_in=None):
+        axes = axes_in
+        if not axes:
+            axes = plt.axes()
+
+        data = None
+        if not isinstance(self.data[0], list):
+            data = [self.data]
+        else:
+            data = self.data
+
+        fmt = None
+        if not isinstance(self.fmt, list):
+            fmt = [self.fmt]
+        else:
+            fmt = self.fmt
+
+        for i, data in enumerate(data):
+            use_fmt = []
+            if i < len(fmt):
+                use_fmt = [fmt[i]]
+            axes.plot(data, *use_fmt)
+
+        axes.set_xlabel(self.xlabel)
+        axes.set_ylabel(self.ylabel)
+        axes.set_title(self.title)
+        if not axes_in:
+            plt.show()
