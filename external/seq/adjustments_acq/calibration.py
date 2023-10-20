@@ -12,20 +12,15 @@ import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-erro
 import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
-from utils import constants
 from sequences.common.util import reading_json_parameter
+from utils import constants
 
 # Extracting configuration
 configuration_data=reading_json_parameter()
 LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
-RF_MAX = configuration_data.rf_parameters.rf_maximum_amplitude_Hze
-SHIM_X = configuration_data.shim_parameters.shim_x
-SHIM_Y = configuration_data.shim_parameters.shim_y
-SHIM_Z = configuration_data.shim_parameters.shim_z
-
 
 def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
-                       shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z, delay_s=1, gui_test=False):
+                       shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
     Used to find a starting point, not for precision
@@ -129,7 +124,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
-               step_size=0.6, plot=False, shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z, gui_test=False):
+               step_size=0.6, plot=False, shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, gui_test=False):
     """
     Run a gradient descent search from a starting larmor frequency, optimizing to find the frequency
     with the most constant phase.
@@ -207,7 +202,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=LARMOR
     # Run once more to check final frequency
     rxd, rx_t = scr.run_pulseq(seq_file, rf_center=larmor_freq,
                                tx_t=1, grad_t=1, tx_warmup=100,
-                               shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z,
+                               shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
                                grad_cal=False, save_np=False, save_mat=False, save_msgs=False, gui_test=gui_test)
 
     # Split echos for FFT
@@ -264,7 +259,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=LARMOR
 
 
 def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
-               shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z,
+               shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
                tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False):
     """
     Calibrate RF maximum for pi/2 flip angle
@@ -659,7 +654,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=LARMOR_FREQ, calibra
 
 
 def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
-             shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z,
+             shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False,):
     """
     Calibrate linear shims (offset for linear gradients)
@@ -731,8 +726,8 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
 
         plt.show()
 
-def shim_cal_multicoil(larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
-             shim_x=SHIM_X, shim_y=SHIM_Y, shim_z=SHIM_Z,
+def shim_cal_multicoil(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+             shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, n_bayopt_iter=20):
     """
     Calibrate MC shim weights. Approach is to use Bayesian optimization to minimize the standard deviation 
@@ -757,10 +752,6 @@ def shim_cal_multicoil(larmor_freq=LARMOR_FREQ, channel='x', range=0.01, shim_po
     """
 
     seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq'
-
-    optimizer = BayesianOptimization(f=None, pbounds=None,
-                                     verbose=2, random_state=1)
-    utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
    
     for _ in range(n_bayopt_iter):
         next_point = optimizer.suggest(utility)
