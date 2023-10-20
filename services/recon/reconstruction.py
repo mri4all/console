@@ -2,7 +2,7 @@ import common.logger as logger
 import common.runtime as rt
 import numpy as np
 import recon.kspaceFiltering.kspace_filtering as kFilter
-import recon.B0Correction.B0Corrector as b0correction
+from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
 log = logger.get_logger()
 
@@ -38,14 +38,20 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     # TODO: Load the k-space data
     kData = np.load(folder + 'rawdata' + '/kSpace.npy')
 
-
     # TODO(Bingyu): K-space filtering
     filterType = 'sine_bell'
     kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
     log.info(f"kSpace {filterType} filtering finished.")
 
-    # Use the trajectory information and B0 map
-    iData = b0correction.correct_Cartesian_basic(kData, kTraj, iB0map)
+    # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    Y = np.ndarray  
+    kt = np.ndarray 
+    df = np.ndarray 
+    Lx = 1  
+    nonCart = None
+    params = None
+    b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
+    iData = b0_corrector().correct_Cartesian_basic()
     log.info(f"B0 correction finished.")
 
     # Image denoising: TO DO
