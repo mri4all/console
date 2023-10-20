@@ -680,6 +680,7 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         return -1
     
     rxd_list = []
+    fwhm_list = []
 
     if channel == 'x':
         shim_centre = shim_x
@@ -703,7 +704,15 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
                                    grad_cal=False, save_np=False, save_mat=False, save_msgs=False, gui_test=gui_test)
         rxd_list.append(rxd)
         time.sleep(tr_spacing)
-
+        
+        # get peaks, find fwhm 
+        peak_index = np.argmax(np.abs(rxd))
+        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        
+    # determine best, and update config file with the best
+    best_shim_index = np.argmin(fwhm_list)
+    best_shim = shim_range[best_shim_index]
+    
     if plot: 
         plt.subplot(2, 1, 1)
         for rx in rxd_list:
@@ -718,9 +727,11 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
             plt.plot(np.abs(rx))
 
         plt.legend(shim_range)
-
+        
         plt.show()
-
+    
+    return best_shim
+    
 def shim_cal_multicoil(larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, n_bayopt_iter=20):
