@@ -42,7 +42,15 @@ class ShowPlotMessage(FifoMessageType):
     plot: TimeSeriesResult
 
 
+class ShowDicomMessage(FifoMessageType):
+    type: Literal["show_dicom"] = "show_dicom"
+    dicom_files: List[str]
+
+
 class Helper:
+    def show_dicoms(self, dicoms: List[str]):
+        return self._query(ShowDicomMessage(dicom_files=dicoms))
+
     def show_plot(
         self,
         plot: Optional[TimeSeriesResult] = None,
