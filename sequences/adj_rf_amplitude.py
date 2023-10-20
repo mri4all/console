@@ -7,11 +7,6 @@ import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
 from sequences.rf_se import pypulseq_rfse  # type: ignore
-from sequences.common.util import reading_json_parameter
-
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 
 log = logger.get_logger()
 
@@ -36,7 +31,7 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
         rf_max_cal(
             seq_file=self.seq_file_path,
-            larmor_freq=LARMOR_FREQ,
+            larmor_freq=cfg.LARMOR_FREQ,
             points=20,
             iterations=2,
             zoom_factor=2,

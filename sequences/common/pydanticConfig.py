@@ -6,7 +6,7 @@ from common import runtime
 ### rf_parameters section
 class RfParameters(BaseModel):
     larmor_frequency_MHz: float = 15.58
-    rf_maximum_amplitude_Hze: float = 0.0
+    rf_maximum_amplitude_Hze: float = 7661.29
     rf_pi2_fraction: float = 0.6744
 
 ### gradients_parameters section

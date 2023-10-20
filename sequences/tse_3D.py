@@ -11,11 +11,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
 import common.logger as logger
-from sequences.common.util import reading_json_parameter
 
-# Extracting configuration
-configuration_data=reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 log = logger.get_logger()
 
 
@@ -119,7 +115,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    # LARMOR_FREQ = LARMOR_FREQ
+    LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
