@@ -86,12 +86,15 @@ class ViewerWidget(QWidget):
         self.clear_view()
         dcm_path = file_path / "dicom"
         other_path = file_path / "other"
-        if next(dcm_path.glob("**/*.dcm"),None):
-            self.load_dicoms(str(dcm_path), task)
-            return True
-        elif other := next(other_path.glob("*.json"),None):
-            self.load_plot(json.loads(other.read_text()))
-            return False
+        if type == "dicom":
+            dcm_path = file_path / "dicom"
+            if next(dcm_path.glob("**/*.dcm"), None):
+                self.load_dicoms(str(dcm_path), task)
+                return True
+        elif type == "plot":
+            self.load_plot()
+        else:
+            pass
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
         if not input_path:
