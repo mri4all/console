@@ -10,7 +10,7 @@ from typing import List
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta  # type: ignore
 import sip  # type: ignore
@@ -333,8 +333,9 @@ class ExaminationWindow(QMainWindow):
                 ui_runtime.status_last_completed_scan
             )
 
-            # Autoload the results into the viewers
-            self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
+            if ui_runtime.status_last_completed_scan:
+                # Autoload the results into the viewers
+                self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -382,6 +383,7 @@ class ExaminationWindow(QMainWindow):
         closing a patient (it is just moved to the background). Hence, all UI elements need to be
         reset to their initial state.
         """
+        self.clear_viewers()
         patient_text = f'<span style="color: #FFF; font-size: 20px; font-weight: bold; ">{ui_runtime.patient_information.get_full_name()}</span><span style="color: #515669; font-size: 20px;">'
         patient_text += chr(0xA0) + chr(0xA0)
         patient_text += f"MRN: {ui_runtime.patient_information.mrn.upper()}</span>"
@@ -1030,6 +1032,11 @@ class ExaminationWindow(QMainWindow):
 
         self.sync_queue_widget(True)
 
+    def clear_viewers(self):
+        self.viewer1.view_data("", "empty")
+        self.viewer2.view_data("", "empty")
+        self.viewer3.view_data("", "empty")
+
     def load_result_in_viewer(self):
         source_results = self.sender().property("source")
         target_viewer = self.sender().property("target")
@@ -1043,28 +1050,15 @@ class ExaminationWindow(QMainWindow):
             log.error("Invalid target viewer selected")
 
     def autoload_results_in_viewer(self, scans_queue_item):
-        # TODO: Read scan_task for given queue item
-
-        # Create a dummy task
-        dummy_results: List[ResultItem] = []
-
-        result_1 = ResultItem()
-        result_1.type = "plot"
-        result_1.name = "temp1"
-        result_1.file_path = "/path/to/exact/folder/from/base/folder"
-        result_1.autoload_viewer = 0
-        dummy_results.append(result_1)
-
-        result_2 = ResultItem()
-        result_2.type = "dicom"
-        result_2.name = "temp1"
-        result_2.file_path = "/path/to/exact/folder/from/base/folder"
-        result_2.autoload_viewer = 1
-        dummy_results.append(result_2)
-
-        dummy_task = ScanTask()
-        dummy_task.results = dummy_results
-        scan_task = dummy_task
+        # Read scan_task for given queue item
+        scan_path = ui_runtime.get_scan_location(scans_queue_item)
+        if not scan_path:
+            log.warning("Unable to find images to be loaded into viewers.")
+            return
+        scan_task = task.read_task(scan_path)
+        if not scan_task:
+            log.warning("Unable load scan task for viewers.")
+            return
 
         # Loop over all results of the scan task
         for result_item in scan_task.results:
@@ -1072,7 +1066,7 @@ class ExaminationWindow(QMainWindow):
                 self.viewer1.view_data(result_item.file_path, result_item.type)
             elif result_item.autoload_viewer == 1:
                 self.viewer2.view_data(result_item.file_path, result_item.type)
-            elif result_item.autoload_viewer == 1:
+            elif result_item.autoload_viewer == 2:
                 self.viewer3.view_data(result_item.file_path, result_item.type)
             else:
                 log.warning("Invalid target viewer provided")

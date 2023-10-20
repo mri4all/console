@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 import qtawesome as qta  # type: ignore
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 import pydicom
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets

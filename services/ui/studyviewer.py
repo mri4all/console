@@ -14,6 +14,7 @@ from common.types import (
 import common.runtime as rt
 import common.logger as logger
 from services.ui import ui_runtime
+from services.ui import dicomexport
 from services.ui.viewerwidget import ViewerWidget
 
 log = logger.get_logger()
@@ -87,12 +88,16 @@ class StudyViewer(QDialog):
         self.viewerFrame.setLayout(viewerLayout)
         self.patient_selected(0)
 
+        self.closeButton.clicked.connect(self.close_clicked)
+
     def dicoms_send(self):
+        # TODO: Add mechanism for sending DICOMs in background task
+
         if not self.selected_scan:
             return
 
         try:
-            ui_runtime.send_dicoms(
+            dicomexport.send_dicoms(
                 self.selected_scan.dir / "dicom",
                 ui_runtime.get_config().dicom_targets[
                     self.dicomTargetComboBox.currentIndex()

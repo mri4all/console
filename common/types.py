@@ -43,7 +43,7 @@ class ExamInformation(BaseModel):
 
     def initialize(self):
         self.id = helper.generate_uid()
-        self.dicom_study_uid: str = pydicom.uid.generate_uid()
+        self.dicom_study_uid: str = pydicom.uid.generate_uid()  # type: ignore
         self.scan_counter = 0
         self.patient_position = ""
         self.acc = ""

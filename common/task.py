@@ -94,7 +94,7 @@ def create_task(
     return str(scan_name)
 
 
-def read_task(folder) -> ScanTask:
+def read_task(folder) -> Any:
     """
     Reads the task file from the provided dictionary.
     """
@@ -167,6 +167,8 @@ def delete_task(folder) -> bool:
     except Exception:
         log.error(f"Unable to delete task folder {folder}")
         return False
+
+    return True
 
 
 def set_task_state(folder: str, state: str, value: bool) -> bool:
