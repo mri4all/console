@@ -9,7 +9,7 @@ import pickle
 
 from PyQt5 import uic
 
-def view_sig(sig, folder):
+def view_sig(sig, folder=""):
     recon = np.fft.fft(np.fft.fftshift(sig))
     plt.style.use("dark_background")
     fig, ax = plt.subplots(2,1)
@@ -18,12 +18,13 @@ def view_sig(sig, folder):
     ax[1].plot(np.abs(recon))
     ax[1].set_title("fft signal")
     plt.show()
-    file = open(folder + "/other/rf_se_plot", 'wb')
-    fig = plt.gcf()
-    pickle.dump(fig, file)
-    file.close()
+    if folder != "":
+        file = open(folder + "/other/sig_plot", 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
 
-def view_traj_2d(k_traj_adc, k_traj, folder):
+def view_traj_2d(k_traj_adc, k_traj, folder=""):
     plt.style.use("dark_background")
     # fig, ax = plt.subplots()
     fig = plt.figure()
@@ -35,10 +36,12 @@ def view_traj_2d(k_traj_adc, k_traj, folder):
     ax.set_ylabel('ky')
     ax.set_title('K-space Trajactory')
     plt.show()  # Display the plots
-    file = open(folder + "/other/rf_se_plot", 'wb')
-    fig = plt.gcf()
-    pickle.dump(fig, file)
-    file.close()
+
+    if folder != "":
+        file = open(folder + "/other/traj_plot", 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
     # plt.figure()
     # plt.style.use("dark_background")
     # plt.plot(k_traj[0,:], k_traj[1,:],color='b',linewidth=1)
@@ -49,7 +52,7 @@ def view_traj_2d(k_traj_adc, k_traj, folder):
     # plt.title('K-space Trajactory')
     # plt.show()  # Display the plots
 
-def view_traj_3d(k_traj_adc, k_traj, folder):
+def view_traj_3d(k_traj_adc, k_traj, folder=""):
 
     k_traj_adc = evenly_sample_array(k_traj_adc,300)
     k_traj = evenly_sample_array(k_traj,300)
@@ -65,10 +68,12 @@ def view_traj_3d(k_traj_adc, k_traj, folder):
     ax.set_zlabel('kz')
     ax.set_title('K-space Trajactory')
     plt.show()  # Display the plots
-    file = open(folder + "/other/rf_se_plot", 'wb')
-    fig = plt.gcf()
-    pickle.dump(fig, file)
-    file.close()
+
+    if folder != "":
+        file = open(folder + "/other/traj_plot", 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
 
 def evenly_sample_array(x, y):
     """
