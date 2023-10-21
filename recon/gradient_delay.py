@@ -1,6 +1,6 @@
 import numpy as np
 
-def grad_delay_correction(kData, delayT, ETL, BW, )
+def grad_delay_correction(kData, delayT, tsk, kTraj)
     pass
 
 # for l in range(L + 1):

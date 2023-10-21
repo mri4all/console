@@ -35,11 +35,11 @@ def pypulseq_se2D(
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
-    num_averages = inputs['NSA']
-    Orientation = inputs['Orientation']
-    fov = inputs['FOV'] / 1000
-    Nx = inputs['Base_Resolution']
-    BW = inputs['BW']
+    num_averages = inputs["NSA"]
+    Orientation = inputs["Orientation"]
+    fov = inputs["FOV"] / 1000
+    Nx = inputs["Base_Resolution"]
+    BW = inputs["BW"]
     # Trajectory = inputs['Trajectory']     TODO
     # PE_Ordering = inputs['PE_Ordering']   TODO
     # PF = inputs['PF']                     TODO
