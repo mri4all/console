@@ -30,7 +30,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
-        make_rf_se.pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+                              "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
