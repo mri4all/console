@@ -64,7 +64,7 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"B0 correction finished.")
 
     try:
-        iData = denoise.remove_gaussian_noise_complex(iData)
+        iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")
         log.info(f"Finished image denoising.")
     except ValueError:
         log.error(f"Image denoising failed.")

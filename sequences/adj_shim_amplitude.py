@@ -99,16 +99,16 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         axes = ['x', 'y', 'z']
         log.info("Running sequence " + self.get_name())
         
-        range = 0.1
+        shim_range = 0.1
         
-        for shim_iter in range(n_iter_linear):
+        for shim_iter in range(int(n_iter_linear)):
             
             for channel in axes:
                 log.info(f"Updating {channel} linear shim (iter {shim_iter})")
                 shim_weight = shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=LARMOR_FREQ,
                         channel=channel,
-                        range=range,
+                        range=shim_range,
                         shim_points=5,
                         points=2,
                         iterations=1,

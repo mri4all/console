@@ -104,7 +104,7 @@ def remove_gaussian_noise(image, sigma=0.2):
 
     Parameters:
     image (numpy.ndarray): The input image from which noise is to be removed.
-    sigma (float, optional): The standard deviation for the Gaussian kernel. Default is 5.
+    sigma (float, optional): The standard deviation for the Gaussian kernel.
 
     Returns:
     numpy.ndarray: The denoised image.
@@ -154,6 +154,8 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
         real_part_denoised = apply_total_variation_denoise(real_part)
         imag_part_denoised = apply_total_variation_denoise(imag_part)
     else:
+        real_part_denoised = real_part
+        imag_part_denoised = imag_part
         log.error(f"Method {method} not recognized.")
 
     # Combine the denoised real and imaginary parts to form the denoised complex image

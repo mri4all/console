@@ -21,9 +21,9 @@ path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 class Configuration(BaseModel):
     scanner_ip: str = "10.42.0.251"
+    dicom_targets: List[DicomTarget] = []
     # bar_string: str = ""
     # foo_int: int = 0
-    dicom_targets: List[DicomTarget] = []
 
     @classmethod
     def load_from_file(cls):
