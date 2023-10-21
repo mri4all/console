@@ -4,6 +4,8 @@ from PyQt5 import uic
 
 from pathlib import Path
 
+from external.seq.adjustments_acq.calibration import shim_cal_linear
+import external.seq.adjustments_acq.config as cfg
 from common.ipc.ipc import *
 
 import common.logger as logger
@@ -23,7 +25,7 @@ LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
 log = logger.get_logger()
 
 
-class CalShimAmplitudeManual(PulseqSequence, registry_key=Path(__file__).stem):
+class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
         return "Manually set B0 shims"
@@ -147,11 +149,12 @@ class CalShimAmplitudeManual(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         
         # calculate the linear shim 
+        axes = ['x', 'y', 'z']
         log.info("Running manual shimming")
     
         k = Communicator(Communicator.RECON)
 
         result = k.do_shim(self.new_user_values, self.new_signal)
         
-        log.info(f"Manual shimming finished, result = {result}")
+        log.info("Manual shimming finished")
         return True

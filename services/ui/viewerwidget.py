@@ -174,8 +174,8 @@ class ViewerWidget(QWidget):
         self.layout().addWidget(self.widget)
 
     def load_pickled_plot(self, input_path, task: Optional[ScanTask] = None):
-        self.set_empty_viewer()
         if not input_path:
+            self.set_empty_viewer()
             return
         
         pickled_file_path = Path(input_path)
