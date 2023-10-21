@@ -10,6 +10,8 @@ from pydicom.uid import UID
 from pydicom.uid import ImplicitVRLittleEndian
 import datetime
 from pydicom.dataset import FileDataset, FileMetaDataset
+from common.types import ResultItem
+from common.constants import *
 
 def write_dicom(image_ndarray, task, folder):
     ''' 
@@ -36,11 +38,20 @@ def write_dicom(image_ndarray, task, folder):
         dicom_dataset = set_image_information(dicom_dataset, pixel_data)
         dicom_dataset = set_window_width_level(dicom_dataset, pixel_data)
         dicom_dataset.PixelData = pixel_data.tobytes()
-        dicom_filename = 'Series_' + str(SeriesNumber) + '#' + str(instance_counter) + '.dcm'
+        dicom_filename = 'series' + str(SeriesNumber) + '#' + str(instance_counter) + '.dcm'
         dicom_dataset.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         dicom_file_path = os.path.join(folder, dicom_filename)
         dicom_dataset.save_as(dicom_file_path)
         instance_counter = instance_counter + 1
+        
+    result = ResultItem()
+    result.name = "Dicoms for " + task.sequence
+    result.description = "DICOM series for Series" + str(SeriesNumber)
+    result.type = "dicom"
+    result.primary = True
+    result.autoload_viewer = 1
+    result.file_path = mri4all_taskdata.DICOM + "/" + "series" + str(SeriesNumber) + "#"
+    task.results.append(result)
         
     return
 

@@ -13,6 +13,7 @@ from sequences import PulseqSequence
 from sequences import make_se_2D
 from sequences.common import view_traj
 import common.logger as logger
+from common.types import ResultItem
 
 log = logger.get_logger()
 
@@ -140,6 +141,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                     "PF": self.param_PF,"view_traj": self.param_view_traj},
             check_timing=True,
             output_file=self.seq_file_path,
+            output_folder=self.get_working_folder(),
         )
         # elif self.Trajectory == "Radial":
         # pypulseq_se2D_radial(
@@ -148,6 +150,18 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
+
+        if self.param_view_traj is True:
+            log.info("Displaying trajectory... " + self.get_name())
+            result = ResultItem()
+            result.name = "traj plot"
+            result.description = "Plot of trajectory in k space of current sequence."
+            result.type = "plot"
+            result.primary = True
+            result.autoload_viewer = 1
+            result.file_path = 'other/traj.plot'
+            scan_task.results.append(result)
+
         return True
 
     def run_sequence(self, scan_task) -> bool:

@@ -3,7 +3,9 @@ from pathlib import Path
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
+from common.types import ResultItem
 from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
@@ -147,7 +149,33 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # plt.plot(np.abs(recon))
             # plt.title("fft signal")
             # plt.show()
-            view_traj.view_sig(rxd, self.get_working_folder())
+
+            # view_traj.view_sig(rxd, self.get_working_folder())
+
+            log.info("Plotting figure now")
+            plt.style.use("dark_background")
+            plt.subplot(121)
+            plt.title('Acq signal')
+            plt.grid(False)
+            plt.plot(np.abs(rxd))
+            plt.subplot(122)
+            recon = np.fft.fft(np.fft.fftshift(rxd))
+            plt.plot(np.abs(recon))
+            plt.title("FFT signal")
+            if self.param_debug_plot:
+                plt.show()
+            file = open(self.get_working_folder() + "/other/se_1D.plot", 'wb')
+            fig = plt.gcf()
+            pickle.dump(fig, file)
+            file.close()
+            result = ResultItem()
+            result.name = "demo"
+            result.description = "This is just a plot"
+            result.type = "plot"
+            result.primary = True
+            result.autoload_viewer = 1
+            result.file_path = 'other/se_1D.plot'
+            scan_task.results.append(result)
 
 
         log.info("Done running sequence " + self.get_name())

@@ -11,7 +11,7 @@ log = logger.get_logger()
 
 
 def pypulseq_se2D(
-    inputs=None, check_timing=True, output_file="") -> bool:
+    inputs=None, check_timing=True, output_file="", output_folder="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -207,7 +207,7 @@ def pypulseq_se2D(
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_k)
         log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
-        view_traj.view_traj_2d(k_traj_adc, k_traj)
+        view_traj.view_traj_2d(k_traj_adc, k_traj, output_folder)
 
     # Save sequence
     log.debug(output_file)

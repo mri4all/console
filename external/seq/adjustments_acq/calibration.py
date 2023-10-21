@@ -15,12 +15,13 @@ from external.marcos_client.examples import trap_cent  # pylint: disable=import-
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
 import common.helper as helper
+from common.types import ResultItem
 from sequences import SequenceBase
 from common.types import ScanTask
 
 
 def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
-                       shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
+                       shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, working_folder = ".", delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
     Used to find a starting point, not for precision
@@ -109,10 +110,18 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
     
-        file = open('serialized_plot', 'wb')
+        file = open(working_folder + "/other/adj_frequency.plot", 'wb')
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
+        plot_result = ResultItem()
+        plot_result.name = "demo"
+        plot_result.description = "This is just a plot"
+        plot_result.type = "plot"
+        plot_result.primary = True
+        plot_result.autoload_viewer = 1
+        plot_result.file_path = 'other/adj_frequency.plot'
+
 
     # Plot noise figure
     if plot:
@@ -131,7 +140,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  }
 
     # Return the frequency that worked the best with SNR
-    return max_freq, max_snr_freq, data_dict
+    return max_freq, max_snr_freq, data_dict, plot_result
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,

@@ -1,3 +1,4 @@
+import os
 from sequences.adj_shim_amplitude import CalShimAmplitude
 from sequences import SequenceBase
 from sequences.common.util import reading_json_parameter, writing_json_parameter
@@ -6,16 +7,21 @@ from common.ipc import Communicator
 
 from common.ipc import Communicator
 
+import common.helper as helper
+import common.logger as logger
+log = logger.get_logger()
+
+
 
 def new_user_values(values):
-    # gets passed in the new values ... will need to respond
+    # gets passed in the new values ... will need to respond 
     # SET SHIMX, SHIMY, SHIMZ
 
-    configuration_data = reading_json_parameter()
+    configuration_data=reading_json_parameter()
 
-    configuration_data.shim_parameters.shim_x = values["x"] / 1000
-    configuration_data.shim_parameters.shim_y = values["y"] / 1000
-    configuration_data.shim_parameters.shim_z = values["z"] / 1000
+    configuration_data.shim_parameters.shim_x = values['x']
+    configuration_data.shim_parameters.shim_y = values['y']
+    configuration_data.shim_parameters.shim_z = values['z']
 
     writing_json_parameter(config_data=configuration_data)
 

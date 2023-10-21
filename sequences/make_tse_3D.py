@@ -11,7 +11,7 @@ from sequences.common import view_traj
 log = logger.get_logger()
 
 
-def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file="") -> bool:
+def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file="", output_folder="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -231,7 +231,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_kx)
         log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
-        view_traj.view_traj_3d(k_traj_adc, k_traj)
+        view_traj.view_traj_3d(k_traj_adc, k_traj, output_folder)
 
     log.debug(output_file)
     try:

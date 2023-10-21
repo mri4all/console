@@ -12,6 +12,7 @@ from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
 from sequences import make_tse_3D
 import common.logger as logger
+from common.types import ResultItem
 
 log = logger.get_logger()
 
@@ -146,7 +147,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             },
             check_timing=True,
             output_file=self.seq_file_path,
-            pe_order_file=self.get_working_folder() + "/rawdata/pe_order.npy"
+            pe_order_file=self.get_working_folder() + "/rawdata/pe_order.npy",
+            output_folder=self.get_working_folder(),
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
@@ -155,6 +157,17 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
+        if self.param_view_traj is True:
+            log.info("Displaying trajectory... " + self.get_name())
+            result = ResultItem()
+            result.name = "traj plot"
+            result.description = "Plot of trajectory in k space of current sequence."
+            result.type = "plot"
+            result.primary = True
+            result.autoload_viewer = 1
+            result.file_path = 'other/traj.plot'
+            scan_task.results.append(result)
+
         return True
 
     def run_sequence(self, scan_task) -> bool:
