@@ -6,7 +6,7 @@ from external.seq.adjustments_acq.calibration import rf_max_cal
 import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
-from sequences.rf_se import make_rf_se  # type: ignore
+from sequences import make_rf_se  # type: ignore
 from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 log = logger.get_logger()

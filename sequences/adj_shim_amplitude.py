@@ -6,7 +6,7 @@ import external.seq.adjustments_acq.config as cfg
 import common.logger as logger
 
 from sequences import PulseqSequence
-from sequences.rf_se import make_rf_se, SequenceRF_SE
+from sequences import make_rf_se, SequenceRF_SE
 
 import configparser
 from sequences.common.util import reading_json_parameter, writing_json_parameter
