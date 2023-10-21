@@ -30,6 +30,7 @@ class SystemStatusWindow(QDialog):
         self.setWindowTitle("System Status")
 
         # State variables
+        self.first_check = True
         self.acq_running = True
         self.recon_running = True
         self.check_is_active = False
@@ -153,15 +154,16 @@ class SystemStatusWindow(QDialog):
         self.check_is_active = True
 
         current_acq_status = self.get_acq_service_status()
-        if current_acq_status != self.acq_running:
+        if current_acq_status != self.acq_running or self.first_check:
             self.acq_running = current_acq_status
             self.update_acq_ui(self.acq_running)
 
         current_recon_status = self.get_recon_service_status()
-        if current_recon_status != self.recon_running:
+        if current_recon_status != self.recon_running or self.first_check:
             self.recon_running = current_recon_status
             self.update_recon_ui(self.recon_running)
 
+        self.first_check = False
         self.check_is_active = False
 
     def update_acq_ui(self, status):
