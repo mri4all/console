@@ -13,6 +13,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences import PulseqSequence
 from sequences import make_se_1D
 import common.logger as logger
+from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -141,15 +142,16 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
         # Debug
         if 1>0: # TODO: set debug mode
-            plt.figure()
-            plt.subplot(121)
-            plt.plot(np.abs(rxd))
-            plt.title("acq signal")
-            plt.subplot(122)
-            recon = np.fft.fft(np.fft.fftshift(rxd))
-            plt.plot(np.abs(recon))
-            plt.title("fft signal")
-            plt.show()
+            # plt.figure()
+            # plt.subplot(121)
+            # plt.plot(np.abs(rxd))
+            # plt.title("acq signal")
+            # plt.subplot(122)
+            # recon = np.fft.fft(np.fft.fftshift(rxd))
+            # plt.plot(np.abs(recon))
+            # plt.title("fft signal")
+            # plt.show()
+            view_traj.view_sig(rxd)
 
 
         log.info("Done running sequence " + self.get_name())

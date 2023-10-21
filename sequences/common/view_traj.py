@@ -8,6 +8,16 @@ from pypulseq.Sequence import parula
 
 from PyQt5 import uic
 
+def view_sig(sig):
+    recon = np.fft.fft(np.fft.fftshift(sig))
+    plt.style.use("dark_background")
+    fig, ax = plt.subplot(1,2)
+    ax[0,0].plot(np.abs(sig))
+    ax[0,0].title("acq signal")
+    ax[0,1].plot(np.abs(recon))
+    ax[0,1].title("fft signal")
+    plt.show()
+
 def view_traj_2d(k_traj_adc, k_traj):
     plt.style.use("dark_background")
     # fig, ax = plt.subplots()
