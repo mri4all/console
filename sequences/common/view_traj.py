@@ -5,31 +5,40 @@ import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib as mpl
 from pypulseq.Sequence import parula
+import pickle
 
 from PyQt5 import uic
 
-def view_sig(sig):
+def view_sig(sig, folder):
     recon = np.fft.fft(np.fft.fftshift(sig))
     plt.style.use("dark_background")
-    fig, ax = plt.subplot(1,2)
+    fig, ax = plt.subplots(1,2)
     ax[0,0].plot(np.abs(sig))
     ax[0,0].title("acq signal")
     ax[0,1].plot(np.abs(recon))
     ax[0,1].title("fft signal")
     plt.show()
+    file = open(folder + "/other/rf_se_plot", 'wb')
+    fig = plt.gcf()
+    pickle.dump(fig, file)
+    file.close()
 
-def view_traj_2d(k_traj_adc, k_traj):
+def view_traj_2d(k_traj_adc, k_traj, folder):
     plt.style.use("dark_background")
     # fig, ax = plt.subplots()
     fig = plt.figure()
     ax = fig.gca()
-    # ax.plot(k_traj[0,:], k_traj[1,:],linewidth=1)
+    ax.plot(k_traj[0,:], k_traj[1,:],linewidth=1)
     ax.plot(k_traj_adc[0,:], k_traj_adc[1,:], 'm.',markersize=0.5)
     ax.set_aspect('equal')
     ax.set_xlabel('kx')
     ax.set_ylabel('ky')
     ax.set_title('K-space Trajactory')
     plt.show()  # Display the plots
+    file = open(folder + "/other/rf_se_plot", 'wb')
+    fig = plt.gcf()
+    pickle.dump(fig, file)
+    file.close()
     # plt.figure()
     # plt.style.use("dark_background")
     # plt.plot(k_traj[0,:], k_traj[1,:],color='b',linewidth=1)
@@ -40,7 +49,7 @@ def view_traj_2d(k_traj_adc, k_traj):
     # plt.title('K-space Trajactory')
     # plt.show()  # Display the plots
 
-def view_traj_3d(k_traj_adc, k_traj):
+def view_traj_3d(k_traj_adc, k_traj, folder):
 
     k_traj_adc = evenly_sample_array(k_traj_adc,300)
     k_traj = evenly_sample_array(k_traj,300)
@@ -56,6 +65,10 @@ def view_traj_3d(k_traj_adc, k_traj):
     ax.set_zlabel('kz')
     ax.set_title('K-space Trajactory')
     plt.show()  # Display the plots
+    file = open(folder + "/other/rf_se_plot", 'wb')
+    fig = plt.gcf()
+    pickle.dump(fig, file)
+    file.close()
 
 def evenly_sample_array(x, y):
     """
