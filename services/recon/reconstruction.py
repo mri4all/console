@@ -1,13 +1,10 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
-import os
-from os import path
 
 from recon.kspaceFiltering.kspace_filtering import *
 
 from recon.B0Correction import B0Corrector
-import recon.recon_utils as ru
 import recon.DICOM.DICOM_utils as DICOM
 from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
 
@@ -23,39 +20,13 @@ from common.types import ScanTask
 import services.recon.utils as utils
 import time
 
-<<<<<<< HEAD
-
-def run_reconstruction(folder: str, task: ScanTask) -> bool:
-    """
-    Perform the reconstruction of the scan contained in the given folder. Scan information such
-    as sequence, protocol name, patient information and system information can be found in the
-    task object.
-    """
-    log.info(f"Folder where the task is = {folder}")
-    log.info(f"JSON information = {task}")
-
-    log.info(f"Starting reconstruction.")
-
-    if task.processing.recon_mode == "bypass":
-        return True
-
-    if task.processing.recon_mode == "fake_dicoms":
-        utils.generate_fake_dicoms(folder, task)
-        time.sleep(2)
-        return True
-    
-    # list fnames in folder
-    fnames = os.listdir(folder)
-
-=======
-def run_recon_Cartesian():
->>>>>>> 7cddbe97f34dd109ef0d4d4a732d4ea05e60652b
+def run_recon_Cartesian(self, folder, task):
     # TODO: run_cartesian(folder, task) based on recon mode?
     # TODO: Load the k-space data
-    kData = np.load(folder + "rawdata" + "/kSpace.npy")
+    kData = np.load(folder + "rawdata" + "/kSpace.npy")  #TODO: Zach
     kTraj = np.genfromtxt(
-        r"%s/%s/trajectory.csv" % (folder), delimiter=","
-    )  # pe_table a lot by 2 # check rotation
+        r"%s/%s/trajectory.csv" % (folder), delimiter="," #TODO: Zach
+    )# pe_table a lot by 2 # check rotation
 
     if kTraj.shape[0] > 2:
         kTraj = np.rot90(kTraj)
@@ -66,11 +37,9 @@ def run_recon_Cartesian():
     log.info(f"kSpace {filterType} filtering finished.")
 
     # TODO(Zach, Shounak): Use the trajectory information and B0 map
-    fname_B0_map = list(filter(lambda x: "B0_map" in x, fnames))
-        
     Y = np.ndarray
     kt = np.ndarray
-    df = np.load(path.join(folder,fname_B0_map[0])) if fname_B0_map else None
+    df = np.ndarray
     Lx = 1
     nonCart = None
     params = None
@@ -111,6 +80,6 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
 
-    run_recon_Cartesian()
+    run_recon_Cartesian(folder, task)
     
     return True
