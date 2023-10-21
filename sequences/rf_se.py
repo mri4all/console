@@ -158,18 +158,18 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
                 plt.show()
                 
             
-            file = open(self.get_working_folder() + "/other/rf_se_plot", 'wb')
+            file = open(self.get_working_folder() + "/other/rf_se.plot", 'wb')
             fig = plt.gcf()
             pickle.dump(fig, file)
             file.close()
 
             result = ResultItem()
             result.name = "demo"
-            result.description = "This is just a fake dicom series"
-            result.type = "other"
+            result.description = "This is just a plot"
+            result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1
-            result.file_path = self.get_working_folder() + '/other'
+            result.file_path = 'other/rf_se.plot'
             scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())
