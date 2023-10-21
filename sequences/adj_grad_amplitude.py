@@ -6,7 +6,7 @@ import external.seq.adjustments_acq.config as cfg
 import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
-from sequences.rf_se import pypulseq_rfse  # type: ignore
+from sequences import make_rf_se  # type: ignore
 from sequences.common.util import reading_json_parameter, writing_json_parameter
 
 import configparser
@@ -28,7 +28,8 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+                              "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -52,20 +53,25 @@ class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                     larmor_freq=cfg.LARMOR_FREQ,
                     calibration_power=0.8,
                     trs=3,
+                    range=0.05,
                     tr_spacing=2e6,
                     echo_duration=5000,
                     readout_duration=500,
                     rx_period=25 / 3,
                     RF_PI2_DURATION=50,
-                    rf_max=RF_MAX,
+                    rf_max=cfg.RF_MAX,
                     trap_ramp_duration=50,
                     trap_ramp_pts=5,
                     plot=True,
                 )
-
-        # updating the Larmor frequency in the config.json file
-        configuration_data.rf_parameters.rf_maximum_amplitude_Hze = grad_max
-        writing_json_parameter(config_data=configuration_data)
+                
+            if axis == 'x':
+                configuration_data.gradients_parameters.gx_maximum = grad_max
+            elif axis == 'y':
+                configuration_data.gradients_parameters.gy_maximum = grad_max
+            elif axis == 'z':   
+                configuration_data.gradients_parameters.gz_maximum = grad_max
+            writing_json_parameter(config_data=configuration_data)
 
         log.info("Done running sequence " + self.get_name())
         return True
