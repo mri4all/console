@@ -1,10 +1,13 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
+import os
+from os import path
 
 from recon.kspaceFiltering.kspace_filtering import *
 
 from recon.B0Correction import B0Corrector
+import recon.recon_utils as ru
 import recon.DICOM.DICOM_utils as DICOM
 from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
 
@@ -39,7 +42,9 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         utils.generate_fake_dicoms(folder, task)
         time.sleep(2)
         return True
-
+    
+    # list fnames in folder
+    fnames = os.listdir(folder)
 
     # TODO: run_cartesian(folder, task) based on recon mode?
     # TODO: Load the k-space data
@@ -57,9 +62,11 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"kSpace {filterType} filtering finished.")
 
     # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    fname_B0_map = list(filter(lambda x: "B0_map" in x, fnames))
+        
     Y = np.ndarray
     kt = np.ndarray
-    df = np.ndarray
+    df = np.load(path.join(folder,fname_B0_map[0])) if fname_B0_map else None
     Lx = 1
     nonCart = None
     params = None
