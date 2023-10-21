@@ -103,7 +103,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_NSA = widget.NSA_SpinBox.value()
         self.param_Orientation = widget.Orientation_ComboBox.currentText()
         self.param_FOV = widget.FOV_SpinBox.value()
-        self.Base_Resolution = widget.Base_Resolution_SpinBox.value()
+        self.param_Base_Resolution = widget.Base_Resolution_SpinBox.value()
         self.param_BW = widget.BW_SpinBox.value()
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
         self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
@@ -126,7 +126,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                     "NSA": self.param_NSA, 
                     "FOV": self.param_FOV,
                     "Orientation":self.param_Orientation,
-                    "Base_Resolution": self.Base_Resolution,
+                    "Base_Resolution": self.param_Base_Resolution,
                     "BW":self.BW,
                     "Trajectory":self.param_Trajectory,
                     "PE_Ordering":self.param_PE_Ordering,
