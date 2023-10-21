@@ -98,7 +98,7 @@ def apply_total_variation_denoise(image, weight=0.1, channel_axis=-1):
     return image_tv_chambolle
 
 
-def remove_gaussian_noise(image, sigma=5):
+def remove_gaussian_noise(image, sigma=0.2):
     """
     Removes Gaussian noise from the input image.
 
