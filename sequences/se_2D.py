@@ -23,9 +23,9 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_TE: int = 20
     param_TR: int = 3000
     param_NSA: int = 1
-    param_FOV: int = 40
+    param_FOV: int = 20
     param_Orientation: str = "Axial"
-    param_Base_Resolution: int = 70
+    param_Base_Resolution: int = 96
     param_BW: int = 32000
     param_Trajectory: str = "Catisian"
     param_PE_Ordering: str = "Center_out"
@@ -61,7 +61,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                 "NSA": 1, 
                 "FOV": 20,
                 "Orientation":"Axial",
-                "Base_Resolution": 70,
+                "Base_Resolution": 96,
                 "BW": 32000,
                 "Trajectory":"Cartesian",
                 "PE_Ordering":"Center_out",
