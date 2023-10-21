@@ -84,6 +84,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
 
     def calculate_sequence(self, scan_task) -> bool:
+        scan_task.processing.recon_mode = "bypass"
+
         self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
         make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
@@ -93,7 +95,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self, scan_task, n_iter_linear=1, refine_multicoil=False) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         
         # calculate the linear shim 
         axes = ['x', 'y', 'z']
@@ -138,9 +140,6 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             else:
                 range = range
         
-        # refine the multicoil shim 
-        if refine_multicoil:
-            log.info("MC shimming selected, not yet implemented")
         
         log.info("Done running sequence " + self.get_name())
         return True
