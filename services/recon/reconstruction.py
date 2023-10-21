@@ -20,7 +20,7 @@ from recon.image_filters import denoise
 log = logger.get_logger()
 
 
-def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
+def run_reconstruction_cartesian(folder: str, task: ScanTask):
     """
     Runs the reconstruction pipeline for Cartesian sampling
     """
@@ -38,7 +38,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
 
     if kTraj.shape[0] > 2:
         kTraj = np.rot90(kTraj)
-    # kData = grad_delay_correction(kData, kTraj, delayT, etLength, BW, ESP)
+    # grad_delay_correction(kData, kTraj, delayT, param)
 
     filterType = "fermi"
     kData = kFilter(kData, filterType, center_correction=True)
