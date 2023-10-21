@@ -18,6 +18,13 @@ from pydantic import BaseModel
 from common.constants import *
 from common.ipc.messages import *
 
+from common.types import ScanTask
+import common.helper as helper
+
+from sequences.adj_shim_amplitude import CalShimAmplitude
+from sequences import SequenceBase
+from sequences.common.util import reading_json_parameter, writing_json_parameter
+
 
 class PipeFile(Enum):
     """
@@ -160,11 +167,37 @@ class Communicator(QObject, Helper):
 
 
 def new_user_values(values):
+    # gets passed in the new values ... will need to respond 
+    # SET SHIMX, SHIMY, SHIMZ
+    
+    configuration_data=reading_json_parameter()
+
+    configuration_data.shim_parameters.shim_x = values['x']
+    configuration_data.shim_parameters.shim_y = values['y']
+    configuration_data.shim_parameters.shim_z = values['z']
+
+    writing_json_parameter(config_data=configuration_data)
+
     print(values)
 
 
-def new_signal():
-    return np.random.normal(size=20).tolist()
+def new_signal(temp_folder):
+    # Run the rf_se with the updated shim parameters
+    scan_task = ScanTask()
+    
+    sequence_name = "rf_se"
+
+    sequence_instance = SequenceBase.get_sequence(sequence_name)()
+    # Get the default parameters from the sequence as an example
+    default_parameters = sequence_instance.get_default_parameters()
+    # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+    sequence_instance.set_parameters(default_parameters, scan_task)
+    sequence_instance.set_working_folder(temp_folder)
+    sequence_instance.calculate_sequence(scan_task)
+    sequence_instance.run_sequence(scan_task, Debug=False)
+    # return the new signal that is produced by user values. should return the FFT or whatever
+    # MEASURE THE FFT OF THE SIGNAL
+    return sequence_instance.rxd.tolist()
 
 
 if __name__ == "__main__":

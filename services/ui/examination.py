@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta
-from services.ui.shimBox import ShimBox
+from services.ui.shimbox import ShimBox
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -33,9 +33,10 @@ import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
 import services.ui.taskviewer as taskviewer
 import services.ui.studyviewer as studyviewer
+import services.ui.protocolbrowser as protocolbrowser
 from sequences import SequenceBase
 from services.ui.viewerwidget import MplCanvas, ViewerWidget
-from services.ui.customMessageBox import CustomMessageBox  # type: ignore
+from services.ui.custommessagebox import CustomMessageBox  # type: ignore
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -91,6 +92,9 @@ class ExaminationWindow(QMainWindow):
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionConfiguration.triggered.connect(configuration.show_configuration)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
+        self.actionProtocol_Browser.triggered.connect(
+            protocolbrowser.show_protocol_browser
+        )
 
         self.menuDebug.menuAction().setVisible(rt.is_debugging_enabled())
         self.actionDebug_update_scan_list.triggered.connect(self.debug_update_scan_list)
@@ -99,6 +103,9 @@ class ExaminationWindow(QMainWindow):
         self.protocolBrowserButton.setToolTip("Open protocol browser")
         self.protocolBrowserButton.setIcon(qta.icon("fa5s.list"))
         self.protocolBrowserButton.setIconSize(QSize(32, 32))
+        self.protocolBrowserButton.clicked.connect(
+            protocolbrowser.show_protocol_browser
+        )
 
         self.resultsViewerButton.setText("")
         self.resultsViewerButton.setToolTip("Open results viewer")

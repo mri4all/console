@@ -1,8 +1,13 @@
+import os
+import common.logger as logger
+
+
 from time import sleep
 from typing import Any, Dict, List, Literal, Optional, Union
 import numpy as np
 from pydantic import BaseModel
 
+import common.helper as helper_common
 from common.types import IntensityMapResult, TimeSeriesResult
 
 
@@ -60,7 +65,16 @@ class Helper:
         return self._query(ShowDicomMessage(dicom_files=dicoms))
 
     def do_shim(self, new_user_values, new_signal, signal_tick_mul=4, values_tick=0.1):
+        log = logger.get_logger()
         self.shim_start()
+        
+        temp_folder = "/tmp/" + helper_common.generate_uid()
+    
+        try:
+            os.mkdir(temp_folder)
+        except:
+            log.error(f"Could not create temporary folder {temp_folder}.")
+            
         n = 0
         while True:
             result = self.shim_get()
@@ -69,7 +83,7 @@ class Helper:
                 return result.response["values"]
             if n >= signal_tick_mul:
                 n = 0
-                self.shim_put(new_signal())
+                self.shim_put(new_signal(temp_folder))
             n = n + 1
             sleep(values_tick)
 

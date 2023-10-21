@@ -61,7 +61,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                 "Base_Resolution": 70,
                 "BW": 32000,
                 "Trajectory":"Cartesian",
-                "PE_Ordering":"center_out",
+                "PE_Ordering":"Center_out",
                 "PF": 1
                 }
 

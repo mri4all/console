@@ -92,7 +92,7 @@ class ConfigurationWindow(QDialog):
         self.tree.currentItemChanged.connect(self.start_edit)
         self.settingsWidget.currentItemChanged.connect(self.start_edit)
         self.generalSettingsWidget.setStyleSheet(
-            "QLineEdit{background-color: #0C1123;}"
+            "QLineEdit{ background-color: #0C1123; }"
         )
         self.dicomTargetWidget.setStyleSheet("QLineEdit{background-color: #0C1123;}")
 
@@ -104,6 +104,7 @@ class ConfigurationWindow(QDialog):
 
     def make_target_item(self, target: DicomTarget):
         item = editable(QTreeWidgetItem([target.name]))
+        item.setToolTip(0, "Double click to edit name")
         item.setData(0, 1, "name")
         item.setData(1, 1, "name")
         for c in ["ip", "port", "aet_target", "aet_source"]:
