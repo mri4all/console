@@ -192,5 +192,11 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         plt.title("imag")
         plt.show()
 
+
+        # save the raw data file
+        self.raw_file_path = self.get_working_folder() + "/rawdata/raw.npy"
+        np.save(self.raw_file_path, rxd)
+
+        log.info("Saving rawdata, sequence " + self.get_name())
         return True
 
