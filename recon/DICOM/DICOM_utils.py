@@ -123,6 +123,7 @@ def set_protocol_information(dicom_dataset, ProtocolInformation):
 def set_parameters(dicom_dataset, parameters, instance_num):
     ''' Fill sequence parameter information in DICOM header'''
     dicom_dataset.Modality = "MR"
+    dicom_dataset.MagneticFieldStrength = 0.048
     dicom_dataset.ScanningSequence = "TSE"
     dicom_dataset.SequenceVariant = ""
     dicom_dataset.ScanOptions = ""
@@ -196,4 +197,5 @@ def set_misc_information(dicom_dataset):
     dicom_dataset.HighBit = 15
     dicom_dataset.is_little_endian = True
     dicom_dataset.is_implicit_VR = True
+    dicom_dataset.SpecificCharacterSet="ISO_IR 100"
     return dicom_dataset
