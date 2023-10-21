@@ -45,7 +45,7 @@ def write_dicom(image_ndarray, task, folder):
         instance_counter = instance_counter + 1
         
     result = ResultItem()
-    result.name = "demo"
+    result.name = "Dicoms for " + task.sequence
     result.description = "DICOM series for Series" + str(SeriesNumber)
     result.type = "dicom"
     result.primary = True
