@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta
-from services.ui.shimBox import ShimBox
+from services.ui.shimbox import ShimBox
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -36,7 +36,7 @@ import services.ui.studyviewer as studyviewer
 import services.ui.protocolbrowser as protocolbrowser
 from sequences import SequenceBase
 from services.ui.viewerwidget import MplCanvas, ViewerWidget
-from services.ui.customMessageBox import CustomMessageBox  # type: ignore
+from services.ui.custommessagebox import CustomMessageBox  # type: ignore
 
 from services.ui.errors import SequenceUIFailed, UIException
 
