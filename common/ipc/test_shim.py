@@ -19,9 +19,9 @@ def new_user_values(values):
 
     configuration_data=reading_json_parameter()
 
-    configuration_data.shim_parameters.shim_x = values['x']
-    configuration_data.shim_parameters.shim_y = values['y']
-    configuration_data.shim_parameters.shim_z = values['z']
+    configuration_data.shim_parameters.shim_x = values['x']/1000
+    configuration_data.shim_parameters.shim_y = values['y']/1000
+    configuration_data.shim_parameters.shim_z = values['z']/1000
 
     writing_json_parameter(config_data=configuration_data)
 
