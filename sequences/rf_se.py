@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
+from common.types import ResultItem
 from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
@@ -139,6 +140,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
+        log.info("Pulseq ran, plotting")
+
 
         self.rxd = rxd
 
@@ -155,10 +158,19 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
                 plt.show()
                 
             
-            file = open('rf_se_plot', 'wb')
+            file = open(self.get_working_folder() + "/other/rf_se_plot", 'wb')
             fig = plt.gcf()
             pickle.dump(fig, file)
             file.close()
+
+            result = ResultItem()
+            result.name = "demo"
+            result.description = "This is just a fake dicom series"
+            result.type = "other"
+            result.primary = True
+            result.autoload_viewer = 1
+            result.file_path = self.get_working_folder() + '/other'
+            scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())
         return True
