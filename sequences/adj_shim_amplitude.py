@@ -43,7 +43,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def get_default_parameters(
         self
     ) -> dict:
-        return {"TE": 70, "TR": 250, "NSA": 1, "ADC_samples": 4096, "ADC_duration": 6400}
+        return {"TE": 70, "TR": 250, "NSA": 1, "ADC_samples": 4096, "ADC_duration": 6400, "N_ITER": 1}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -53,6 +53,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_NSA = parameters["NSA"]
             self.param_ADC_samples = parameters["ADC_samples"]
             self.param_ADC_duration = parameters["ADC_duration"]
+            self.param_N_ITER = parameters["N_ITER"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -64,6 +65,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         widget.NSA_SpinBox.setValue(self.param_NSA)
         widget.ADC_samples_SpinBox.setValue(self.param_ADC_samples)
         widget.ADC_duration_SpinBox.setValue(self.param_ADC_duration)
+        widget.N_ITER_SpinBox.setValue(self.param_N_ITER)
         
         return True
 
@@ -74,12 +76,15 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_NSA = widget.NSA_SpinBox.value()
         self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
         self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
+        self.param_N_ITER = widget.N_ITER_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
     def validate_parameters(self, scan_task) -> bool:
         if self.param_TE > self.param_TR:
             self.problem_list.append("TE cannot be longer than TR")
+        if self.param_N_ITER < 1:
+            self.problem_list.append("Cannot have less than 1 iteration")
         return self.is_valid()
 
 
