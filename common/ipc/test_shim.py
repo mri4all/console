@@ -33,6 +33,18 @@ def new_signal(temp_folder):
     scan_task = ScanTask()
 
     sequence_name = "rf_se"
+    
+    temp_folder = "/tmp/" + helper.generate_uid()
+    log.info(f"Using temporary folder: {temp_folder}")
+
+    try:
+        os.mkdir(temp_folder)
+        os.mkdir(temp_folder+'/other')
+        os.mkdir(temp_folder+'/dicom')
+        os.mkdir(temp_folder+'/rawdata')
+    except:
+        log.error(f"Could not create temporary folder {temp_folder}.")
+        return False
 
     sequence_instance = SequenceBase.get_sequence(sequence_name)()
     # Get the default parameters from the sequence as an example
