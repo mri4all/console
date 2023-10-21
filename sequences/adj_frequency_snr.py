@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search
+from external.seq.adjustments_acq.calibration import larmor_cal, larmor_step_search, load_plot_in_ui
 from sequences.common.util import reading_json_parameter, writing_json_parameter
 from sequences.common.pydanticConfig import Config
 
@@ -107,7 +107,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         working_folder = self.get_working_folder()
 
-        max_freq, max_snr_freq, data_dict,  plot_result_signal1, plot_result_noise1 = larmor_step_search(
+        max_freq, max_snr_freq, data_dict, fig_snr_signal1, fig_snr_noise1 = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
             steps=30,
@@ -116,15 +116,16 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
-            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
-        )
+        ) 
+        
+        plot_snr_result_signal1 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result_signal1", fig=fig_snr_signal1)
+        scan_task.results.append(plot_snr_result_signal1)
+        plot_snr_result_noise1 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result_noise1", fig=fig_snr_noise1)
+        scan_task.results.append(plot_snr_result_noise1)
 
-        scan_task.results.append(plot_result_signal1)
-        scan_task.results.append(plot_result_noise1)
-
-        opt_max_freq, opt_max_snr_freq, data_dict,  plot_result_signal2, plot_result_noise2 = larmor_step_search(
+        opt_max_freq, opt_max_snr_freq, data_dict, fig_snr_signal2, fig_snr_noise2 = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=max_snr_freq,
             steps=30,
@@ -133,15 +134,16 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
-            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
         )
 
-        scan_task.results.append(plot_result_signal2)
-        scan_task.results.append(plot_result_noise2)
+        plot_snr_result_signal2 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result_signal2", fig=fig_snr_signal2)
+        scan_task.results.append(plot_snr_result_signal2)
+        plot_snr_result_noise2 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result_noise2", fig=fig_snr_noise2)
+        scan_task.results.append(plot_snr_result_noise2)
 
-        larmor_freq, data_dict, plot_result1 = larmor_cal(
+        larmor_freq, data_dict, fig_snr1 = larmor_cal(
             seq_file=self.seq_file_path,
             larmor_start=opt_max_snr_freq,
             iterations=10,
@@ -152,13 +154,13 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
-            working_folder=working_folder,
             gui_test=False,
         )
         
-        scan_task.results.append(plot_result1)
+        plot_snr_result1 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result1", fig=fig_snr1)
+        scan_task.results.append(plot_snr_result1)
 
-        calibrated_larmor_freq, data_dict, plot_result2 = larmor_cal(
+        calibrated_larmor_freq, data_dict, fig_snr2 = larmor_cal(
             seq_file=self.seq_file_path,
             larmor_start=larmor_freq,
             iterations=10,
@@ -169,11 +171,11 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
-            working_folder=working_folder,
             gui_test=False,
         )
 
-        scan_task.results.append(plot_result2)
+        plot_snr_result2 = load_plot_in_ui(working_folder= working_folder, file_name = "plot_snr_result2", fig=fig_snr2)
+        scan_task.results.append(plot_snr_result2)
 
         print("Final Larmor frequency using SNR: " + str(calibrated_larmor_freq) + " MHz")
 

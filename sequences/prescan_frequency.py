@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.calibration import larmor_step_search
+from external.seq.adjustments_acq.calibration import larmor_step_search, load_plot_in_ui
 from sequences.common.util import reading_json_parameter, writing_json_parameter
 from sequences.common.pydanticConfig import Config
 
@@ -37,7 +37,9 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # reading configuration data from config.json
         configuration_data=reading_json_parameter()
 
-        max_freq, data_dict, plot_results = larmor_step_search(
+        working_folder = self.get_working_folder()
+
+        max_freq, data_dict, fig = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
             steps=2,
@@ -50,7 +52,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
-        scan_task.results.append(plot_results)
+        plot_result = load_plot_in_ui(working_folder= working_folder, file_name = "plot_result", fig=fig)
+        scan_task.results.append(plot_result)
 
         print("Final Larmor frequency : " + str(max_freq) + " MHz")
 
