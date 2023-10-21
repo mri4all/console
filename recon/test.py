@@ -2,49 +2,49 @@
 # import numpy as np
 import matplotlib.pyplot as plt
 from kspaceFiltering.kspace_filtering import *
+from recon_utils.imaging import *
 import numpy as np
 
-# def grad_delay_correction(kData, kTraj, delayT, param):
-#     ## JChen
-#     ## 10.20.2023
-#     # to be passed by imaging parameters
-#     # kData.shape = kx, ky, kz
-#     # kTraj pe table, numPE x (pe_y, pe_z)
-#     etLength = param.etLength
-#     BW_px = param.BW
-#     numPE = kTraj.shape[0]
-#     Ns = kData.shape[0]
-#     TE = param.TE
-#     deltaTE = TE[1]-TE[0]
+kData = np.load('/vagrant/test_data_kspace_d1s1.npy')
+kTraj = np.genfromtxt(r"/vagrant/trajectory.csv", delimiter=",")  # pe_table a lot by 2 # check rotation
+iData0 = np.fft.ifftshift(np.fft.ifftn(kData), axes=[0,1,2])
 
-#     if Ns%2:
-#         nx = np.arange(-Ns//2,Ns//2+1,1)
-#     else:
-#         nx = np.arange(-Ns//2,Ns//2,1) 
+delayT = 8e-6 # in us
+Ns = kData.shape[0]
 
-#     T_PE = Ns/BW_px
-#     for L in range(etLength):
-#         idx_trj = np.arange(L, etLength, numPE)
-#         phi = 2 * np.pi * (delayT + TE[0] - T_PE/2 + deltaTE*L) * nx
-#         tmp = kData[:,kTraj[idx_trj,0], kTraj[idx_trj,1]]
-#         kData[:,kTraj[idx_trj,0], kTraj[idx_trj,1]] \
-#             =np.fft.fft(np.fft.ifft(tmp) * np.exp(1j * phi))  ## check dim 
-        
-#     return kData
+etLength = 4
+BW = 40e3 # 40kHz
+ESP = 1e-6*20e3 #us 
+T_PE = 1/BW
 
+if Ns%2:
+    nx = np.arange(-Ns//2+1,Ns//2+1,1)/Ns
+else:
+    nx = np.arange(-Ns//2,Ns//2,1)/Ns 
+# phase_acc = np.fft.fftshift(exp(2*pi*1i*nx*bw
+# _acq*delay));
 
+for L in range(etLength):
+    coords1 =  np.where(kTraj % etLength == L)[1] #ny
+    coords2 = np.where(kTraj % etLength == L)[0] #nz
+    # idx_trj = np.arange(L, etLength, numPE)
+    phi = 2 * np.pi * nx  * (delayT + ESP - Ns*T_PE/2) * L
+    tmp = kData[:,coords1, coords2]
+    kData[:,coords1, coords2] \
+        =np.fft.fft(np.fft.ifft(tmp, axis=0) *  np.fft.fftshift(np.exp(-1j * phi)[:,None], axes=0), axis=0)  ## check dim 
 
-kData = np.load('/vagrant/test_data_kspace_d1s1B0_noshift.npy')
-kData = kFilter(kData, 'fermi', center_correction=True)
+#kData = kFilter(kData, 'fermi', center_correction=True)
 
+iData = np.fft.ifftshift(np.fft.ifftn(kData), axes=[0,1,2])
+plt.figure()
+plt.imshow(abs(iData0[:,:,18])-abs(iData[:,:,18]))
+plt.colorbar()
+plt.savefig('iKData_DelayCorr_diff.png')
+plt.close()
 
-# print(kData.shape)
-# plt.imshow(abs(kData))
-# plt.savefig('absKData1.png')
-
-
-plt.imshow(abs(kData[:,:,12]))
-plt.savefig('absKData1.png')
-
-
+plt.figure()
+plt.imshow(abs(iData[:,:,18]), vmin=0, vmax=0.003)
+plt.colorbar()
+plt.savefig('iKData_corr.png')
+plt.close()
 
