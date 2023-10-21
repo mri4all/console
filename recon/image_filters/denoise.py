@@ -118,6 +118,40 @@ def remove_gaussian_noise(image, sigma=0.2):
     return image_gaussian
 
 
+def _apply_filter(real_part, imag_part, method, strength):
+    # Normalize strength to be between 0 and 1
+    normalized_strength = strength / 100
+
+    # Apply the filter to the real and imaginary parts separately
+    if method == "gaussian_filter":
+        sigma = normalized_strength * 0.5
+        real_part_denoised = remove_gaussian_noise(real_part, sigma=sigma)
+        imag_part_denoised = remove_gaussian_noise(imag_part, sigma=sigma)
+    elif method == "bilateral":
+        sigma_color = normalized_strength * 0.05
+        sigma_spatial = normalized_strength * 15
+        real_part_denoised = apply_bilateral_denoise(
+            real_part, sigma_color=sigma_color, sigma_spatial=sigma_spatial
+        )
+        imag_part_denoised = apply_bilateral_denoise(
+            imag_part, sigma_color=sigma_color, sigma_spatial=sigma_spatial
+        )
+    elif method == "nl_means":
+        h = normalized_strength * 0.1
+        real_part_denoised = apply_nl_means_denoise(real_part, h=h)
+        imag_part_denoised = apply_nl_means_denoise(imag_part, h=h)
+    elif method == "total_variation":
+        weight = normalized_strength * 0.1
+        real_part_denoised = apply_total_variation_denoise(real_part, weight=weight)
+        imag_part_denoised = apply_total_variation_denoise(imag_part, weight=weight)
+    else:
+        real_part_denoised = real_part
+        imag_part_denoised = imag_part
+        log.error(f"Method {method} not recognized.")
+
+    return real_part_denoised, imag_part_denoised
+
+
 def remove_gaussian_noise_complex(image_complex, method="gaussian_filter", strength=50):
     """
     Removes Gaussian noise from the real and imaginary parts of the input complex image, separately.
@@ -142,23 +176,9 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter", stren
     real_part = np.real(image_complex)
     imag_part = np.imag(image_complex)
 
-    # Apply the filter to the real and imaginary parts separately
-    if method == "gaussian_filter":
-        real_part_denoised = remove_gaussian_noise(real_part)
-        imag_part_denoised = remove_gaussian_noise(imag_part)
-    elif method == "bilateral":
-        real_part_denoised = apply_bilateral_denoise(real_part)
-        imag_part_denoised = apply_bilateral_denoise(imag_part)
-    elif method == "nl_means":
-        real_part_denoised = apply_nl_means_denoise(real_part)
-        imag_part_denoised = apply_nl_means_denoise(imag_part)
-    elif method == "total_variation":
-        real_part_denoised = apply_total_variation_denoise(real_part)
-        imag_part_denoised = apply_total_variation_denoise(imag_part)
-    else:
-        real_part_denoised = real_part
-        imag_part_denoised = imag_part
-        log.error(f"Method {method} not recognized.")
+    real_part_denoised, imag_part_denoised = _apply_filter(
+        real_part, imag_part, method, strength
+    )
 
     # Combine the denoised real and imaginary parts to form the denoised complex image
     image_denoised_complex = real_part_denoised + 1j * imag_part_denoised
