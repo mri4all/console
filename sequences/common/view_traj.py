@@ -25,6 +25,10 @@ def view_sig(sig, folder=""):
         file.close()
 
 def view_traj_2d(k_traj_adc, k_traj, folder=""):
+
+    k_traj_adc = evenly_sample_array(k_traj_adc,10000)
+    k_traj = evenly_sample_array(k_traj,10000)
+
     plt.style.use("dark_background")
     # fig, ax = plt.subplots()
     fig = plt.figure()
@@ -54,8 +58,8 @@ def view_traj_2d(k_traj_adc, k_traj, folder=""):
 
 def view_traj_3d(k_traj_adc, k_traj, folder=""):
 
-    k_traj_adc = evenly_sample_array(k_traj_adc,300)
-    k_traj = evenly_sample_array(k_traj,300)
+    k_traj_adc = evenly_sample_array(k_traj_adc,10000)
+    k_traj = evenly_sample_array(k_traj,10000)
 
     plt.style.use("dark_background")
     fig = plt.figure()
@@ -86,14 +90,14 @@ def evenly_sample_array(x, y):
     Returns:
     numpy.ndarray: The evenly sampled array with a length not exceeding 'y'.
     """
-    if len(x) <= y:
+    if len(x[0]) <= y:
         # If 'x' is already shorter than or equal to 'y', return it as is.
         return x
 
     # Calculate the step size for sampling.
-    step = len(x) // y
+    step = len(x[0]) // y
 
     # Sample 'x' evenly using the calculated step size.
-    sampled_x = x[::step]
+    sampled_x = x[:,::step]
 
     return sampled_x
