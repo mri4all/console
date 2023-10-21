@@ -169,6 +169,7 @@ class Communicator(QObject, Helper):
 def new_user_values(values):
     # gets passed in the new values ... will need to respond 
     # SET SHIMX, SHIMY, SHIMZ
+    
     configuration_data=reading_json_parameter()
 
     # TODO: actually assign the correct values from values
