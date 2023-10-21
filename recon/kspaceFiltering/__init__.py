@@ -1,4 +1,3 @@
-from .filter_lib import *
 from .kspace_filtering import *
 from .utils import *
 
@@ -37,7 +36,7 @@ def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fe
     # 2. center correction
     kspace_center = kspace_center_correction(kspace)
     # 3. filtering
-    kspace_center_filtered, mask = kspace_filtering(kspace_center, filter_type, center_correction=False, return_mask=True, **kwargs)
+    kspace_center_filtered, mask = kFilter(kspace_center, filter_type, center_correction=False, return_mask=True, **kwargs)
     # 4. back to image
     output = get_img_from_ksp(kspace_center_filtered)
     # 5. visualization: compare the original image and the filtered image
@@ -62,7 +61,7 @@ def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fe
     ax3 = plt.subplot(gs[3])
 
     # Total number of slices and the number of slices to plot
-    total_slices = 25
+    total_slices = kspace.shape[-1]
     slices_to_plot = 9
 
     # Calculate the spacing between slices
