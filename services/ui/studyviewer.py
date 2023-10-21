@@ -211,9 +211,7 @@ class StudyViewer(QDialog):
         scan = exam.scans[row]
 
         if not scan.task.results:
-            pass
-            # for result in ["DICOM", "PLOT", "RAWDATA"]:
-            #     self.resultListWidget.addItem(result)
+            self.viewer.clear_view()
         else:
             for result in scan.task.results:
                 self.resultListWidget.addItem(
