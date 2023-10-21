@@ -1,8 +1,8 @@
 import numpy as np
-from B0Correction import OCTOPUS as oc
+from recon.B0Correction import OCTOPUS as oc
 from typing import Optional, Any, Mapping, TypedDict
 
-import recon_utils
+import recon.recon_utils
 
 
 class B0Params(TypedDict):

@@ -2,8 +2,9 @@ import common.logger as logger
 import common.runtime as rt
 import numpy as np
 import recon.kspaceFiltering.kspace_filtering as kFilter
-import recon.B0Correction.B0Corrector as b0correction
+from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
+from recon.image_filters import denoise
 log = logger.get_logger()
 
 import common.queue as queue
@@ -29,23 +30,40 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     
     ## data_loading{folder}
     log.info(f"Starting reconstruction.")
-    ## reshape ksapce using trajectory
-    ## if partial_fourier 
-    ## 
-    filterType = 'sine_bell'
-    kData = np.load('/vagrant/test_data_kspace_d1s1B0_shift49us.npy')
-    kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
-    log.info(f"kSpace {filterType} filtering finished.")
-    iData = b0correction.correct_Cartesian_basic(kData, kTraj, iB0map)
-    log.info(f"B0 correction finished.")
-    ## b0correction.correct_Cartesian_basiccorrect_MFI
-    DICOM.write_dicom(iData, task, folder)
-    log.info(f"DICOM writting finished.")
-
-    # To see what's available in the JSON, take a look at common/types.py
 
     if task.processing.recon_mode == "fake_dicoms":
         utils.generate_fake_dicoms(folder, task)
         time.sleep(2)
+        return True
+    
+    # TODO: Load the k-space data
+    kData = np.load(folder + 'rawdata' + '/kSpace.npy')
+
+    # TODO(Bingyu): K-space filtering
+    filterType = 'sine_bell'
+    kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
+    log.info(f"kSpace {filterType} filtering finished.")
+
+    # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    Y = np.ndarray  
+    kt = np.ndarray 
+    df = np.ndarray 
+    Lx = 1  
+    nonCart = None
+    params = None
+    b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
+    iData = b0_corrector()
+    log.info(f"B0 correction finished.")
+
+    # TODO(Kranthi): Image denoising (Gaussian)
+    iData = denoise.apply_nl_means_denoise(iData)
+    log.info(f"Finished image denoising.")
+
+    # TODO(Lavanya): Write the DICOM file to the folder 
+    DICOM.write_dicom(iData, task, folder)
+    log.info(f"DICOM writting finished.")
+
+    # TODO(Radhika): Write ISMRMRD file to the folder
+    # Should it be done on background? (Could be out of this function)
 
     return True
