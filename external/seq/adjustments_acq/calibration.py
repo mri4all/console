@@ -969,7 +969,7 @@ def load_plot_in_ui(working_folder= ".", file_name = "default_plot_name", fig=[]
     pickle.dump(fig, file)
     file.close()
     plot_result = ResultItem()
-    plot_result.name = "demo"
+    plot_result.name = file_name
     plot_result.description = "This is just a plot"
     plot_result.type = "plot"
     plot_result.primary = True

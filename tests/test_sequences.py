@@ -75,7 +75,7 @@ def run_tests() -> bool:
     log.info("")
     # Comment all test sequences except one when testing without connecting RedPitaya
     # run_sequence_test("cal_grad_duration")
-    run_sequence_test('adj_shim_amplitude')
+    #run_sequence_test('adj_shim_amplitude')
     # run_sequence_test('adj_rf_duration')
     #run_sequence_test('adj_rf_amplitude')
     run_sequence_test('adj_frequency')
