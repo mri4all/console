@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta
+from services.ui.shimBox import ShimBox
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -75,6 +76,8 @@ class ExaminationWindow(QMainWindow):
 
     status_overwrite = None
     updating_queue_widget = False
+
+    shimSignal = pyqtSignal(object)
 
     def __init__(self):
         """
@@ -340,6 +343,25 @@ class ExaminationWindow(QMainWindow):
             except:
                 pipe.send_user_response(error=True)
                 raise
+        elif isinstance(msg_value, ipc.messages.DoShimMessage):
+            if msg_value.message == "start":
+                self.shim_dlg = ShimBox(self)
+                self.shimSignal.connect(self.shim_dlg.new_data)
+                self.shim_dlg.show()
+                pipe.send_user_response()
+            elif msg_value.message == "get":
+                pipe.send_user_response(
+                    {
+                        "values": self.shim_dlg.current_values.model_dump(),
+                        "complete": self.shim_dlg.user_clicked != None,
+                    }
+                )
+            elif msg_value.message == "put":
+                # self.shim_dlg.canvas.axes.clear()
+                log.info("received put")
+                self.shimSignal.emit(msg_value.data)
+                # self.shim_dlg.canvas.axes.plot([1, 2, 3, 4, 5, 6])  # [msg_value.data])
+                # self.shim_dlg.canvas.axes.up
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
