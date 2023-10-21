@@ -2,6 +2,7 @@ import atexit
 import json
 import os
 from pathlib import Path
+from time import sleep
 from typing import Any, Dict, Literal, Optional, Union
 from uuid import uuid5
 import uuid
@@ -43,6 +44,7 @@ class CommunicatorEnvelope(BaseModel):
         ShowPlotMessage,
         ShowDicomMessage,
         IntensityMapResult,
+        DoShimMessage,
     ]
     error: bool = False
 
@@ -157,22 +159,44 @@ class Communicator(QObject, Helper):
             # self.handle(o)
 
 
+def new_user_values(values):
+    print(values)
+
+
+def new_signal():
+    return np.random.normal(size=20).tolist()
+
+
 if __name__ == "__main__":
     k = Communicator(Communicator.RECON)
-    # result = k.query_user(request="test request", input_type="float")
+
+    result = k.do_shim(new_user_values, new_signal)
+    print("Final result", result)
+    # k.shim_start()
+    # while True:
+    #     result = k.shim_get()
+    #     print(result)
+    #     k.shim_put(np.random.normal(size=20).tolist())
+    #     sleep(0.1)
+    #     if result.response["complete"] == True:
+    #         break
+    # # exit()
+    # # result = k.query_user(request="test request", input_type="float")
     # r = k.show_plot(
     #     xlabel="x axis",
     #     ylabel="y axis",
     #     title="title",
     #     data=[[x**y for x in range(-10, 11)] for y in range(2, 4)],
     # )
-    r = k.show_dicoms([str(x) for x in Path("/vagrant/SE000000").glob("*.dcm")])
-    print(r)
-    # k.show_image(
+    # print(r)
+
+    # r = k.show_dicoms([str(x) for x in Path("/vagrant/SE000000").glob("*.dcm")])
+    # print(r)
+    # r = k.show_image(
     #     data=[
     #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
     #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
     #         [[0, 0, 255, 255], [0, 0, 255, 255], [255, 255, 0, 0], [255, 255, 0, 0]],
     #     ]
     # )
-    # k.send_user_alert(message=f"You typed {result}")
+    # r = k.send_user_alert(message=f"You typed {r}")
