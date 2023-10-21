@@ -34,7 +34,7 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         # reading configuration data from config.json
         configuration_data=reading_json_parameter()
 
-        est_rf_max, data_dict = rf_max_cal(
+        est_rf_max, rf_pi2_fraction, data_dict = rf_max_cal(
             seq_file=self.seq_file_path,
             larmor_freq=cfg.LARMOR_FREQ,
             points=20,
@@ -53,6 +53,7 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
         # updating the Larmor frequency in the config.json file
         configuration_data.rf_parameters.rf_maximum_amplitude_Hze = est_rf_max
+        configuration_data.rf_parameters.rf_pi2_fraction = rf_pi2_fraction
         writing_json_parameter(config_data=configuration_data)
 
         log.info("Done running sequence " + self.get_name())
