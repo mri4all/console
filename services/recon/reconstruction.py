@@ -62,9 +62,11 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
 
-    # TODO(Kranthi): Image denoising (Gaussian)
-    iData = denoise.apply_nl_means_denoise(iData)
-    log.info(f"Finished image denoising.")
+    try:
+        iData = denoise.remove_gaussian_noise_complex(iData)
+        log.info(f"Finished image denoising.")
+    except ValueError:
+        log.error(f"Image denoising failed.")
 
     # TODO(Lavanya): Write the DICOM file to the folder
     DICOM.write_dicom(iData, task, folder)
