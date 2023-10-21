@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta
+from services.ui.shimBox import ShimBox
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -75,6 +76,8 @@ class ExaminationWindow(QMainWindow):
 
     status_overwrite = None
     updating_queue_widget = False
+
+    shimSignal = pyqtSignal(object)
 
     def __init__(self):
         """
@@ -238,6 +241,14 @@ class ExaminationWindow(QMainWindow):
         viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
 
+        self.sequenceResolutionLabel.setStyleSheet(
+            "color: #515669; font-size: 18px; font-weight: normal;"
+        )
+        self.sequenceResolutionLabel.setText(
+            "TA: 4.5 min   Voxel Size: 1.0 x 1.0 x 1.0 mm"
+        )
+        self.sequenceResolutionLabel.setVisible(False)
+
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
         self.statusLabel.setStyleSheet("QLabel:hover { background-color: none; }")
@@ -340,6 +351,25 @@ class ExaminationWindow(QMainWindow):
             except:
                 pipe.send_user_response(error=True)
                 raise
+        elif isinstance(msg_value, ipc.messages.DoShimMessage):
+            if msg_value.message == "start":
+                self.shim_dlg = ShimBox(self)
+                self.shimSignal.connect(self.shim_dlg.new_data)
+                self.shim_dlg.show()
+                pipe.send_user_response()
+            elif msg_value.message == "get":
+                pipe.send_user_response(
+                    {
+                        "values": self.shim_dlg.current_values.model_dump(),
+                        "complete": self.shim_dlg.user_clicked != None,
+                    }
+                )
+            elif msg_value.message == "put":
+                # self.shim_dlg.canvas.axes.clear()
+                log.info("received put")
+                self.shimSignal.emit(msg_value.data)
+                # self.shim_dlg.canvas.axes.plot([1, 2, 3, 4, 5, 6])  # [msg_value.data])
+                # self.shim_dlg.canvas.axes.up
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
@@ -740,7 +770,9 @@ class ExaminationWindow(QMainWindow):
 
         # Ask the sequence to insert its UI into the first tab of the parameter widget
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
-        ui_runtime.editor_sequence_instance.setup_ui(sequence_ui_container)
+        ui_runtime.editor_sequence_instance.init_ui(
+            sequence_ui_container, self.sequenceResolutionLabel
+        )
         scan_path = ui_runtime.get_scan_location(index)
         if not scan_path:
             log.error("Case has invalid state. Cannot read scan parameters")
@@ -773,6 +805,7 @@ class ExaminationWindow(QMainWindow):
 
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(True)
+        self.sequenceResolutionLabel.setVisible(True)
         ui_runtime.editor_active = True
         ui_runtime.editor_readonly = read_only
         ui_runtime.editor_queue_index = index
@@ -806,6 +839,7 @@ class ExaminationWindow(QMainWindow):
         self.clear_seq_tab_and_return_empty()
         self.scanParametersWidget.setCurrentIndex(0)
         self.scanParametersWidget.setEnabled(False)
+        self.sequenceResolutionLabel.setVisible(False)
 
         # Delete the sequence instance created for the editor
         if ui_runtime.editor_sequence_instance is not None:
