@@ -71,11 +71,15 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         
         # Calculate signal to noise ratio
         snr_array = []
+        signal_index = 0
+        noise_index = 0
         for index in range(0,rxd.shape[0]):
             if index > rxd.shape[0]/4 and index < (rxd.shape[0] - rxd.shape[0]/4):
-                signal_array[index,i] = rx_arr[index, i]
+                signal_array[signal_index,i] = rx_arr[index, i]
+                signal_index += 1
             else:
-                noise_array[index,i] = rx_arr[index, i]
+                noise_array[noise_index,i] = rx_arr[index, i]
+                noise_index += 1
         snr = np.mean(np.abs(signal_array[:,i])) / np.std(np.abs(noise_array[:,i]))
         print("SNR= " + str(snr))
         snr_array.append(snr)
