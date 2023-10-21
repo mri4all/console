@@ -172,7 +172,6 @@ def new_user_values(values):
     
     configuration_data=reading_json_parameter()
 
-    # TODO: actually assign the correct values from values
     configuration_data.shim_parameters.shim_x = values['x']
     configuration_data.shim_parameters.shim_y = values['y']
     configuration_data.shim_parameters.shim_z = values['z']
@@ -182,13 +181,12 @@ def new_user_values(values):
     print(values)
 
 
-def new_signal():
+def new_signal(temp_folder):
     # Run the rf_se with the updated shim parameters
     scan_task = ScanTask()
     
     sequence_name = "rf_se"
-    temp_folder = "/tmp/" + helper.generate_uid()
-    
+
     sequence_instance = SequenceBase.get_sequence(sequence_name)()
     # Get the default parameters from the sequence as an example
     default_parameters = sequence_instance.get_default_parameters()
