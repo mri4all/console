@@ -83,7 +83,7 @@ class Helper:
                 return result.response["values"]
             if n >= signal_tick_mul:
                 n = 0
-                self.shim_put(new_signal())
+                self.shim_put(new_signal(temp_folder))
             n = n + 1
             sleep(values_tick)
 
