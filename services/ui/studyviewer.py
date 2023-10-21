@@ -130,6 +130,9 @@ class StudyViewer(QDialog):
 
         self.setStyleSheet(
             """
+            QListView {
+                background-color: #0C1123;
+            }
             QListView::item
             {
                 padding: 8px;
@@ -210,7 +213,9 @@ class StudyViewer(QDialog):
                 self.resultListWidget.addItem(result)
         else:
             for result in scan.task.results:
-                self.resultListWidget.addItem(result.name + "  (" + result.type + ")")
+                self.resultListWidget.addItem(
+                    result.name + "  (" + result.type.upper() + ")"
+                )
         self.resultListWidget.setCurrentRow(0)
 
     def exam_selected(self, index: int):
