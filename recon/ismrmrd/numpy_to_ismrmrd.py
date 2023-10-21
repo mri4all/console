@@ -1,82 +1,80 @@
 # coding: utf-8
 import ismrmrd
 import ismrmrd.xsd
-from simulation import *
-from transform import *
 import numpy as np
 import argparse
+import json
+import os
 
-def create(filename='testdata.h5', matrix_size=256, coils=8, oversampling=2, repetitions=1, acceleration=1, noise_level=0.05):
+#json_file = "/opt/mri4all/data/acq_queue/e05a03dc-6f73-11ee-b9cb-4be9ddc04f52#scan_1/scan.json"
+
+def create_ismrmrd(folder, raw_data, task):
+    # Opening JSON file
+    #f = open(json_file)
+    data = task
 
     # Create the XML header and write it to the file (creation mode)
     header = ismrmrd.xsd.ismrmrdHeader()
     ##?############# Following block of code will get replaced by whatever numpy is given to us ##?###############?###############?###############?###############?###############?#############
-    
-    
-    # # Generate the phantom and coil sensitivity maps
-    # matrix_size=256 
-    # coils=8 
-    # oversampling=2 
-    # repetitions=1 
-    # acceleration=1 
-    # noise_level=0.05 
-    # phan = phantom(matrix_size)
-    # csm = generate_birdcage_sensitivities(matrix_size, coils)
-    # coil_images = np.tile(phan,(coils, 1, 1)) * csm
-
-    # # Oversample if needed
-    # if oversampling>1:
-    #     padding = round((oversampling*phan.shape[1] - phan.shape[1])/2)
-    #     phan = np.pad(phan,((0,0),(padding,padding)),mode='constant')
-    #     csm = np.pad(csm,((0,0),(0,0),(padding,padding)),mode='constant')
-    #     coil_images = np.pad(coil_images,((0,0),(0,0),(padding,padding)),mode='constant')
-
+    repetitions = 1 #! check
+    coils = 1 #! check
+    acceleration = 1 #! check
     ##?###############?###############?###############?###############?###############?###############?############# ##?###############?###############?###########?###############?###############?#################
     # The number of points in x,y,kx,ky
-    nx = matrix_size
-    ny = matrix_size
-    nkx = oversampling*nx
-    nky = ny
+    nx, ny = raw_data.shape[0], raw_data.shape[1]
+    nkx, nky = raw_data.shape[0], raw_data.shape[1]
 
     # Open the dataset (creation mode)
-    dset = ismrmrd.Dataset(filename, "dataset", create_if_needed=True)
+    filename_to_save = os.path.join(folder, "ismrmrd_file.h5")
+    dset = ismrmrd.Dataset(filename_to_save, "dataset", create_if_needed=True)
 
     # Create the XML header and write it to the file (creation mode)
     header = ismrmrd.xsd.ismrmrdHeader()
 
     # Experimental Conditions
     exp = ismrmrd.xsd.experimentalConditionsType() 
-    exp.H1resonanceFrequency_Hz = 128000000 #! needed field
+    #exp.H1resonanceFrequency_Hz = 128000000 #! needed field
+    exp.H1resonanceFrequency_Hz = data['FieldStrength']*(42.57e+06) 
+
     header.experimentalConditions = exp
 
     # Acquisition System Information
     sys = ismrmrd.xsd.acquisitionSystemInformationType()
-    sys.receiverChannels = coils #! needed field
+    sys.receiverChannels = 1 #! assuming single coil
     header.acquisitionSystemInformation = sys
 
 
     # Encoding
-    encoding = ismrmrd.xsd.encodingType()  #! needed field
-    encoding.trajectory = ismrmrd.xsd.trajectoryType.CARTESIAN
+    encoding = ismrmrd.xsd.encodingType()  
+    #encoding.trajectory = ismrmrd.xsd.trajectoryType.CARTESIAN
+    encoding.trajectory =ismrmrd.xsd.trajectoryType[data['processing']['trajectory'].upper()]
 
     # encoded and recon spaces
     efov = ismrmrd.xsd.fieldOfViewMm() 
-    efov.x = oversampling*256 #! needed field
-    efov.y = 256 #! needed field
-    efov.z = 5   #! needed field
+    #efov.x = oversampling*256 #! needed field
+    #efov.y = 256 #! needed field
+    #efov.z = 5   #! needed field
+    efov.x = raw_data.shape[0]
+    efov.y = raw_data.shape[1]
+    efov.z = raw_data.shape[2]
+
+
     rfov = ismrmrd.xsd.fieldOfViewMm() 
-    rfov.x = 256 #! needed field
-    rfov.y = 256 #! needed field
-    rfov.z = 5   #! needed field
+    rfov.x = raw_data.shape[0]
+    rfov.y = raw_data.shape[1]
+    rfov.z = raw_data.shape[2]
+
 
     ematrix = ismrmrd.xsd.matrixSizeType()
-    ematrix.x = nkx #! needed field
-    ematrix.y = nky #! needed field
-    ematrix.z = 1
     rmatrix = ismrmrd.xsd.matrixSizeType()
-    rmatrix.x = nx #! needed field
-    rmatrix.y = ny #! needed field
-    rmatrix.z = 1  #! needed field
+
+
+    ematrix.x = raw_data.shape[0]
+    ematrix.y = raw_data.shape[1]
+    ematrix.z = raw_data.shape[2]
+    rmatrix.x = raw_data.shape[0]
+    rmatrix.y = raw_data.shape[1]
+    rmatrix.z = raw_data.shape[2]
 
     espace = ismrmrd.xsd.encodingSpaceType() 
     espace.matrixSize = ematrix
@@ -122,7 +120,8 @@ def create(filename='testdata.h5', matrix_size=256, coils=8, oversampling=2, rep
     dset.write_xml_header(header.toXML('utf-8'))           
 
     # Synthesize the k-space data
-    Ktrue = transform_image_to_kspace(coil_images,(1,2))
+    #Ktrue = transform_image_to_kspace(coil_images,(1,2))
+    Ktrue = raw_data
 
     # Create an acquistion and reuse it
     acq = ismrmrd.Acquisition()
@@ -138,23 +137,13 @@ def create(filename='testdata.h5', matrix_size=256, coils=8, oversampling=2, rep
     # Initialize an acquisition counter
     counter = 0
 
-    # Write out a few noise scans
-    for n in range(32):
-        noise = noise_level * (np.random.randn(coils, nkx) + 1j * np.random.randn(coils, nkx))
-        # here's where we would make the noise correlated
-        acq.scan_counter = counter
-        acq.clearAllFlags()
-        acq.setFlag(ismrmrd.ACQ_IS_NOISE_MEASUREMENT)
-        acq.data[:] = noise
-        dset.append_acquisition(acq)
-        counter += 1 # increment the scan counter
-
     # Loop over the repetitions, add noise and write to disk
     # simulating a T-SENSE type scan
     for rep in range(repetitions):
-        noise = noise_level * (np.random.randn(coils, nky, nkx) + 1j * np.random.randn(coils, nky, nkx))
+        #noise = noise_level * (np.random.randn(coils, nky, nkx) + 1j * np.random.randn(coils, nky, nkx))
         # here's where we would make the noise correlated
-        K = Ktrue + noise
+        #K = Ktrue + noise
+        K = Ktrue
         acq.idx.repetition = rep
         for acc in range(acceleration):
             for line in np.arange(acc,nky,acceleration):
@@ -177,24 +166,4 @@ def create(filename='testdata.h5', matrix_size=256, coils=8, oversampling=2, rep
 
     # Clean up
     dset.close()
-
-def main():
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-o', '--output', help='output filename')
-    parser.add_argument('-m', '--matrix-size', type=int, dest='matrix_size', help='k-space matrix size')
-    parser.add_argument('-c', '--coils', type=int, help='number of coils')
-    parser.add_argument('-s', '--oversampling', type=int, help='oversampling')
-    parser.add_argument('-r', '--repetitions', type=int, help='number of repetitions')
-    parser.add_argument('-a', '--acceleration', type=int, help='acceleration')
-    parser.add_argument('-n', '--noise-level', type=float, dest='noise_level', help='noise level')
-
-    parser.set_defaults(output='testdata.h5', matrix_size=256, coils=8,
-            oversampling=2, repetitions=1, acceleration=1, noise_level=0.05)
-
-    args = parser.parse_args()
-
-    create(args.output, args.matrix_size, args.coils, args.oversampling,
-            args.repetitions, args.acceleration, args.noise_level)
-
-if __name__ == "__main__":
-    main()
+    print("ISMRMRD file created")

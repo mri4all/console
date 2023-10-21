@@ -54,3 +54,8 @@ def clear_current_task_id():
 def is_debugging_enabled():
     """Returns True if debugging is enabled."""
     return debugging_enabled
+
+
+def set_debug(new_state):
+    global debugging_enabled
+    debugging_enabled = new_state

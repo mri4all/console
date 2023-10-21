@@ -74,6 +74,7 @@ TrajectoryType = Literal["cartesian", "radial"]
 class ProcessingConfig(BaseModel):
     trajectory: TrajectoryType = "cartesian"
     recon_mode: str = ""
+    denoising_strength: int = 0
 
 
 ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]

@@ -6,6 +6,8 @@ from recon.kspaceFiltering.kspace_filtering import *
 
 from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
+from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
+
 from recon.image_filters import denoise
 
 log = logger.get_logger()
@@ -38,6 +40,8 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
 
+
+    # TODO: run_cartesian(folder, task) based on recon mode?
     # TODO: Load the k-space data
     kData = np.load(folder + "rawdata" + "/kSpace.npy")
     kTraj = np.genfromtxt(
@@ -62,7 +66,8 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
-
+    # denoising strength from the user interface? - provided by json
+    # move all to helper function - recon_cartesian based on recon type in json.
     try:
         iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")
         log.info(f"Finished image denoising.")
@@ -74,5 +79,5 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"DICOM writting finished.")
 
     # TODO(Radhika): Write ISMRMRD file to the folder
-
+    create_ismrmrd(folder, kData, task)
     return True

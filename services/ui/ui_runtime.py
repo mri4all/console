@@ -163,6 +163,7 @@ def update_scan_queue_list() -> bool:
 
     for entry in scan_queue_list:
         folder = entry.folder_name
+        old_state = entry.state
         current_state = ""
 
         # Check the current location of the task folder to determine the state
@@ -189,7 +190,12 @@ def update_scan_queue_list() -> bool:
         if os.path.isdir(mri4all_paths.DATA_COMPLETE + "/" + folder):
             current_state = mri4all_states.COMPLETE
             status_last_completed_scan = entry.folder_name
-            entry.has_results = True
+            if current_state != old_state:
+                # State has changed to complete. Check if the cas has results. In that
+                # case, an icon will be showed in the UI
+                temp_scan = task.read_task(mri4all_paths.DATA_COMPLETE + "/" + folder)
+                if len(temp_scan.results) > 0:
+                    entry.has_results = True
         if os.path.isdir(mri4all_paths.DATA_FAILURE + "/" + folder):
             current_state = mri4all_states.FAILURE
 
