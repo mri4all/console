@@ -90,7 +90,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             self.problem_list.append("Cannot have less than 1 iteration")
         return self.is_valid()
     
-    def new_user_values(values):
+    def new_user_values(self, values):
         # gets passed in the new values ... will need to respond
         # SET SHIMX, SHIMY, SHIMZ
 

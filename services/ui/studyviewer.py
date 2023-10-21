@@ -38,6 +38,7 @@ class ExamData(BaseModel):
     acc: str
     scans: list[ScanData]
     patientName: str
+    examTime: str
 
 
 class PatientData(BaseModel):
@@ -86,7 +87,10 @@ class StudyViewer(QDialog):
             return
 
         self.examListWidget.addItems(
-            [e.patientName + "   (acc " + e.acc.upper() + ")" for e in self.exams]
+            [
+                e.patientName + "     ACC " + e.acc.upper() + "     " + e.examTime
+                for e in self.exams
+            ]
         )
 
         self.dicomTargetComboBox.addItems(
@@ -249,11 +253,14 @@ class StudyViewer(QDialog):
             # create a new exam object if not found
             exam = next((e for e in exams if e.id == exam_id), None)
             if not exam:
+                exam_date, exam_time = scan_task.exam.registration_time.split("T")
+                exam_time = exam_time.split(".")[0]
                 exam = ExamData(
                     id=exam_id,
                     acc=scan_task.exam.acc,
                     scans=[],
                     patientName=patient_name,
+                    examTime=exam_date + " " + exam_time,
                 )
                 exams.append(exam)
 
