@@ -173,9 +173,9 @@ def new_user_values(values):
     configuration_data=reading_json_parameter()
 
     # TODO: actually assign the correct values from values
-    configuration_data.shim_parameters.shim_x = 0
-    configuration_data.shim_parameters.shim_y = 0
-    configuration_data.shim_parameters.shim_z = 0
+    configuration_data.shim_parameters.shim_x = values['x']
+    configuration_data.shim_parameters.shim_y = values['y']
+    configuration_data.shim_parameters.shim_z = values['z']
 
     writing_json_parameter(config_data=configuration_data)
 
