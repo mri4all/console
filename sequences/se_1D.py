@@ -147,7 +147,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # plt.plot(np.abs(recon))
             # plt.title("fft signal")
             # plt.show()
-            view_traj.view_sig(rxd, self.get_working_folder())
+            view_traj.view_sig_1d(rxd, self.get_working_folder())
 
 
         log.info("Done running sequence " + self.get_name())
