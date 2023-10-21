@@ -56,7 +56,6 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
 
     # Repeat for each frequency after the first
     signal_array = []
-    noise_array = []
     snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
@@ -66,6 +65,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
         # Calculate signal to noise ratio
+        noise_array = []
         for index in range(0,len(rx_arr[:, i])):
             if index >= steps/4 and index < steps - steps/4:
                 signal_array.append(rx_arr[index, i])
@@ -355,8 +355,9 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
 
     # Calculate RF max in Hz
     est_rf_max = 0.25 / (RF_PI2_DURATION * rf_max_val) * 1e6
+    rf_pi2_fraction = rf_max_val * cfg.RF_MAX / est_rf_max
     print(f'Estimated RF max: {est_rf_max:.2f} Hz')
-    print(f'{RF_PI2_DURATION}us pulse, pi/2 flip maxed at {rf_max_val * cfg.RF_MAX / est_rf_max:.4f} fractional power')
+    print(f'{RF_PI2_DURATION}us pulse, pi/2 flip maxed at {rf_pi2_fraction:.4f} fractional power')
 
     # Plot if asked
     if plot:
@@ -381,7 +382,7 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
                  'rf_max': est_rf_max
                  }
 
-    return est_rf_max, data_dict
+    return est_rf_max, rf_pi2_fraction, data_dict
 
 def rf_duration_cal(rxd_list=[], points=25, zoom_factor=2, smooth=True, iterations=2, first_max=False, \
                     plot=True):
