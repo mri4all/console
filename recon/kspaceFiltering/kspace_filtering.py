@@ -21,7 +21,7 @@ def kspace_center_correction(kspace):
     return kspace
 
 
-def kspace_filtering(kspace, filter_type, center_correction=True, **kwargs):
+def kFilter(kspace, filter_type, center_correction=True, **kwargs):
     '''
     Apply a filter to the k-space data.
     
