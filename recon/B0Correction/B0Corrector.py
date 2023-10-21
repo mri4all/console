@@ -6,6 +6,9 @@ import common.logger as logger
 from recon.B0Correction import OCTOPUS as oc
 import recon.recon_utils as ru
 
+# from B0Correction import OCTOPUS as oc
+# import recon_utils as ru
+
 
 log = logger.get_logger()
 
@@ -44,34 +47,24 @@ class B0Corrector:
                     
     def __call__(self) -> np.ndarray:
         if self.df is None:  # if no B0, directly perform ifft
-            log.info("Performing n-dim IFFT reconstruction")
-            return ru.centered_ifft(self.Y)
+            return self.reconstruct(self.Y)
         
         return self.correct_MFI()  # default method
     
     
-    def correct_Cartesian_basic(self) -> np.ndarray: 
+    def reconstruct(self, ksp) -> np.ndarray: 
         '''
-        Doc from OCTOPUS for Cartesian off-resonance correction:
+        Directly reconstruct raw k-space data given trajectory.
+        '''
+        # log.info("Running reconstruction")
+        if not self.nonCart: 
+            log.info("Performing n-dim IFFT reconstruction")
+            return ru.centered_ifft(ksp)
         
-        Off-resonance correction for Cartesian trajectories
-
-        Parameters
-        ----------
-        M : numpy.ndarray
-            Cartesian image data
-        kt : numpy.ndarray
-            Cartesian k-space trajectory
-        df : numpy.ndarray
-            Field map
-
-        Returns
-        -------
-        M_hat : numpy.ndarray
-            Off-resonance corrected image data
-        '''
-        log.info("Running naive Cartesian off-resonance correction")
-        return oc.orc(ru.centered_ifft2(self.Y), self.kt, self.df)  # expects image domain
+        log.info("Performing non-Cartesian reconstruction") 
+        cartesian_opt = 0
+        NufftObj = oc.imtransforms.nufft_init(kt, params)
+        return os.imtransforms.ksp2im(ksp, cartesian_opt, NufftObj, params)
     
     def correct_MFI(self) -> np.ndarray: 
         '''
@@ -101,7 +94,7 @@ class B0Corrector:
         M_hat : numpy.ndarray
             Corrected image data.
         '''
-        log.info("Running multi-frequency interpolation for off-resonance corrected reconstruction")
+        # log.info("Running multi-frequency interpolation for off-resonance corrected reconstruction")
         if len(self.Y.shape) <= 2:
             return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=self.Lx, nonCart=self.nonCart, params=self.params) 
         elif len(self.Y.shape)  == 3:
