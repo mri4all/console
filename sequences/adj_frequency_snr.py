@@ -26,7 +26,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
     @classmethod
     def get_readable_name(self) -> str:
-        return "Adjust Frequency with maximum"
+        return "Adjust Frequency with SNR"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -120,7 +120,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         opt_max_freq, opt_max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
-            step_search_center=max_freq,
+            step_search_center=max_snr_freq,
             steps=30,
             step_bw_MHz=5e-3,
             plot=True,  # For Debug
@@ -133,7 +133,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
 
         larmor_freq, data_dict = larmor_cal(
             seq_file=self.seq_file_path,
-            larmor_start=opt_max_freq,
+            larmor_start=opt_max_snr_freq,
             iterations=10,
             delay_s=1,
             echo_count=1,
@@ -159,7 +159,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
-        print("Final Larmor frequency using maximum: " + str(calibrated_larmor_freq) + " MHz")
+        print("Final Larmor frequency using SNR: " + str(calibrated_larmor_freq) + " MHz")
 
         # updating the Larmor frequency in the config.json file
         configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq
