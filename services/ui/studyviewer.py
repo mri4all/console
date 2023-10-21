@@ -62,7 +62,7 @@ class StudyViewer(QDialog):
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/studyviewer.ui", self)
 
         screen_width, screen_height = ui_runtime.get_screen_size()
-        self.resize(int(screen_width * 0.9), int(screen_height * 0.8))
+        self.resize(int(screen_width * 0.9), int(screen_height * 0.85))
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
@@ -80,7 +80,6 @@ class StudyViewer(QDialog):
             [e.patientName + " - " + e.acc for e in self.exams]
         )
         self.examListWidget.currentRowChanged.connect(self.exam_selected)
-
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
         self.resultListWidget.currentRowChanged.connect(self.result_selected)
 
@@ -88,10 +87,10 @@ class StudyViewer(QDialog):
             [t.name for t in ui_runtime.get_config().dicom_targets]
         )
         self.sendDicomsButton.clicked.connect(self.dicoms_send)
+
         viewerLayout = QHBoxLayout(self.viewerFrame)
         viewerLayout.setContentsMargins(0, 0, 0, 0)
         self.viewer = ViewerWidget()
-        # self.viewer1.setProperty("id", "1")
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
         self.exam_selected(0)
@@ -101,22 +100,38 @@ class StudyViewer(QDialog):
         self.closeButton.setProperty("type", "highlight")
         self.closeButton.setIcon(qta.icon("fa5s.check"))
         self.closeButton.setIconSize(QSize(20, 20))
+        self.closeButton.setText(" Close")
 
         self.selectAllPushButton.clicked.connect(self.select_all_clicked)
         self.definitionPushButton.clicked.connect(self.show_definition)
 
+        self.scansLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
+        self.examsLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
+        self.resultsLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
+        self.dicomSendLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
+
+        self.definitionPushButton.setIcon(qta.icon("fa5s.binoculars"))
+        self.definitionPushButton.setText(" Show definition...")
+        self.definitionPushButton.setIconSize(QSize(20, 20))
+        self.exportPushButton.setIcon(qta.icon("fa5s.save"))
+        self.exportPushButton.setText(" Export...")
+        self.exportPushButton.setIconSize(QSize(20, 20))
+
+        self.sendDicomsButton.setIcon(qta.icon("fa5s.paper-plane"))
+        self.sendDicomsButton.setText(" Send")
+        self.sendDicomsButton.setIconSize(QSize(20, 20))
+
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
-
         checked_scans_numbers = []
         for i in range(self.scanListWidget.count()):
             item = self.scanListWidget.item(i)
             if item.checkState():
                 checked_scans_numbers.append(i)
-        
+
         if not checked_scans_numbers:
             return
-        
+
         exam = self.exams[self.examListWidget.currentRow()]
         for scan_number in checked_scans_numbers:
             checked_scan = exam.scans[scan_number]
@@ -161,7 +176,6 @@ class StudyViewer(QDialog):
             item = QListWidgetItem(scan_obj.task.protocol_name)
             item.setCheckState(Qt.CheckState.Unchecked)
             self.scanListWidget.addItem(item)
-
         self.scanListWidget.setCurrentRow(0)
 
     def organize_scan_data_from_folders(self) -> List[ExamData]:

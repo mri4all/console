@@ -84,23 +84,26 @@ class ViewerWidget(QWidget):
 
     def view_scan(
         self,
-        file_path: Path,
+        file_path: str,
         type: Literal["dicom", "plot", "raw"],
         task: Optional[ScanTask] = None,
-    ):
+    ) -> bool:
         self.clear_view()
-        dcm_path = file_path / "dicom"
-        other_path = file_path / "other"
+
         if type == "dicom":
-            dcm_path = file_path / "dicom"
-            if next(dcm_path.glob("**/*.dcm"), None):
-                self.load_dicoms(str(dcm_path), task)
-                return True
+            self.load_dicoms(file_path, task)
+            return True
+            # dcm_path = file_path / "dicom"
+            # if next(dcm_path.glob("**/*.dcm"), None):
+            #     self.load_dicoms(str(dcm_path), task)
+            #     return True
         elif type == "plot":
+            other_path = Path(file_path) / "other"
             if path := next(other_path.glob("**/*.json"), None):
                 self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
+            return False
         else:
-            pass
+            return False
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
         if not input_path:

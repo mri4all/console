@@ -19,7 +19,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="examsLabel">
          <property name="text">
           <string>Exams</string>
          </property>
@@ -29,7 +29,23 @@
         <widget class="QListWidget" name="examListWidget"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_3">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="scansLabel">
          <property name="text">
           <string>Scans</string>
          </property>
@@ -58,6 +74,29 @@
          </property>
          <property name="autoDefault">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="dicomSendLabel">
+         <property name="text">
+          <string>DICOM Transfer</string>
          </property>
         </widget>
        </item>
@@ -115,6 +154,13 @@
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="resultsLabel">
+         <property name="text">
+          <string>Results</string>
+         </property>
         </widget>
        </item>
        <item>
