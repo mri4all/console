@@ -20,12 +20,12 @@ log = logger.get_logger()
 
 class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
-    param_TE: int = 70
-    param_TR: int = 250
+    param_TE: int = 20
+    param_TR: int = 3000
     param_NSA: int = 1
-    param_FOV: int = 140
+    param_FOV: int = 20
     param_Base_Resolution: int = 70
-    param_BW: int = 20
+    param_BW: int = 32000
     param_Gradient: str = "x"
 
     @classmethod
@@ -49,9 +49,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def get_default_parameters(self) -> dict:
         return {"TE": 20, "TR": 3000,
         "NSA": 1, 
-        "FOV": 140,
+        "FOV": 20,
         "Base_Resolution": 70,
-        "BW":20,
+        "BW": 32000,
         "Gradient":"x",}
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -106,7 +106,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": self.param_NSA, 
             "FOV": self.param_FOV,
             "Base_Resolution": self.param_Base_Resolution,
-            "BW":self.BW,
+            "BW":self.param_BW,
             "Gradient":self.param_Gradient},
             check_timing=True,
             output_file=self.seq_file_path,

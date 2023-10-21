@@ -75,7 +75,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             inputs={"TE": self.param_TE, "TR": self.param_TR},
             check_timing=True,
             output_file=self.seq_file_path,
-            pe_order_file=self.get_working_folder() + "/data/pe_order.npy"
+            pe_order_file=self.get_working_folder() + "/rawdata/pe_order.npy"
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(

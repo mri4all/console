@@ -649,7 +649,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.05, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False,):
     """
@@ -707,8 +707,8 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         time.sleep(tr_spacing)
         
         # get peaks, find fwhm 
-        peak_index = np.squeeze(np.argmax(np.abs(rxd)))
-        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        peak_index = [np.argmax(np.abs(rxd))]
+        fwhm_list.append(sig.peak_widths(np.abs(rxd), peaks=peak_index, rel_height=0.5))
         
     # determine best, and update config file with the best
     best_shim_index = np.argmin(fwhm_list)
