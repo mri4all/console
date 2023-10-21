@@ -71,8 +71,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          gui_test=gui_test)
         
         # Calculate signal to noise ratio
-        for index in range(0,len(rx_arr[:, i])):
-            if index > len(rx_arr[:, i])/4 and index < (len(rx_arr[:, i]) - len(rx_arr[:, i])/4):
+        for index in range(0,rxd.shape[0]):
+            if index > rxd.shape[0]/4 and index < (rxd.shape[0] - rxd.shape[0]/4):
                 signal_array[index,i] = rx_arr[index, i]
             else:
                 noise_array[index,i] = rx_arr[index, i]
