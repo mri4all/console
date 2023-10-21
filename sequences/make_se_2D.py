@@ -31,22 +31,23 @@ def pypulseq_se2D(
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     #num_averages = 1
-    #BW = 32e3
-    adc_dwell = 1 / BW
-    adc_duration = Nx * adc_dwell  # 6.4e-3
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
     num_averages = inputs['NSA']
     Orientation = inputs['Orientation']
-    fov = inputs['FOV']
-    Nx = inputs['base_resolution']
+    fov = inputs['FOV'] / 1000
+    Nx = inputs['Base_Resolution']
     BW = inputs['BW']
     # Trajectory = inputs['Trajectory']     TODO
     # PE_Ordering = inputs['PE_Ordering']   TODO
     # PF = inputs['PF']                     TODO
+
     Ny = Nx
+    #BW = 32e3
+    adc_dwell = 1 / BW
+    adc_duration = Nx * adc_dwell  # 6.4e-3
 
     # ======
     # INITIATE SEQUENCE

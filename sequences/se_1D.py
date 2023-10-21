@@ -21,6 +21,11 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 70
     param_TR: int = 250
+    param_NSA: int = 1
+    param_FOV: int = 140
+    param_Base_Resolution: int = 70
+    param_BW: int = 20
+    param_Gradient: str = "x"
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -32,17 +37,32 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR}
+        return {"TE": self.param_TE, "TR": self.param_TR,
+        "NSA": self.param_NSA, 
+        "FOV": self.param_FOV,
+        "Base_Resolution": self.param_Base_Resolution,
+        "BW":self.param_BW,
+        "Gradient":self.param_Gradient,}
 
     @classmethod
     def get_default_parameters(self) -> dict:
-        return {"TE": 20, "TR": 3000}
+        return {"TE": 20, "TR": 3000,
+        "NSA": 1, 
+        "FOV": 20,
+        "Base_Resolution": 70,
+        "BW": 32e3,
+        "Gradient":"x",}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
             self.param_TR = parameters["TR"]
+            self.param_NSA = parameters["NSA"]
+            self.param_FOV = parameters["FOV"]
+            self.param_Base_Resolution = parameters["Base_Resolution"]
+            self.param_BW = parameters["BW"]
+            self.param_Gradient = parameters["Gradient"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -51,12 +71,23 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
+        widget.NSA_SpinBox.setValue(self.param_NSA)
+        widget.FOV_SpinBox.setValue(self.param_FOV)
+        widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
+        widget.BW_SpinBox.setValue(self.param_BW)
+        widget.Gradient_ComboBox.setCurrentText(self.param_Gradient)
+
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
+        self.param_FOV = widget.FOV_SpinBox.value()
+        self.param_Base_Resolution = widget.Base_Resolution_SpinBox.value()
+        self.param_BW = widget.BW_SpinBox.value()
+        self.param_Gradient = widget.Gradient_ComboBox.currentText()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -70,7 +101,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         make_se_1D.pypulseq_1dse(
-            inputs={"TE": self.param_TE, "TR": self.param_TR},
+            inputs={"TE": self.param_TE, "TR": self.param_TR,
+            "NSA": self.param_NSA, 
+            "FOV": self.param_FOV,
+            "Base_Resolution": self.param_Base_Resolution,
+            "BW":self.param_BW,
+            "Gradient":self.param_Gradient},
             check_timing=True,
             output_file=self.seq_file_path,
         )
