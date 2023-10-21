@@ -76,7 +76,7 @@ class ExaminationWindow(QMainWindow):
     viewer2 = None
     viewer3 = None
 
-    status_overwrite = None
+    scanner_status_message = ""
     updating_queue_widget = False
 
     shimSignal = pyqtSignal(object)
@@ -338,7 +338,7 @@ class ExaminationWindow(QMainWindow):
             else:
                 pipe.send_user_response(error=False)
         elif isinstance(msg_value, ipc.messages.SetStatusMessage):
-            self.overwrite_status_message(msg_value.message)
+            self.set_status_message(msg_value.message)
         elif isinstance(msg_value, ipc.messages.ShowPlotMessage):
             try:
                 sc = MplCanvas(width=7, height=4)
@@ -381,12 +381,20 @@ class ExaminationWindow(QMainWindow):
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)
+
+        new_status_message = ""
+
         if ui_runtime.status_acq_active:
-            self.set_status_message("Running scan...")
+            new_status_message = "Running scan..."
         elif ui_runtime.status_recon_active:
-            self.set_status_message("Reconstruction data...")
-        elif not self.status_overwrite:  # TODO: unset the overwritten status
-            self.set_status_message("Scanner ready")
+            new_status_message = "Reconstruction data..."
+        else:
+            new_status_message = "Scanner ready"
+
+        # Update the status widget, but only if the scanner status has changed
+        if new_status_message != self.scanner_status_message:
+            self.scanner_status_message = new_status_message
+            self.set_status_message(self.scanner_status_message)
 
         if (
             ui_runtime.status_last_completed_scan
@@ -436,10 +444,6 @@ class ExaminationWindow(QMainWindow):
 
     def set_status_message(self, message: str):
         self.statusLabel.setText(message)
-
-    def overwrite_status_message(self, message: str):
-        self.status_overwrite = message
-        self.set_status_message(message)
 
     def prepare_examination_ui(self):
         """

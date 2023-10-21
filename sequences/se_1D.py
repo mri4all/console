@@ -118,7 +118,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
-        iterations = 5
+        iterations = 1
         for iter in range(iterations):
             rxd, rx_t = run_pulseq(
                 seq_file=self.seq_file_path,
@@ -147,7 +147,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # plt.plot(np.abs(recon))
             # plt.title("fft signal")
             # plt.show()
-            view_traj.view_sig(rxd)
+            view_traj.view_sig(rxd, self.get_working_folder())
 
 
         log.info("Done running sequence " + self.get_name())
