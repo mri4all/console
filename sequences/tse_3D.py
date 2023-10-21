@@ -20,6 +20,17 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 70
     param_TR: int = 250
+    param_ETL: int = 2
+    param_NSA: int = 1
+    param_Orientation: str = "Axial"
+    param_FOV: int = 140
+    param_Base_Resolution: int = 70
+    param_BW: int = 32e3
+    param_Trajectory: str = "Catisian"
+    param_PE_Ordering: str = "Center_out"
+    param_Slice_Ordering: str = "Center_out"
+    param_PE_PF: int = 1
+    param_Slice_PF: int = 1
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -31,19 +42,52 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR}
+        return {"TE": self.param_TE, "TR": self.param_TR,
+        "ETL": self.param_ETL,
+        "NSA": self.param_NSA,
+        "Orientation":self.param_Orientation, 
+        "FOV": self.param_FOV,
+        "Base_Resolution": self.param_Base_Resolution,
+        "BW":self.param_BW,
+        "Trajectory":self.param_Trajectory,
+        "PE_Ordering":self.param_PE_Ordering,
+        "Slice_Ordering":self.param_Slice_Ordering,
+        "PE_PF": self.param_PE_PF,
+        "Slice_PF":self.param_Slice_PF}
 
     @classmethod
     def get_default_parameters(
         self,
     ) -> dict:
-        return {"TE": 70, "TR": 250}
+        return {"TE": 70, "TR": 250,
+        "ETL":1,
+        "NSA": 1, 
+        "Orientation":"Axial",
+        "FOV": 140,
+        "Base_Resolution": 70,
+        "BW":20,
+        "Trajectory":"Cartesian",
+        "PE_Ordering":"Center_out",
+        "Slice_Ordering":"Center_out",
+        "PE_PF": 1,
+        "Slice_PF":1}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
             self.param_TR = parameters["TR"]
+            self.param_ETL = parameters["ETL"]
+            self.param_NSA = parameters["NSA"]
+            self.param_Orientation = parameters["Orientation"]
+            self.param_FOV = parameters["FOV"]
+            self.param_Base_Resolution = parameters["Base_Resolution"]
+            self.param_BW = parameters["BW"]
+            self.param_Trajectory = parameters["Trajectory"]
+            self.param_PE_Ordering = parameters["PE_Ordering"]
+            self.param_Slice_Ordering = parameters["Slice_Ordering"]
+            self.param_PE_PF = parameters["PE_PF"]
+            self.param_Slice_PF = parameters["Slice_PF"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -52,12 +96,34 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
+        widget.ETL_SpinBox.setValue(self.param_ETL)
+        widget.NSA_SpinBox.setValue(self.param_NSA)
+        widget.Orientation_ComboBox.setCurrentText(self.param_Orientation)
+        widget.FOV_SpinBox.setValue(self.param_FOV)
+        widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
+        widget.BW_SpinBox.setValue(self.param_BW)
+        widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
+        widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
+        widget.Slice_Ordering_ComboBox.setCurrentText(self.param_Slice_Ordering)
+        widget.PE_PF_SpinBox.setValue(self.param_PE_PF)
+        widget.Slice_PF_SpinBox.setValue(self.param_Slice_PF)
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
+        self.param_ETL = widget.ETL_SpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
+        self.param_Orientation = widget.Orientation_ComboBox.currentText()
+        self.param_FOV = widget.FOV_SpinBox.value()
+        self.param_Base_Resolution = widget.Base_Resolution_SpinBox.value()
+        self.param_BW = widget.BW_SpinBox.value()
+        self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
+        self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
+        self.param_Slice_Ordering = widget.Slice_Ordering_ComboBox.currentText()
+        self.param_PE_PF = widget.PE_PF_SpinBox.value()
+        self.param_Slice_PF = widget.Slice_PF_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -72,7 +138,19 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
         make_tse_3D.pypulseq_tse3D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR},
+            inputs={"TE": self.param_TE, "TR": self.param_TR,
+            "NSA": self.param_NSA, 
+            "ETL":self.param_ETL,
+            "FOV": self.param_FOV,
+            "Orientation":self.param_Orientation,
+            "Base_Resolution": self.param_Base_Resolution,
+            "BW":self.param_BW,
+            "Trajectory":self.param_Trajectory,
+            "PE_Ordering":self.param_PE_Ordering,
+            "Slice_Ordering":self.param_Slice_Ordering,
+            "PE_PF": self.param_PE_PF,
+            "Slice_PF": self.param_Slice_PF
+            },
             check_timing=True,
             output_file=self.seq_file_path,
             pe_order_file=self.get_working_folder() + "/rawdata/pe_order.npy"
@@ -137,7 +215,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     num_averages = 1
-    traj = "center_out"
+    traj = "Center_out"
     BW = 20e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
@@ -146,6 +224,18 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
+    ETL = inputs['ETL']
+    num_averages = inputs['NSA']
+    Orientation = inputs['Orientation']
+    fov = inputs['FOV']
+    base_resolution = inputs['Base_Resolution']
+    BW = inputs['BW']
+    Trajectory = inputs['Trajectory']
+    PE_Ordering = inputs['PE_Ordering']
+    Slice_Ordering = inputs['Slice_Ordering']
+    PE_PF = inputs['PE_PF']
+    Slice_PF = inputs['Slice_PF']
+
 
     # ======
     # INITIATE SEQUENCE

@@ -27,8 +27,7 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"JSON information = {task}")
     log.info(f"Access data in the JSON like this: {task.protocol_name}")
 
-    
-    ## data_loading{folder}
+
     log.info(f"Starting reconstruction.")
 
     if task.processing.recon_mode == "fake_dicoms":
@@ -39,6 +38,9 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     # TODO: Load the k-space data
     kData = np.load(folder + 'rawdata' + '/kSpace.npy')
 
+    ## delay correction
+    
+    
     # TODO(Bingyu): K-space filtering
     filterType = 'sine_bell'
     kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)

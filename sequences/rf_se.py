@@ -13,6 +13,7 @@ from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
 import common.logger as logger
+from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -117,9 +118,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         )
 
         # Debug 
-        plt.figure()
-        plt.plot(np.abs(rxd))
-        plt.show()
+        # plt.figure()
+        # plt.plot(np.abs(rxd))
+        # plt.show()
+        if 1>0: #todo: debug mode
+            view_traj.view_sig(rxd)
+
 
         log.info("Done running sequence " + self.get_name())
         return True
