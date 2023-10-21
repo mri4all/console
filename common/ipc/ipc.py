@@ -197,7 +197,8 @@ def new_signal(temp_folder):
     sequence_instance.run_sequence(scan_task)
     # return the new signal that is produced by user values. should return the FFT or whatever
     # MEASURE THE FFT OF THE SIGNAL
-    return sequence_instance.rxd.tolist()
+    rxd = abs(sequence_instance.rxd)
+    return rxd.tolist()
 
 
 if __name__ == "__main__":
