@@ -10,6 +10,9 @@ log = logger.get_logger()
 import common.task as task
 from common.constants import *
 from . import PulseqSequence
+from common.ipc import Communicator
+
+ipc_comm = Communicator(Communicator.ACQ)
 
 
 class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
@@ -96,6 +99,7 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         for i in range(0, 10):
+            ipc_comm.send_status(f"Running sequence {i*10}%...")
             time.sleep(1)
             if task.has_task_state(self.get_working_folder(), mri4all_files.STOP):
                 log.info("Termination of sequence requested")
