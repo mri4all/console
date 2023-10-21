@@ -477,7 +477,7 @@ class ExaminationWindow(QMainWindow):
         )
         for seq in sequence_list:
             # Adjustment sequences should not be shown here
-            if not seq.startswith("adj_") or rt.is_debugging_enabled():
+            if (not seq.startswith("adj_") or not seq.startswith("prescan_")) or rt.is_debugging_enabled():
                 add_sequence_action = QAction(self)
                 add_sequence_action.setText(
                     SequenceBase.get_sequence(seq).get_readable_name()
