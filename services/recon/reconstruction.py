@@ -65,7 +65,7 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
         log.error(f"Image denoising failed.")
 
     # Create the DICOM file
-    DICOM.write_dicom(iData, task, folder + mri4all_taskdata.DICOM)
+    DICOM.write_dicom(iData, task, folder + '/' + mri4all_taskdata.DICOM)
     log.info(f"DICOM writting finished.")
 
     # Create the ISMRMRD file
