@@ -13,6 +13,10 @@ import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
+import common.helper as helper
+from sequences import SequenceBase
+from common.types import ScanTask
+
 
 def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
@@ -919,3 +923,28 @@ if __name__ == "__main__":
             print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
         print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
+
+def run_sequence_test(sequence_name: str) -> bool:
+    print(f"Testing sequence {sequence_name}...")
+
+    temp_folder = "/tmp/" + helper.generate_uid()
+    print(f"Using temporary folder: {temp_folder}")
+
+    try:
+        os.mkdir(temp_folder)
+    except:
+        print(f"Could not create temporary folder {temp_folder}.")
+        return False
+
+    scan_task = ScanTask()
+
+    sequence_instance = SequenceBase.get_sequence(sequence_name)()
+    # Get the default parameters from the sequence as an example
+    default_parameters = sequence_instance.get_default_parameters()
+    # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+    sequence_instance.set_parameters(default_parameters, scan_task)
+    sequence_instance.set_working_folder(temp_folder)
+    sequence_instance.calculate_sequence(scan_task)
+    sequence_instance.run_sequence(scan_task)
+
+    return True
