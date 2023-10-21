@@ -149,7 +149,6 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         
         # calculate the linear shim 
-        axes = ['x', 'y', 'z']
         log.info("Running manual shimming")
     
         k = Communicator(Communicator.RECON)
