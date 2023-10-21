@@ -15,7 +15,7 @@ class CustomMessageBox(QDialog):
     def __init__(self, parent, widget, buttons=btns.Ok | btns.Abort | btns.Retry):
         super(CustomMessageBox, self).__init__(parent)
         uic.loadUi(
-            f"{rt.get_console_path()}/services/ui/forms/customMessageBox.ui", self
+            f"{rt.get_console_path()}/services/ui/forms/custommessagebox.ui", self
         )
         self.setWindowTitle("Configuration")
 

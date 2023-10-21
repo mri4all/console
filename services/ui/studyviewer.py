@@ -18,6 +18,7 @@ from services.ui import ui_runtime
 from services.ui import dicomexport
 from services.ui.viewerwidget import ViewerWidget
 from services.ui import taskviewer
+from common.constants import *
 
 log = logger.get_logger()
 
@@ -57,6 +58,12 @@ class StudyViewer(QDialog):
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
 
+    loaded_path = ""
+    load_scan_path = ""
+    load_result_type = ""
+    load_scan_task = ""
+    loadTimer = QTimer()
+
     def __init__(self):
         super(StudyViewer, self).__init__()
         uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/studyviewer.ui", self)
@@ -77,11 +84,8 @@ class StudyViewer(QDialog):
             return
 
         self.examListWidget.addItems(
-            [e.patientName + " - " + e.acc for e in self.exams]
+            [e.patientName + "   (acc " + e.acc.upper() + ")" for e in self.exams]
         )
-        self.examListWidget.currentRowChanged.connect(self.exam_selected)
-        self.scanListWidget.currentRowChanged.connect(self.scan_selected)
-        self.resultListWidget.currentRowChanged.connect(self.result_selected)
 
         self.dicomTargetComboBox.addItems(
             [t.name for t in ui_runtime.get_config().dicom_targets]
@@ -91,10 +95,9 @@ class StudyViewer(QDialog):
         viewerLayout = QHBoxLayout(self.viewerFrame)
         viewerLayout.setContentsMargins(0, 0, 0, 0)
         self.viewer = ViewerWidget()
+        self.viewer.setStyleSheet("border: 1px solid #E0A526;")
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
-        self.exam_selected(0)
-        self.examListWidget.setCurrentRow(0)
 
         self.closeButton.clicked.connect(self.close_clicked)
         self.closeButton.setProperty("type", "highlight")
@@ -103,23 +106,58 @@ class StudyViewer(QDialog):
         self.closeButton.setText(" Close")
 
         self.selectAllPushButton.clicked.connect(self.select_all_clicked)
+        self.selectNonePushButton.clicked.connect(self.select_none_clicked)
         self.definitionPushButton.clicked.connect(self.show_definition)
 
-        self.scansLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
-        self.examsLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
-        self.resultsLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
-        self.dicomSendLabel.setStyleSheet("font-weight: bold; color: #E0A526;")
+        label_style = "font-weight: bold; color: #E0A526; font-size: 20px; margin-left: 0px; padding-left: 0px;"
+        self.scansLabel.setStyleSheet(label_style)
+        self.examsLabel.setStyleSheet(label_style)
+        self.resultsLabel.setStyleSheet(label_style)
+        self.dicomSendLabel.setStyleSheet(label_style)
+        self.viewerLabel.setStyleSheet(label_style)
 
         self.definitionPushButton.setIcon(qta.icon("fa5s.binoculars"))
-        self.definitionPushButton.setText(" Show definition...")
+        self.definitionPushButton.setText(" Show definition")
         self.definitionPushButton.setIconSize(QSize(20, 20))
+
         self.exportPushButton.setIcon(qta.icon("fa5s.save"))
-        self.exportPushButton.setText(" Export...")
+        self.exportPushButton.setText(" Export")
         self.exportPushButton.setIconSize(QSize(20, 20))
 
         self.sendDicomsButton.setIcon(qta.icon("fa5s.paper-plane"))
         self.sendDicomsButton.setText(" Send")
         self.sendDicomsButton.setIconSize(QSize(20, 20))
+
+        self.setStyleSheet(
+            """
+            QListView::item
+            {
+                padding: 8px;
+            }
+            QListView::item:selected
+            {
+                background-color: #E0A526;  
+            }
+            QListView::item:hover
+            {
+                background-color: rgba(224, 165, 38, 120);
+            }
+            """
+        )
+        self.loadTimer = QTimer(self)
+        self.loadTimer.setInterval(100)
+        self.loadTimer.timeout.connect(self.trigger_load_scan)
+
+        self.examListWidget.currentRowChanged.connect(self.exam_selected)
+        self.scanListWidget.currentRowChanged.connect(self.scan_selected)
+        self.resultListWidget.currentRowChanged.connect(self.result_selected)
+        self.examListWidget.setCurrentRow(0)
+
+    def trigger_load_scan(self):
+        self.loadTimer.stop()
+        self.viewer.view_scan(
+            self.load_scan_path, self.load_result_type, self.load_scan_task
+        )
 
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
@@ -154,7 +192,13 @@ class StudyViewer(QDialog):
         scan = exam.scans[self.scanListWidget.currentRow()]
         if scan.task.results:
             result_data = scan.task.results[row]
-            self.viewer.view_scan(result_data.file_path, result_data.type)
+            scan_path = str(scan.dir) + "/" + result_data.file_path
+            if self.loaded_path != scan_path:
+                self.load_scan_path = scan_path
+                self.load_result_type = result_data.type
+                self.load_scan_task = scan.task
+                if not self.loadTimer.isActive():
+                    self.loadTimer.start()
 
     def scan_selected(self, row: int):
         self.resultListWidget.clear()
@@ -166,7 +210,7 @@ class StudyViewer(QDialog):
                 self.resultListWidget.addItem(result)
         else:
             for result in scan.task.results:
-                self.resultListWidget.addItem(result.name + " - " + result.type)
+                self.resultListWidget.addItem(result.name + "  (" + result.type + ")")
         self.resultListWidget.setCurrentRow(0)
 
     def exam_selected(self, index: int):
@@ -192,18 +236,6 @@ class StudyViewer(QDialog):
             patient_name = (
                 f"{scan_task.patient.last_name}, {scan_task.patient.first_name}"
             )
-            # exam_id = scan_task["exam"]["id"] # should be same as id found in dir_name
-            scan_id = scan_task.id
-
-            # create a new patient object if not found
-            # patient = next(
-            #     (p for p in patients if p.mrn == scan_task.patient.mrn), None
-            # )
-            # if not patient:
-            #     patient = PatientData(
-            #         name=patient_name, mrn=scan_task.patient.mrn, exams=[]
-            #     )
-            #     patients.append(patient)
 
             # create a new exam object if not found
             exam = next((e for e in exams if e.id == exam_id), None)
@@ -216,14 +248,7 @@ class StudyViewer(QDialog):
                 )
                 exams.append(exam)
 
-            dicom_data = np.array([])
-            rawdata = np.array([])
-
             scan = ScanData(
-                # id=scan_id,
-                # dicom=dicom_data,
-                # rawdata=rawdata,
-                # metadata=scan_task,
                 task=scan_task,
                 dir=exam_dir,
             )
@@ -237,6 +262,11 @@ class StudyViewer(QDialog):
         for i in range(self.scanListWidget.count()):
             item = self.scanListWidget.item(i)
             item.setCheckState(Qt.CheckState.Checked)
+
+    def select_none_clicked(self):
+        for i in range(self.scanListWidget.count()):
+            item = self.scanListWidget.item(i)
+            item.setCheckState(Qt.CheckState.Unchecked)
 
     def show_definition(self):
         exam = self.exams[self.examListWidget.currentRow()]

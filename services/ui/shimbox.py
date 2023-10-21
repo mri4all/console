@@ -25,7 +25,7 @@ class ShimBox(QDialog):
 
     def __init__(self, parent, buttons=btns.Ok):
         super(ShimBox, self).__init__(parent)
-        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/shimBox.ui", self)
+        uic.loadUi(f"{rt.get_console_path()}/services/ui/forms/shimbox.ui", self)
         self.setWindowTitle("Configuration")
 
         self.buttons.setStandardButtons(buttons)
