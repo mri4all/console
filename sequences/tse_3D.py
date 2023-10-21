@@ -74,6 +74,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             inputs={"TE": self.param_TE, "TR": self.param_TR},
             check_timing=True,
             output_file=self.seq_file_path,
+            pe_order_file=self.get_working_folder() + "/data/pe_order.npy"
         )
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
@@ -107,15 +108,18 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
+def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
+        return False
+    if not pe_order_file:
+        log.error("No PE order file specified")
         return False
 
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    # LARMOR_FREQ = LARMOR_FREQ
+    LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
@@ -201,7 +205,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="") -> bool:
     )
 
     pe_order = choose_pe_order(
-        ndims=3, npe=[dim0, dim1], traj=traj, save_pe_order=False
+        ndims=3, npe=[dim0, dim1], traj=traj, save_pe_order=True, save_path = pe_order_file
     )
     npe = pe_order.shape[0]
     phase_areas0 = pe_order[:, 0] * delta_ky

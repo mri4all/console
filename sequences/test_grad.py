@@ -20,10 +20,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 70
     param_TR: int = 250
-    param_NSA: int = 1
-    param_ADC_samples: int = 4096
-    param_ADC_duration: int = 6400
-
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -35,23 +31,19 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration} # , 
+        return {"TE": self.param_TE, "TR": self.param_TR}
 
     @classmethod
     def get_default_parameters(
         self
     ) -> dict:
-        return {"TE": 70, "TR": 250, "NSA": 1, "ADC_samples": 4096, "ADC_duration": 6400}
-
+        return {"TE": 70, "TR": 250}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
             self.param_TR = parameters["TR"]
-            self.param_NSA = parameters["NSA"]
-            self.param_ADC_samples = parameters["ADC_samples"]
-            self.param_ADC_duration = parameters["ADC_duration"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -60,19 +52,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
-        widget.NSA_SpinBox.setValue(self.param_NSA)
-        widget.ADC_samples_SpinBox.setValue(self.param_ADC_samples)
-        widget.ADC_duration_SpinBox.setValue(self.param_ADC_duration)
-        
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
-        self.param_NSA = widget.NSA_SpinBox.value()
-        self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
-        self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -81,20 +66,19 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.problem_list.append("TE cannot be longer than TR")
         return self.is_valid()
 
-    def calculate_sequence(self, scan_task) -> bool:
+    def calculate_sequence(self) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(
-            inputs={"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, 
-            "ADC_samples":self.param_ADC_samples, "ADC_duration":self.param_ADC_duration}, check_timing=True, output_file=self.seq_file_path
-        ) # 
+        pypulseq_1dse(
+            inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
+        )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
         return True
 
-    def run_sequence(self, scan_task) -> bool:
+    def run_sequence(self) -> bool:
         log.info("Running sequence " + self.get_name())
 
         rxd, rx_t = run_pulseq(
@@ -122,7 +106,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
+def pypulseq_1dse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -133,22 +117,32 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
+    TR = 250.0
+    TE = 70.0
     alpha1 = 90  # flip angle
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
-    # adc_num_samples = 4096
-    # adc_duration = 6.4e-3
+    TE = 70e-3
+    TR = 250e-3
+    num_averages = 1
+    adc_num_samples = 4096
+    adc_duration = 6.4e-3
+
+    fov = 140e-3  # Define FOV and resolution
+    Nx = 96
+    BW = 32e3
+    adc_dwell = 1 / BW
+    adc_duration = Nx * adc_dwell  # 6.4e-3
+
+    prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     # LARMOR_FREQ = ui_inputs["LARMOR_FREQ"]
     # RF_MAX = ui_inputs["RF_MAX"]
     # RF_PI2_FRACTION = ui_inputs["RF_PI2_FRACTION"]
 
-    TR = inputs["TR"] / 1000 # ms to s
-    TE = inputs["TE"] / 1000
-    num_averages = inputs["NSA"]
-    adc_num_samples = inputs['ADC_samples']
-    adc_duration = inputs['ADC_duration'] / 1e6 # us to s
+    # TR = inputs["TR"] / 1000
+    # TE = inputs["TE"] / 1000
 
     # ======
     # INITIATE SEQUENCE
@@ -184,16 +178,33 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
         use='refocusing'
     )
 
+
+    delta_k = 1 / fov
+    gx = pp.make_trapezoid(channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system)
+    gx_pre = pp.make_trapezoid(channel="x", area=gx.area / 2, duration=prephaser_duration, system=system)
+    # Define ADC events
+    # adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system)
+
+
     # ======
     # CALCULATE DELAYS
     # ======
-    tau1 = TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
-    tau2 = TE / 2 - 0.5 * (pp.calc_duration(rf2) + (adc_duration))
+    tau1 = (
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            / seq.grad_raster_time
+        )
+    ) * seq.grad_raster_time
+
+    tau2 = (
+        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre)) / seq.grad_raster_time)
+    ) * seq.grad_raster_time
+
     delay_TR = TR - TE - (0.5 * adc_duration)
     assert np.all(tau1 >= 0)
-
-    # Define ADC events
-    adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    assert np.all(tau2 >= 0)
+    assert np.all(delay_TR >= 0)
 
     # ======
     # CONSTRUCT SEQUENCE
@@ -201,9 +212,13 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
         seq.add_block(rf1)
-        seq.add_block(pp.make_delay(tau1))
-        seq.add_block(rf2)
-        seq.add_block(adc, pp.make_delay(delay_TR))
+        seq.add_block(gx_pre)
+        # seq.add_block(pp.make_delay(tau1))
+        # seq.add_block(rf2)
+        # seq.add_block(pp.make_delay(tau2))
+        # seq.add_block(gx, adc, pp.make_delay(delay_TR))
+        
+    seq.write('test.seq')
 
     # Check whether the timing of the sequence is correct
     if check_timing:
