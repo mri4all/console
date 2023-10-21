@@ -694,6 +694,7 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         shim_centre = shim_z
 
     shim_range = np.linspace(-range / 2, range / 2, shim_points) + shim_centre
+    print(f'shim range = {shim_range}')
     for shim in shim_range:
         if channel == 'x':
             shim_x = shim
@@ -711,10 +712,12 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         
         # get peaks, find fwhm 
         peak_index = [np.argmax(np.abs(rxd))]
-        fwhm_list.append(sig.peak_widths(np.abs(rxd), peaks=peak_index, rel_height=0.5))
+        peak_widths = sig.peak_widths(np.abs(rxd), peaks=peak_index, rel_height=0.5)
+        fwhm_list.append(np.squeeze(peak_widths[0]))
         
     # determine best, and update config file with the best
     best_shim_index = np.argmin(fwhm_list)
+    shim_range = list(shim_range)
     best_shim = shim_range[best_shim_index]
     
     if plot: 
