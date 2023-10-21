@@ -708,7 +708,7 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         
         # get peaks, find fwhm 
         peak_index = [np.argmax(np.abs(rxd))]
-        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        fwhm_list.append(sig.peak_widths(np.abs(rxd), peaks=peak_index, rel_height=0.5))
         
     # determine best, and update config file with the best
     best_shim_index = np.argmin(fwhm_list)
