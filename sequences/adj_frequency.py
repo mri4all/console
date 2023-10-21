@@ -105,6 +105,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # reading configuration data from config.json
         configuration_data=reading_json_parameter()
 
+        working_folder = self.get_working_folder()
+
         max_freq, max_snr_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
@@ -114,6 +116,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
+            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
         )
@@ -127,6 +130,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
+            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
         )

@@ -105,7 +105,9 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # reading configuration data from config.json
         configuration_data=reading_json_parameter()
 
-        max_freq, max_snr_freq, data_dict = larmor_step_search(
+        working_folder = self.get_working_folder()
+
+        max_freq, max_snr_freq, data_dict, plot_result1 = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
             steps=30,
@@ -114,11 +116,14 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
+            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
         )
 
-        opt_max_freq, opt_max_snr_freq, data_dict = larmor_step_search(
+        scan_task.results.append(plot_result1)
+
+        opt_max_freq, opt_max_snr_freq, data_dict, plot_result2 = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=max_snr_freq,
             steps=30,
@@ -127,9 +132,12 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_x=cfg.SHIM_X,
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
+            working_folder=working_folder,
             delay_s=1,
             gui_test=False,
         )
+
+        scan_task.results.append(plot_result2)
 
         larmor_freq, data_dict = larmor_cal(
             seq_file=self.seq_file_path,
