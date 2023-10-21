@@ -126,7 +126,7 @@ class Communicator(QObject, Helper):
         if not os.path.exists(self.out_file):
             return False
         with open(self.out_file, "w") as f:
-            f.write(CommunicatorEnvelope(value=obj, error=error).model_dump_json())
+            f.write(CommunicatorEnvelope(value=abs(obj), error=error).model_dump_json())
             f.write("\n")
         return True
 
