@@ -11,8 +11,7 @@ log = logger.get_logger()
 
 
 def pypulseq_se2D(
-    inputs=None, check_timing=True, output_file="", visualize=True
-) -> bool:
+    inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -40,6 +39,7 @@ def pypulseq_se2D(
     fov = inputs["FOV"] / 1000
     Nx = inputs["Base_Resolution"]
     BW = inputs["BW"]
+    visualize = inputs["view_traj"]
     # Trajectory = inputs['Trajectory']     TODO
     # PE_Ordering = inputs['PE_Ordering']   TODO
     # PF = inputs['PF']                     TODO

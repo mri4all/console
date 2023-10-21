@@ -13,12 +13,15 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="whatsThis">
+   <string>pop up trajectory graph</string>
+  </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>16</x>
      <y>12</y>
-     <width>832</width>
+     <width>833</width>
      <height>483</height>
     </rect>
    </property>
@@ -267,36 +270,52 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Trajectory</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="Trajectory_ComboBox">
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="PF_SpinBox">
         <property name="minimumSize">
          <size>
           <width>120</width>
           <height>0</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>Cartesian</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="text">
-         <string>PE Ordering</string>
+        <property name="minimum">
+         <number>1</number>
         </property>
        </widget>
       </item>
+      <item row="4" column="1">
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>352</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="1" column="1">
+       <widget class="QCheckBox" name="visualize_traj_CheckBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="whatsThis">
+         <string>pop up trajectory graph</string>
+        </property>
+        <property name="text">
+         <string>Visualize Traj</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <widget class="QComboBox" name="PE_Ordering_ComboBox">
         <property name="minimumSize">
          <size>
@@ -316,38 +335,41 @@
         </item>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_13">
         <property name="text">
          <string>PF</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="PF_SpinBox">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Trajectory</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>PE Ordering</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="Trajectory_ComboBox">
         <property name="minimumSize">
          <size>
           <width>120</width>
           <height>0</height>
          </size>
         </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
+        <item>
+         <property name="text">
+          <string>Cartesian</string>
+         </property>
+        </item>
        </widget>
-      </item>
-      <item row="3" column="1">
-       <spacer name="verticalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>352</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </item>
