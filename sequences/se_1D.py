@@ -26,7 +26,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_FOV: int = 20
     param_Base_Resolution: int = 250
     param_BW: int = 32000
-    param_Gradient: str = "x"
+    param_Gradient: str = "y"
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -52,7 +52,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         "FOV": 20,
         "Base_Resolution": 250,
         "BW": 32000,
-        "Gradient":"x",}
+        "Gradient":"y",}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
