@@ -21,14 +21,14 @@ if Ns%2:
     nx = np.arange(-Ns//2+1,Ns//2+1,1)/Ns
 else:
     nx = np.arange(-Ns//2,Ns//2,1)/Ns 
-# phase_acc = np.fft.fftshift(exp(2*pi*1i*nx*bw
-# _acq*delay));
-
+    
 for L in range(etLength):
     coords1 =  np.where(kTraj % etLength == L)[1] #ny
     coords2 = np.where(kTraj % etLength == L)[0] #nz
     # idx_trj = np.arange(L, etLength, numPE)
-    phi = 2 * np.pi * nx  * (delayT + ESP - Ns*T_PE/2) * L
+    # phi = 2 * np.pi * nx  * (delayT + ESP - Ns*T_PE/2) * L
+    phi = 2 * np.pi * nx  * delayT * BW  * (L + 1)
+
     tmp = kData[:,coords1, coords2]
     kData[:,coords1, coords2] \
         =np.fft.fft(np.fft.ifft(tmp, axis=0) *  np.fft.fftshift(np.exp(-1j * phi)[:,None], axes=0), axis=0)  ## check dim 

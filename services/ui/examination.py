@@ -277,6 +277,8 @@ class ExaminationWindow(QMainWindow):
 
         self.queue_selection_changed()
 
+        self.init_seqparam_ui()
+
     def received_recon(self, o):
         self.received_message(o, self.recon_pipe)
 
@@ -807,6 +809,7 @@ class ExaminationWindow(QMainWindow):
             pass
 
         self.otherParametersTextEdit.setPlainText(json.dumps(scan_task.other, indent=4))
+        self.load_seqparam_to_ui(scan_task)
 
         ui_runtime.editor_scantask = scan_task
         ui_runtime.editor_sequence_instance.write_parameters_to_ui(
@@ -838,6 +841,7 @@ class ExaminationWindow(QMainWindow):
             ui_runtime.editor_scantask.other = json.loads(
                 self.otherParametersTextEdit.toPlainText()
             )
+            self.store_seqparam_from_ui(ui_runtime.editor_scantask)
             ui_runtime.editor_scantask.journal.prepared_at = helper.get_datetime()
             task.write_task(scan_path, ui_runtime.editor_scantask)
             task.set_task_state(scan_path, mri4all_files.EDITING, False)
@@ -1218,3 +1222,28 @@ class ExaminationWindow(QMainWindow):
             self.stopScanButton.setEnabled(True)
 
         self.editScanButton.setEnabled(True)
+
+    def ui_denoising_strength(self):
+        value = self.denoisingSlider.value()
+        description = "OFF"
+        if value > 0:
+            description = "LOW"
+        if value > 3:
+            description = "MEDIUM"
+        if value > 6:
+            description = "HIGH"
+        self.denoisingValueLabel.setText(description + " (" + str(value) + ")")
+
+    def init_seqparam_ui(self):
+        self.denoisingSlider.valueChanged.connect(self.ui_denoising_strength)
+
+    def load_seqparam_to_ui(self, scan_task):
+        denoising_strength = scan_task.processing.denoising_strength
+        if denoising_strength > 9:
+            denoising_strength = 9
+        if denoising_strength < 0:
+            denoising_strength = 0
+        self.denoisingSlider.setValue(denoising_strength)
+
+    def store_seqparam_from_ui(self, scan_task):
+        scan_task.processing.denoising_strength = self.denoisingSlider.value()

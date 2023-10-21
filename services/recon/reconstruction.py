@@ -20,7 +20,7 @@ from recon.image_filters import denoise
 log = logger.get_logger()
 
 
-def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
+def run_reconstruction_cartesian(folder: str, task: ScanTask):
     """
     Runs the reconstruction pipeline for Cartesian sampling
     """
