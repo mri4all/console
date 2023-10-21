@@ -62,7 +62,7 @@ def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fe
     ax3 = plt.subplot(gs[3])
 
     # Total number of slices and the number of slices to plot
-    total_slices = 25
+    total_slices = kspace.shape[-1]
     slices_to_plot = 9
 
     # Calculate the spacing between slices

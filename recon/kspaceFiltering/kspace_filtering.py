@@ -16,7 +16,7 @@ def kspace_center_correction(kspace):
     h, w, z = kspace.shape
     move_h = h // 2 - max_index_2d[0]
     move_w = w // 2 - max_index_2d[1]
-    kspace = np.roll(kspace, (move_h, move_w, 0), axis=(0, 1, 2))
+    kspace = np.roll(kspace, (move_h, move_w), axis=(0, 1))
     
     return kspace
 
