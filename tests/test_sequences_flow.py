@@ -71,10 +71,10 @@ def run_tests() -> bool:
     log.info("Running tests for sequences...")
     log.info("")
     # Comment all test sequences except one when testing without connecting RedPitaya
-    run_sequence_test("rf_se")
-    run_sequence_test("se_1D")      # TODO: go over x,y,z
+    #run_sequence_test("rf_se")
+    #run_sequence_test("se_1D")      # TODO: go over x,y,z
     run_sequence_test("se_2D")
-    run_sequence_test("tse_3D")
+    #run_sequence_test("tse_3D")
     return True
 
 
