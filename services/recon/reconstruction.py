@@ -31,9 +31,9 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
         return
 
     # Load the k-space data
-    kData = np.load(folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.RAWDATA)
+    kData = np.load(folder + '/' + mri4all_taskdata.RAWDATA + '/' + mri4all_scanfiles.RAWDATA)
     kTraj = np.genfromtxt(
-        folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.TRAJ, delimiter=","
+        folder + '/'  + mri4all_taskdata.RAWDATA+ '/' + mri4all_scanfiles.TRAJ, delimiter=","
     )  # pe_table a lot by 2 # check rotation
 
     if kTraj.shape[0] > 2:
@@ -46,8 +46,8 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
 
     # Preform B0 correction and reconstruct the image
     fname_B0_map = list(filter(lambda x: mri4all_scanfiles.BDATA in x, fnames))
-    Y = np.ndarray
-    kt = np.ndarray
+    Y = kData
+    kt = kTraj
     df = np.load(path.join(folder, fname_B0_map[0])) if fname_B0_map else None
     Lx = 1
     nonCart = None
@@ -65,7 +65,7 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
         log.error(f"Image denoising failed.")
 
     # Create the DICOM file
-    DICOM.write_dicom(iData, task, folder + mri4all_taskdata.DICOM)
+    DICOM.write_dicom(iData, task, folder + '/' + mri4all_taskdata.DICOM)
     log.info(f"DICOM writting finished.")
 
     # Create the ISMRMRD file

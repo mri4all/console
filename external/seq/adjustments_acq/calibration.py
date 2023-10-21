@@ -21,7 +21,7 @@ from common.types import ScanTask
 
 
 def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
-                       shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, working_folder = ".", delay_s=1, gui_test=False):
+                       shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
     Used to find a starting point, not for precision
@@ -109,18 +109,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].plot(np.abs(rx_arr))
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
-    
-        file = open(working_folder + "/other/adj_frequency.plot", 'wb')
-        fig = plt.gcf()
-        pickle.dump(fig, file)
-        file.close()
-        plot_result = ResultItem()
-        plot_result.name = "demo"
-        plot_result.description = "This is just a plot"
-        plot_result.type = "plot"
-        plot_result.primary = True
-        plot_result.autoload_viewer = 1
-        plot_result.file_path = 'other/adj_frequency.plot'
+        fig_signal = plt.gcf()
 
 
     # Plot noise figure
@@ -132,6 +121,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].plot(np.abs(noise_array))
         axs[1].set_title('noise_array')
         plt.show()
+        fig_noise = plt.gcf()
 
     # Output of useful data for visualization
     data_dict = {'rx_arr': rx_arr,
@@ -140,7 +130,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  }
 
     # Return the frequency that worked the best with SNR
-    return max_freq, max_snr_freq, data_dict, plot_result
+    return max_freq, max_snr_freq, data_dict, fig_signal, fig_noise
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
@@ -267,6 +257,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LA
         axs[4].sharex(axs[3])
         axs[4].set_xlabel('Frequency (MHz)')
         plt.show()
+        fig = plt.gcf()
 
     # Data saved for visualization
     data_dict = {'rxd': rxd,
@@ -275,7 +266,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LA
                  'larmor_freq': larmor_freq
                  }
 
-    return larmor_freq, data_dict
+    return larmor_freq, data_dict, fig
 
 
 def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
@@ -972,3 +963,17 @@ def run_sequence_test(sequence_name: str) -> bool:
     sequence_instance.run_sequence(scan_task)
 
     return True
+
+def load_plot_in_ui(working_folder= ".", file_name = "default_plot_name", fig=[]):
+    file = open(working_folder + "/other/" + file_name + ".plot", 'wb')
+    pickle.dump(fig, file)
+    file.close()
+    plot_result = ResultItem()
+    plot_result.name = "demo"
+    plot_result.description = "This is just a plot"
+    plot_result.type = "plot"
+    plot_result.primary = True
+    plot_result.autoload_viewer = 1
+    plot_result.file_path = "/other/" + file_name + ".plot"
+
+    return plot_result

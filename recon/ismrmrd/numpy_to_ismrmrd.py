@@ -33,8 +33,8 @@ def create_ismrmrd(folder, raw_data, task):
 
     # Experimental Conditions
     exp = ismrmrd.xsd.experimentalConditionsType() 
-    #exp.H1resonanceFrequency_Hz = 128000000 #! needed field
-    exp.H1resonanceFrequency_Hz = data['FieldStrength']*(42.57e+06) 
+    magneticFieldStrength = 0.048
+    exp.H1resonanceFrequency_Hz = magneticFieldStrength*(42.57e+06) 
 
     header.experimentalConditions = exp
 
@@ -47,7 +47,7 @@ def create_ismrmrd(folder, raw_data, task):
     # Encoding
     encoding = ismrmrd.xsd.encodingType()  
     #encoding.trajectory = ismrmrd.xsd.trajectoryType.CARTESIAN
-    encoding.trajectory =ismrmrd.xsd.trajectoryType[data['processing']['trajectory'].upper()]
+    encoding.trajectory =ismrmrd.xsd.trajectoryType[data.processing.trajectory.upper()]
 
     # encoded and recon spaces
     efov = ismrmrd.xsd.fieldOfViewMm() 
