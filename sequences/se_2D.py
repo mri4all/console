@@ -364,10 +364,9 @@ def pypulseq_se2D(
 
     # Visualize Trajectory and other things
     if visualize:
-        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
-        log.info("Completed calculating Trajectory")
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_k)
+        log.info("Completed calculating trajectory")
         log.info("Generating plots...")
-        seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     # Save sequence

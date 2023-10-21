@@ -8,7 +8,7 @@ from sequences.common.pydanticConfig import Config
 import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
-from sequences.rf_se import pypulseq_rfse  # type: ignore
+from sequences import pypulseq_rfse  # type: ignore
 
 
 log = logger.get_logger()
