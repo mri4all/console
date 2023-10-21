@@ -37,6 +37,7 @@ import services.ui.protocolbrowser as protocolbrowser
 from sequences import SequenceBase
 from services.ui.viewerwidget import MplCanvas, ViewerWidget
 from services.ui.custommessagebox import CustomMessageBox  # type: ignore
+import services.ui.control as control
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -477,7 +478,9 @@ class ExaminationWindow(QMainWindow):
         )
         for seq in sequence_list:
             # Adjustment sequences should not be shown here
-            if (not seq.startswith("adj_") or not seq.startswith("prescan_")) or rt.is_debugging_enabled():
+            if (
+                not seq.startswith("adj_") or not seq.startswith("prescan_")
+            ) or rt.is_debugging_enabled():
                 add_sequence_action = QAction(self)
                 add_sequence_action.setText(
                     SequenceBase.get_sequence(seq).get_readable_name()
@@ -930,7 +933,10 @@ class ExaminationWindow(QMainWindow):
             # Revert the case to the "created" state
             task.set_task_state(scan_path, mri4all_files.PREPARED, False)
         if scan_entry.state == "acq":
-            task.set_task_state(scan_path, mri4all_files.STOP, True)
+            if task.has_task_state(scan_path, mri4all_files.STOP):
+                control.restart_device()
+            else:
+                task.set_task_state(scan_path, mri4all_files.STOP, True)
         self.sync_queue_widget(False)
 
     def sync_queue_widget(self, reset: bool):
