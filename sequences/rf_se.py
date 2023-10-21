@@ -152,7 +152,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             file = open('rf_se_plot', 'wb')
             fig = plt.gcf()
             pickle.dump(fig, file)
-            
             file.close()
 
         log.info("Done running sequence " + self.get_name())
