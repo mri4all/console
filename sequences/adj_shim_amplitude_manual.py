@@ -108,6 +108,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def new_signal(self, temp_folder):
         # Run the rf_se with the updated shim parameters
         scan_task = ScanTask()
+        log.info("Calculating sequence " + self.get_name())
 
         sequence_name = "rf_se"
 
