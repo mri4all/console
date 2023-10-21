@@ -1,3 +1,4 @@
+import os
 from sequences.adj_shim_amplitude import CalShimAmplitude
 from sequences import SequenceBase
 from sequences.common.util import reading_json_parameter, writing_json_parameter
@@ -5,6 +6,11 @@ from common.types import ScanTask
 from common.ipc import Communicator
 
 from common.ipc import Communicator
+
+import common.helper as helper
+import common.logger as logger
+log = logger.get_logger()
+
 
 
 def new_user_values(values):
@@ -25,6 +31,15 @@ def new_user_values(values):
 def new_signal(temp_folder):
     # Run the rf_se with the updated shim parameters
     scan_task = ScanTask()
+    
+    temp_folder = "/tmp/" + helper.generate_uid()
+    log.info(f"Using temporary folder: {temp_folder}")
+
+    try:
+        os.mkdir(temp_folder)
+    except:
+        log.error(f"Could not create temporary folder {temp_folder}.")
+        return False
 
     sequence_name = "rf_se"
 
