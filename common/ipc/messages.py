@@ -72,6 +72,9 @@ class Helper:
     
         try:
             os.mkdir(temp_folder)
+            os.mkdir(temp_folder+'/other')
+            os.mkdir(temp_folder+'/dicom')
+            os.mkdir(temp_folder+'/rawdata')
         except:
             log.error(f"Could not create temporary folder {temp_folder}.")
             
