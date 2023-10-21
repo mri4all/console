@@ -24,7 +24,23 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+
+        widget.baseresolutionSpinBox.valueChanged.connect(self.update_info)
+        widget.flipAngleSpinBox.valueChanged.connect(self.update_info)
+        widget.TESpinBox.valueChanged.connect(self.update_info)
+        widget.TRSpinBox.valueChanged.connect(self.update_info)
+
         return True
+
+    def update_info(self):
+        duration = int(
+            self.main_widget.TRSpinBox.value()
+            * self.main_widget.baseresolutionSpinBox.value()
+            / 1000
+        )
+        self.show_ui_info_text(
+            f"TA: {duration} sec       Voxel Size: 1.0 x 1.0 x 1.0 mm"
+        )
 
     def get_parameters(self) -> dict:
         return {
@@ -55,6 +71,7 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
         widget.flipAngleSpinBox.setValue(self.param_flipangle)
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
+        self.update_info()
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:

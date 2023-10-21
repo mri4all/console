@@ -81,22 +81,23 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
-
-        rxd, rx_t = run_pulseq(
-            seq_file=self.seq_file_path,
-            rf_center=cfg.LARMOR_FREQ,
-            tx_t=1,
-            grad_t=10,
-            tx_warmup=100,
-            shim_x=0,
-            shim_y=0,
-            shim_z=0,
-            grad_cal=False,
-            save_np=False,
-            save_mat=False,
-            save_msgs=False,
-            gui_test=False,
-        )
+        iterations = 1000
+        for iter in range(iterations):
+            rxd, rx_t = run_pulseq(
+                seq_file=self.seq_file_path,
+                rf_center=cfg.LARMOR_FREQ,
+                tx_t=1,
+                grad_t=10,
+                tx_warmup=100,
+                shim_x=0,
+                shim_y=0,
+                shim_z=0,
+                grad_cal=False,
+                save_np=False,
+                save_mat=False,
+                save_msgs=False,
+                gui_test=False,
+            )
 
         # save the raw data file
         self.raw_file_path = self.get_working_folder() + "/data/raw.npy"

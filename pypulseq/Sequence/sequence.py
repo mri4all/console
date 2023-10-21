@@ -84,7 +84,7 @@ class Sequence:
         """
         block.add_block(self, len(self.dict_block_events) + 1, *args)
 
-    def calculate_kspace(self, trajectory_delay: int = 0) -> Tuple[np.array, np.array, np.array, np.array, np.array]:
+    def calculate_kspace(self, trajectory_delay: int = 0, spoil_val: float = []) -> Tuple[np.array, np.array, np.array, np.array, np.array]:
         """
         Calculates the k-space trajectory of the entire pulse sequence.
 
@@ -170,24 +170,24 @@ class Sequence:
             gw_period = gw[:, i_periods[i] - 1:i_period_end] * self.grad_raster_time
             k_period = np.concatenate((k, gw_period), axis=1)
             k_period = np.cumsum(k_period, axis=1)
-            # TODO: account for spoiling: when traj is out of bound, set it back to 0
-            for j in range(1):  #TODO: now it's only for Gx
-                spoil_val = 1100   #TODO: this should either be passed in or read from the sequence
-                while max(abs(k_period[j,:]))>=spoil_val:
-                    ind_spoil = np.where(abs(k_period[j,:]) >= spoil_val)[0][0]
-                    spoil_start_1 = np.where(gw_period[j,:ind_spoil] == 0)[0]
-                    spoil_start_2 = argrelextrema(gw_period[j,:ind_spoil], np.less)[0]
-                    spoil_end = np.where(gw_period[j,ind_spoil+1:] == 0)[0]
+            # account for spoiling: when traj is out of bound, set it back to 0
+            if spoil_val != []:
+                for j in range(3):
+                    while max(abs(k_period[j,:]))>=spoil_val*0.9:
+                        ind_spoil = np.where(abs(k_period[j,:]) >= spoil_val*0.9)[0][0]
+                        spoil_start_1 = np.where(gw_period[j,:ind_spoil] == 0)[0]
+                        spoil_start_2 = argrelextrema(gw_period[j,:ind_spoil], np.less)[0]
+                        spoil_end = np.where(gw_period[j,ind_spoil+1:] == 0)[0]
 
-                    spoil_start_1 = spoil_start_1[-1] + 1 if spoil_start_1.size > 0 else 0
-                    spoil_start_2 = spoil_start_2[-1] + 1 if spoil_start_2.size > 0 else 0
-                    spoil_start = max(spoil_start_1,spoil_start_2)
-                    spoil_end = ind_spoil + 1 + spoil_end[0] if spoil_end.size > 0 else -1
+                        spoil_start_1 = spoil_start_1[-1] + 1 if spoil_start_1.size > 0 else 0
+                        spoil_start_2 = spoil_start_2[-1] + 1 if spoil_start_2.size > 0 else 0
+                        spoil_start = max(spoil_start_1,spoil_start_2)
+                        spoil_end = ind_spoil + 1 + spoil_end[0] if spoil_end.size > 0 else -1
 
-                    k_period_temp = np.concatenate((k[j,:], gw_period[j,:]))
-                    k_period[j,:spoil_start] = np.cumsum(k_period_temp[:spoil_start])
-                    k_period[j,spoil_start:spoil_end] = 0
-                    k_period[j,spoil_end:] = np.cumsum(k_period_temp[spoil_end:])
+                        k_period_temp = np.concatenate((k[j,:], gw_period[j,:]))
+                        k_period[j,:spoil_start] = np.cumsum(k_period_temp[:spoil_start])
+                        k_period[j,spoil_start:spoil_end] = 0
+                        k_period[j,spoil_end:] = np.cumsum(k_period_temp[spoil_end:])
 
             k_traj[:, i_periods[i] - 1:i_period_end] = k_period[:, 1:]
             k = k_period[:, -1]

@@ -1,198 +1,13 @@
-import os
-from pathlib import Path
 import math
 import numpy as np
-import matplotlib.pyplot as plt
-from PyQt5 import uic
 
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.scripts import run_pulseq
 
-from sequences import PulseqSequence
-from sequences import make_se_2D
 from sequences.common import view_traj
 import common.logger as logger
 
 log = logger.get_logger()
-
-
-class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
-    # Sequence parameters
-    param_TE: int = 70
-    param_TR: int = 250
-    param_NSA: int = 1
-    param_FOV: int = 140
-    param_Orientation: str = "Axial"
-    param_Base_Resolution: int = 70
-    param_BW: int = 32e3
-    param_Trajectory: str = "Catisian"
-    param_PE_Ordering: str = "Center_out"
-    param_PF: int = 1 
-    
-
-    @classmethod
-    def get_readable_name(self) -> str:
-        return "2D Spin-Echo"
-
-    def setup_ui(self, widget) -> bool:
-        seq_path = os.path.dirname(os.path.abspath(__file__))
-        uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
-        return True
-
-    def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, 
-        "TR": self.param_TR, 
-        "NSA": self.param_NSA, 
-        "FOV": self.param_FOV,
-        "Orientation":self.param_Orientation,
-        "Base_Resolution": self.param_Base_Resolution,
-        "BW":self.param_BW,
-        "Trajectory":self.param_Trajectory,
-        "PE_Ordering":self.param_PE_Ordering,
-        "PF": self.param_PF}
-
-    @classmethod
-    def get_default_parameters(self) -> dict:
-        return {"TE": 70, "TR": 250,
-                "NSA": 1, 
-                "FOV": 140,
-                "Orientation":"axial",
-                "Base_Resolution": 70,
-                "BW":20,
-                "Trajectory":"Cartesian",
-                "PE_Ordering":"center_out",
-                "PF": 1
-                }
-
-    def set_parameters(self, parameters, scan_task) -> bool:
-        self.problem_list = []
-        try:
-            self.param_TE = parameters["TE"]
-            self.param_TR = parameters["TR"]
-            self.param_NSA = parameters["NSA"]
-            self.param_FOV = parameters["FOV"]
-            self.param_Orientation = parameters["Orientation"]
-            self.param_Base_Resolution = parameters["Base_Resolution"]
-            self.param_BW = parameters["BW"]
-            self.param_Trajectory = parameters["Trajectory"]
-            self.param_PE_Ordering = parameters["PE_Ordering"]
-            self.param_PF = parameters["PF"]
-        except:
-            self.problem_list.append("Invalid parameters provided")
-            return False
-        return self.validate_parameters(scan_task)
-
-    def write_parameters_to_ui(self, widget) -> bool:
-        widget.TESpinBox.setValue(self.param_TE)
-        widget.TRSpinBox.setValue(self.param_TR)
-        widget.NSA_SpinBox.setValue(self.param_NSA)
-        widget.Orientation_ComboBox.setCurrentText(self.param_Orientation)
-        widget.FOV_SpinBox.setValue(self.param_FOV)
-        widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
-        widget.BW_SpinBox.setValue(self.param_BW)
-        widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
-        widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
-        widget.PF_SpinBox.setValue(self.param_PF)
-
-        return True
-
-    def read_parameters_from_ui(self, widget, scan_task) -> bool:
-        self.problem_list = []
-        self.param_TE = widget.TESpinBox.value()
-        self.param_TR = widget.TRSpinBox.value()
-        self.param_NSA = widget.NSA_SpinBox.value()
-        self.param_Orientation = widget.Orientation_ComboBox.currentText()
-        self.param_FOV = widget.FOV_SpinBox.value()
-        self.param.Base_Resolution = widget.Base_Resolution_SpinBox.value()
-        self.param_BW = widget.BW_SpinBox.value()
-        self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
-        self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
-        self.param_PF = widget.PF_SpinBox.value()
-        self.validate_parameters(scan_task)
-        return self.is_valid()
-
-    def validate_parameters(self, scan_task) -> bool:
-        if self.param_TE > self.param_TR:
-            self.problem_list.append("TE cannot be longer than TR")
-        return self.is_valid()
-
-    def calculate_sequence(self, scan_task) -> bool:
-        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
-        log.info("Calculating sequence " + self.get_name())
-
-        # ToDo: if self.Trajectory == "Cartesian": (default)
-        make_se_2D.pypulseq_se2D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR, 
-                    "NSA": self.param_NSA, 
-                    "FOV": self.param_FOV,
-                    "Orientation":self.param_Orientation,
-                    "Base_Resolution": self.param_Base_Resolution,
-                    "BW":self.param_BW,
-                    "Trajectory":self.param_Trajectory,
-                    "PE_Ordering":self.param_PE_Ordering,
-                    "PF": self.param_PF},
-            check_timing=True,
-            output_file=self.seq_file_path,
-        )
-        # elif self.Trajectory == "Radial":
-        # pypulseq_se2D_radial(
-        #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        # )
-
-        log.info("Done calculating sequence " + self.get_name())
-        self.calculated = True
-        return True
-
-    def run_sequence(self, scan_task) -> bool:
-        log.info("Running sequence " + self.get_name())
-
-        rxd, rx_t = run_pulseq(
-            seq_file=self.seq_file_path,
-            rf_center=cfg.LARMOR_FREQ,
-            tx_t=1,
-            grad_t=10,
-            tx_warmup=100,
-            shim_x=0,
-            shim_y=0,
-            shim_z=0,
-            grad_cal=False,
-            save_np=False,
-            save_mat=False,
-            save_msgs=False,
-            gui_test=False,
-        )
-
-        log.info("Done running sequence " + self.get_name())
-
-        # test for recon testing
-        data = rxd.reshape((70, 70))
-        plt.figure()
-        plt.subplot(131)
-        plt.imshow(np.abs(data))
-        plt.title("kspace, abs")
-        plt.subplot(132)
-        plt.imshow(np.real(data))
-        plt.title("real")
-        plt.subplot(133)
-        plt.imshow(np.imag(data))
-        plt.title("imag")
-        plt.show()
-
-        img = np.fft.fft2(data)
-        plt.figure()
-        plt.subplot(131)
-        plt.imshow(np.abs(img))
-        plt.title("image, abs")
-        plt.subplot(132)
-        plt.imshow(np.real(img))
-        plt.title("real")
-        plt.subplot(133)
-        plt.imshow(np.imag(img))
-        plt.title("imag")
-        plt.show()
-
-        return True
 
 
 def pypulseq_se2D(
@@ -209,17 +24,13 @@ def pypulseq_se2D(
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fov = 140e-3  # Define FOV and resolution
-    Nx = 70
-    Ny = Nx
+    # fov = 140e-3  # Define FOV and resolution
+    # Nx = 70
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
-    num_averages = 1
-    BW = 32e3
-    adc_dwell = 1 / BW
-    adc_duration = Nx * adc_dwell  # 6.4e-3
+    #num_averages = 1
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     TR = inputs["TR"] / 1000
@@ -227,11 +38,16 @@ def pypulseq_se2D(
     num_averages = inputs['NSA']
     Orientation = inputs['Orientation']
     fov = inputs['FOV']
-    base_resolution = inputs['Base_Resolution']
+    Nx = inputs['Base_Resolution']
     BW = inputs['BW']
-    Trajectory = inputs['Trajectory']
-    PE_Ordering = inputs['PE_Ordering']
-    PF = inputs['PF']
+    # Trajectory = inputs['Trajectory']     TODO
+    # PE_Ordering = inputs['PE_Ordering']   TODO
+    # PF = inputs['PF']                     TODO
+
+    Ny = Nx
+    #BW = 32e3
+    adc_dwell = 1 / BW
+    adc_duration = Nx * adc_dwell  # 6.4e-3
 
     # ======
     # INITIATE SEQUENCE
@@ -364,9 +180,10 @@ def pypulseq_se2D(
 
     # Visualize Trajectory and other things
     if visualize:
-        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_k)
-        log.info("Completed calculating trajectory")
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
+        log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
+        seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     # Save sequence
@@ -381,7 +198,7 @@ def pypulseq_se2D(
     return True
 
 
-# implement 2D radial Trajectory (Ruoxun Zi)
+# implement 2D radial Trajectory
 def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
