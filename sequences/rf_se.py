@@ -116,7 +116,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-
+        
+        self.rxd = rxd
+        
         # Debug 
         if 1>0: #todo: debug mode
             # view_traj.view_sig(rxd)
