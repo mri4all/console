@@ -38,6 +38,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         configuration_data=reading_json_parameter()
 
         max_freq, data_dict = larmor_step_search(
+            self_val=self,
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
             steps=2,

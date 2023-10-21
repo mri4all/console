@@ -15,11 +15,12 @@ from external.marcos_client.examples import trap_cent  # pylint: disable=import-
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
 import common.helper as helper
+from common.types import ResultItem
 from sequences import SequenceBase
 from common.types import ScanTask
 
 
-def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
+def larmor_step_search(self_val=self, seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
@@ -109,10 +110,18 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
     
-        file = open('serialized_plot', 'wb')
-        fig = plt.gcf()
-        pickle.dump(fig, file)
-        file.close()
+        # file = open(self_val.get_working_folder() + "/other/rf_se.plot", 'wb')
+        # fig = plt.gcf()
+        # pickle.dump(fig, file)
+        # file.close()
+        # result = ResultItem()
+        # result.name = "demo"
+        # result.description = "This is just a plot"
+        # result.type = "plot"
+        # result.primary = True
+        # result.autoload_viewer = 1
+        # result.file_path = 'other/rf_se.plot'
+        # scan_task.results.append(result)
 
     # Plot noise figure
     if plot:
