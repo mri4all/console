@@ -188,7 +188,6 @@ class ViewerWidget(QWidget):
         
         fig.set_figheight(8)
         fig.set_figwidth(5)
-        pickled_file_path.close()
 
         figCanvas = FigureCanvasQTAgg(fig)
         toolbar = NavigationToolbar2QT(figCanvas, self)
