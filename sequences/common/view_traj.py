@@ -41,10 +41,11 @@ def view_traj_2d(k_traj_adc, k_traj):
     # plt.show()  # Display the plots
 
 def view_traj_3d(k_traj_adc, k_traj):
+    plt.style.use("dark_background")
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot(k_traj[0,:], k_traj[1,:], k_traj[2,:],'b',linewidth=1)
-    ax.plot(k_traj_adc[0,:], k_traj_adc[1,:], k_traj_adc[2,:], 'r.',markersize=0.5)
+    ax = fig.add_subplot(projection='3d')
+    ax.plot(k_traj[0,:], k_traj[1,:], k_traj[2,:],linewidth=1)
+    ax.plot(k_traj_adc[0,:], k_traj_adc[1,:], k_traj_adc[2,:],'m.',markersize=0.5)
     ax.set_aspect('equal')
     ax.set_xlabel('kx')
     ax.set_ylabel('ky')

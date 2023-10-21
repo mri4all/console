@@ -2,6 +2,14 @@ import numpy as np
 from typing import Tuple
 
 
+def centered_fft(x: np.ndarray) -> np.ndarray: # n-dim fft
+    return np.fft.fftshift(np.fft.fftn(np.fft.ifftshift(x), norm='ortho'))
+
+
+def centered_ifft(y) -> np.ndarray: # n-dim ifft
+    return np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(y), norm='ortho'))
+
+
 def centered_fft2(x: np.ndarray) -> np.ndarray:
     return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(x), norm='ortho'))
 

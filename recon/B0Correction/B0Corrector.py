@@ -1,9 +1,13 @@
 import numpy as np
-from recon.B0Correction import OCTOPUS as oc
 from typing import Optional, Any, Mapping, TypedDict
 
-import recon.recon_utils
+import common.logger as logger
 
+from recon.B0Correction import OCTOPUS as oc
+import recon.recon_utils as ru
+
+
+log = logger.get_logger()
 
 class B0Params(TypedDict):
     '''
@@ -26,7 +30,7 @@ class B0Corrector:
     def __init__(self, 
                  Y: np.ndarray, 
                  kt: np.ndarray, 
-                 df: np.ndarray, 
+                 df: Optional[np.ndarray], 
                  Lx: int=1,
                  nonCart: Optional[bool]=None, 
                  params: Optional[B0Params]=None):
@@ -39,7 +43,12 @@ class B0Corrector:
         self.params = params  # parameters for B0 correction
                     
     def __call__(self) -> np.ndarray:
+        if self.df is None:  # if no B0, directly perform ifft
+            log.info("Performing n-dim IFFT reconstruction")
+            return ru.centered_ifft(self.Y)
+        
         return self.correct_MFI()  # default method
+    
     
     def correct_Cartesian_basic(self) -> np.ndarray: 
         '''
@@ -61,7 +70,8 @@ class B0Corrector:
         M_hat : numpy.ndarray
             Off-resonance corrected image data
         '''
-        return oc.orc(recon_utils.centered_ifft2(self.Y), self.kt, self.df)  # expects image domain
+        log.info("Running naive Cartesian off-resonance correction")
+        return oc.orc(ru.centered_ifft2(self.Y), self.kt, self.df)  # expects image domain
     
     def correct_MFI(self) -> np.ndarray: 
         '''
@@ -91,4 +101,13 @@ class B0Corrector:
         M_hat : numpy.ndarray
             Corrected image data.
         '''
-        return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=self.Lx, nonCart=self.nonCart, params=self.params) 
+        log.info("Running multi-frequency interpolation for off-resonance corrected reconstruction")
+        if len(self.Y.shape) <= 2:
+            return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=self.Lx, nonCart=self.nonCart, params=self.params) 
+        elif len(self.Y.shape)  == 3:
+            mfi_img = np.zeros(self.Y.shape)
+            for i in range(self.Y.shape[2]):
+                 mfi_img[..., i] = oc.MFI(self.Y[..., i], self.kt, self.df[..., i], Lx=1, nonCart=False, params=self.params) 
+            return mfi_img
+        else:
+            raise ValueError(f'Input data shape {self.Y.shape} not supported')

@@ -3,6 +3,7 @@ from pathlib import Path
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 from PyQt5 import uic
 
@@ -12,6 +13,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
+from sequences import make_rf_se
 import common.logger as logger
 from sequences.common import view_traj
 
@@ -25,6 +27,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_NSA: int = 1
     param_ADC_samples: int = 4096
     param_ADC_duration: int = 6400
+    param_debug_plot: bool = True
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -42,6 +45,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": self.param_NSA,
             "ADC_samples": self.param_ADC_samples,
             "ADC_duration": self.param_ADC_duration,
+            "debug_plot": self.param_debug_plot,
         }  # ,
 
     @classmethod
@@ -52,6 +56,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": 1,
             "ADC_samples": 4096,
             "ADC_duration": 6400,
+            "debug_plot": True
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -62,6 +67,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_NSA = parameters["NSA"]
             self.param_ADC_samples = parameters["ADC_samples"]
             self.param_ADC_duration = parameters["ADC_duration"]
+            self.param_debug_plot = parameters["debug_plot"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -97,7 +103,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(
+        make_rf_se.pypulseq_rfse(
             inputs={
                 "TE": self.param_TE,
                 "TR": self.param_TR,
@@ -141,9 +147,18 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
-            plt.figure()
+            plt.style.use("dark_background")
+            plt.title('Acq signal')  
+            plt.grid(True)
             plt.plot(np.abs(rxd))
-            plt.show()
+            if self.param_debug_plot:
+                plt.show()
+                
+            
+            file = open('rf_se_plot', 'wb')
+            fig = plt.gcf()
+            pickle.dump(fig, file)
+            file.close()
 
         log.info("Done running sequence " + self.get_name())
         return True
