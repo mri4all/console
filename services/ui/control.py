@@ -48,3 +48,11 @@ def ping(ip: str):
         return True
     except subprocess.CalledProcessError:
         return False
+
+
+def run_device_bootsequence() -> bool:
+    return True
+
+
+def run_device_test() -> bool:
+    return True

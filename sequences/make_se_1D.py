@@ -29,14 +29,20 @@ def pypulseq_1dse(
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
-    TE = 20e-3
-    TR = 3000e-3
-    num_averages = 1
-    channel = "y"
-    # adc_num_samples = 4096
+    # TE = 20e-3
+    # TR = 3000e-3
+    # num_averages = 1
+    # channel = "y"
+    TR = inputs["TR"] / 1000 # ms to s
+    TE = inputs["TE"] / 1000
+    num_averages = inputs["NSA"]
+    fov = inputs['FOV'] / 1000
+    Nx = inputs['Base_Resolution']
+    BW = inputs['BW']
+    channel = inputs["Gradient"]
 
-    fov = 20e-3  # Define FOV and resolution - 37.5e-3
-    Nx = 250
+    # fov = 20e-3  # Define FOV and resolution - 37.5e-3
+    # Nx = 250
     # BW = 64e3
     # adc_dwell = 1 / BW
     # adc_duration = 2.25e-3 # Nx * adc_dwell  # 6.4e-3

@@ -114,6 +114,7 @@ def prepare_system() -> bool:
 
     # TODO: If disk space is low, clear old cases from the archive folder
     control_services(ServiceAction.START)
+
     # TODO: Check if the acquisition and reconstruction services are running
 
     ui_runtime.load_config()

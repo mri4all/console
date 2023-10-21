@@ -1,6 +1,13 @@
+import os
+import common.logger as logger
+
+
+from time import sleep
 from typing import Any, Dict, List, Literal, Optional, Union
+import numpy as np
 from pydantic import BaseModel
 
+import common.helper as helper_common
 from common.types import IntensityMapResult, TimeSeriesResult
 
 
@@ -28,7 +35,7 @@ class UserQueryMessage(FifoMessageType):
 
 class UserResponseMessage(FifoMessageType):
     type: Literal["user_response"] = "user_response"
-    response: Optional[Union[float, int, str]] = None
+    response: Optional[Union[float, int, str, dict]] = None
 
 
 class UserAlertMessage(FifoMessageType):
@@ -47,9 +54,47 @@ class ShowDicomMessage(FifoMessageType):
     dicom_files: List[str]
 
 
+class DoShimMessage(FifoMessageType):
+    type: Literal["shim"] = "shim"
+    message: Literal["start", "put", "get"]
+    data: Optional[List[Any]] = None
+
+
 class Helper:
     def show_dicoms(self, dicoms: List[str]):
         return self._query(ShowDicomMessage(dicom_files=dicoms))
+
+    def do_shim(self, new_user_values, new_signal, signal_tick_mul=4, values_tick=0.1):
+        log = logger.get_logger()
+        self.shim_start()
+        
+        temp_folder = "/tmp/" + helper_common.generate_uid()
+    
+        try:
+            os.mkdir(temp_folder)
+        except:
+            log.error(f"Could not create temporary folder {temp_folder}.")
+            
+        n = 0
+        while True:
+            result = self.shim_get()
+            new_user_values(result.response["values"])
+            if result.response["complete"] == True:
+                return result.response["values"]
+            if n >= signal_tick_mul:
+                n = 0
+                self.shim_put(new_signal(temp_folder))
+            n = n + 1
+            sleep(values_tick)
+
+    def shim_start(self):
+        return self._query(DoShimMessage(message="start"))
+
+    def shim_get(self):
+        return self._query(DoShimMessage(message="get"))
+
+    def shim_put(self, data):
+        self._send(DoShimMessage(message="put", data=data))
 
     def show_image(
         self,

@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
 
 import qtawesome as qta
+from services.ui.shimbox import ShimBox
 import sip  # type: ignore
 
 import common.runtime as rt
@@ -32,9 +33,10 @@ import services.ui.configuration as configuration
 import services.ui.systemstatus as systemstatus
 import services.ui.taskviewer as taskviewer
 import services.ui.studyviewer as studyviewer
+import services.ui.protocolbrowser as protocolbrowser
 from sequences import SequenceBase
 from services.ui.viewerwidget import MplCanvas, ViewerWidget
-from services.ui.customMessageBox import CustomMessageBox  # type: ignore
+from services.ui.custommessagebox import CustomMessageBox  # type: ignore
 
 from services.ui.errors import SequenceUIFailed, UIException
 
@@ -76,6 +78,8 @@ class ExaminationWindow(QMainWindow):
     status_overwrite = None
     updating_queue_widget = False
 
+    shimSignal = pyqtSignal(object)
+
     def __init__(self):
         """
         Loads the user interface, applies styling, and configures the event handling.
@@ -88,6 +92,9 @@ class ExaminationWindow(QMainWindow):
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionConfiguration.triggered.connect(configuration.show_configuration)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
+        self.actionProtocol_Browser.triggered.connect(
+            protocolbrowser.show_protocol_browser
+        )
 
         self.menuDebug.menuAction().setVisible(rt.is_debugging_enabled())
         self.actionDebug_update_scan_list.triggered.connect(self.debug_update_scan_list)
@@ -96,6 +103,9 @@ class ExaminationWindow(QMainWindow):
         self.protocolBrowserButton.setToolTip("Open protocol browser")
         self.protocolBrowserButton.setIcon(qta.icon("fa5s.list"))
         self.protocolBrowserButton.setIconSize(QSize(32, 32))
+        self.protocolBrowserButton.clicked.connect(
+            protocolbrowser.show_protocol_browser
+        )
 
         self.resultsViewerButton.setText("")
         self.resultsViewerButton.setToolTip("Open results viewer")
@@ -348,6 +358,25 @@ class ExaminationWindow(QMainWindow):
             except:
                 pipe.send_user_response(error=True)
                 raise
+        elif isinstance(msg_value, ipc.messages.DoShimMessage):
+            if msg_value.message == "start":
+                self.shim_dlg = ShimBox(self)
+                self.shimSignal.connect(self.shim_dlg.new_data)
+                self.shim_dlg.show()
+                pipe.send_user_response()
+            elif msg_value.message == "get":
+                pipe.send_user_response(
+                    {
+                        "values": self.shim_dlg.current_values.model_dump(),
+                        "complete": self.shim_dlg.user_clicked != None,
+                    }
+                )
+            elif msg_value.message == "put":
+                # self.shim_dlg.canvas.axes.clear()
+                log.info("received put")
+                self.shimSignal.emit(msg_value.data)
+                # self.shim_dlg.canvas.axes.plot([1, 2, 3, 4, 5, 6])  # [msg_value.data])
+                # self.shim_dlg.canvas.axes.up
 
     def update_monitor_status(self):
         self.sync_queue_widget(False)

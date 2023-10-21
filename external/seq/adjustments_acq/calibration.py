@@ -13,6 +13,10 @@ import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
+import common.helper as helper
+from sequences import SequenceBase
+from common.types import ScanTask
+
 
 def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
@@ -50,13 +54,13 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     # Create array for storing data
     rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
     rx_arr[:, 0] = rxd
+    noise_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
+    signal_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
 
     # Pause for spin recovery
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
-    signal_array = []
-    noise_array = []
     snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
@@ -65,16 +69,16 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
+        
         # Calculate signal to noise ratio
-        for index in range(0,len(rx_arr[:, i])):
-            if index >= steps/4 and index < steps - steps/4:
-                signal_array.append(rx_arr[index, i])
+        for index in range(0,rxd.shape[0]):
+            if index > rxd.shape[0]/4 and index < (rxd.shape[0] - rxd.shape[0]/4):
+                signal_array[index,i] = rx_arr[index, i]
             else:
-                noise_array.append(rx_arr[index, i])
-        snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
+                noise_array[index,i] = rx_arr[index, i]
+        snr = np.mean(np.abs(signal_array[:,i])) / np.std(np.abs(noise_array[:,i]))
         print("SNR= " + str(snr))
         snr_array.append(snr)
-        time.sleep(delay_s)
 
     # Find the frequency data with the largest maximum absolute value
     max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
@@ -102,7 +106,6 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         fig, axs = plt.subplots(2, 1, constrained_layout=True)
         fig.suptitle('NOISE')
         axs[0].plot(np.abs(signal_array))
-        # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
         axs[0].set_title('signal_array')
         axs[1].plot(np.abs(noise_array))
         axs[1].set_title('noise_array')
@@ -355,8 +358,9 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
 
     # Calculate RF max in Hz
     est_rf_max = 0.25 / (RF_PI2_DURATION * rf_max_val) * 1e6
+    rf_pi2_fraction = rf_max_val * cfg.RF_MAX / est_rf_max
     print(f'Estimated RF max: {est_rf_max:.2f} Hz')
-    print(f'{RF_PI2_DURATION}us pulse, pi/2 flip maxed at {rf_max_val * cfg.RF_MAX / est_rf_max:.4f} fractional power')
+    print(f'{RF_PI2_DURATION}us pulse, pi/2 flip maxed at {rf_pi2_fraction:.4f} fractional power')
 
     # Plot if asked
     if plot:
@@ -381,7 +385,7 @@ def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=
                  'rf_max': est_rf_max
                  }
 
-    return est_rf_max, data_dict
+    return est_rf_max, rf_pi2_fraction, data_dict
 
 def rf_duration_cal(rxd_list=[], points=25, zoom_factor=2, smooth=True, iterations=2, first_max=False, \
                     plot=True):
@@ -648,7 +652,7 @@ def grad_max_cal(channel='x', phantom_width=10, larmor_freq=cfg.LARMOR_FREQ, cal
     return grad_max
 
 
-def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.01, shim_points=3, points=2, iterations=1, zoom_factor=2,
+def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.seq', larmor_freq=cfg.LARMOR_FREQ, channel='x', range=0.05, shim_points=3, points=2, iterations=1, zoom_factor=2,
              shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z,
              tr_spacing=2, force_tr=False, first_max=False, smooth=True, plot=True, gui_test=False,):
     """
@@ -706,8 +710,8 @@ def shim_cal_linear(seq_file = cfg.MGH_PATH + f'cal_seq_files/spin_echo_1D_proj.
         time.sleep(tr_spacing)
         
         # get peaks, find fwhm 
-        peak_index = np.array(np.argmax(np.abs(rxd)))
-        fwhm_list.append(sig.peak_widths(rxd, peaks=peak_index, rel_height=0.5))
+        peak_index = [np.argmax(np.abs(rxd))]
+        fwhm_list.append(sig.peak_widths(np.abs(rxd), peaks=peak_index, rel_height=0.5))
         
     # determine best, and update config file with the best
     best_shim_index = np.argmin(fwhm_list)
@@ -918,3 +922,28 @@ if __name__ == "__main__":
             print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
     else:
         print('Enter a calibration command from: [larmor, larmor_w, rf, grad, shim]')
+
+def run_sequence_test(sequence_name: str) -> bool:
+    print(f"Testing sequence {sequence_name}...")
+
+    temp_folder = "/tmp/" + helper.generate_uid()
+    print(f"Using temporary folder: {temp_folder}")
+
+    try:
+        os.mkdir(temp_folder)
+    except:
+        print(f"Could not create temporary folder {temp_folder}.")
+        return False
+
+    scan_task = ScanTask()
+
+    sequence_instance = SequenceBase.get_sequence(sequence_name)()
+    # Get the default parameters from the sequence as an example
+    default_parameters = sequence_instance.get_default_parameters()
+    # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+    sequence_instance.set_parameters(default_parameters, scan_task)
+    sequence_instance.set_working_folder(temp_folder)
+    sequence_instance.calculate_sequence(scan_task)
+    sequence_instance.run_sequence(scan_task)
+
+    return True

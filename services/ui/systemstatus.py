@@ -9,7 +9,12 @@ import qtawesome as qta  # type: ignore
 from common.version import mri4all_version
 import common.runtime as rt
 import services.ui.ui_runtime as ui_runtime
-from services.ui.control import control_service, ping
+from services.ui.control import (
+    control_service,
+    ping,
+    run_device_bootsequence,
+    run_device_test,
+)
 from common.constants import *
 
 
@@ -63,6 +68,11 @@ class SystemStatusWindow(QDialog):
         self.reconstructionLabel.setText("")
         self.reconstructionLabel.setFont(qta.font("fa", 16))
 
+        self.deviceResetButton.setIcon(qta.icon("fa5s.power-off"))
+        self.deviceResetButton.setText(" Reset")
+        self.deviceResetButton.setFont(qta.font("fa", 16))
+        self.deviceResetLabel.setText("")
+
         self.softwareLabel.setText(
             f'<span style="color: #E0A526; font-size: 22px;"><b>MRI4ALL {ui_runtime.system_information.model}</b></span><br><br>Serial Number  {ui_runtime.system_information.serial_number}<p>Software Version  {mri4all_version.get_version_string()}</p>'
         )
@@ -73,6 +83,19 @@ class SystemStatusWindow(QDialog):
             f"{int(diskspace.free / 1024 / 1024 / 1024)} GB available"
         )
         self.diskspaceFreeLabel.setStyleSheet("color: #424d76;")
+
+        self.deviceTestLabel.setText(
+            '<span style="color: #515669; font-size: 24px;"> '
+            + chr(0xF059)
+            + chr(0xA0)
+            + " </span> Not tested"
+        )
+        self.pingLabel.setText(
+            '<span style="color: #515669; font-size: 24px;"> '
+            + chr(0xF059)
+            + chr(0xA0)
+            + " </span> Not tested"
+        )
 
         # Check services status periodically
         self.timer = QTimer(self)
@@ -182,17 +205,18 @@ class SystemStatusWindow(QDialog):
             )
 
     def deviceTestButton_clicked(self):
-        if False:
+        test_result = run_device_test()
+        if test_result:
             self.deviceTestLabel.setText(
                 '<span style="color: #40C1AC; font-size: 24px;"> '
                 + chr(0xF058)
                 + chr(0xA0)
-                + " </span> Test successful"
+                + " </span> Success"
             )
         else:
             self.deviceTestLabel.setText(
                 '<span style="color: #E5554F; font-size: 24px;"> '
                 + chr(0xF057)
                 + chr(0xA0)
-                + " </span> Test failed"
+                + " </span> Failure"
             )
