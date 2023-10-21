@@ -30,6 +30,9 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
 
     log.info(f"Starting reconstruction.")
 
+    if task.processing.recon_mode == "bypass":
+        return True
+
     if task.processing.recon_mode == "fake_dicoms":
         utils.generate_fake_dicoms(folder, task)
         time.sleep(2)
