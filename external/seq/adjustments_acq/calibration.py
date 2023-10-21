@@ -71,8 +71,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         noise_array = []
         signal_array = []
         for index in range(0,len(rx_arr[:, i])):
-            print("DEBUG "+str(index)+"/"+str(len(rx_arr[:, i])))
-            if index >= steps/4 and index < steps - steps/4:
+            if index >= len(rx_arr[:, i])/4 and index < len(rx_arr[:, i]) - len(rx_arr[:, i])/4:
                 signal_array.append(rx_arr[index, i])
             else:
                 noise_array.append(rx_arr[index, i])
