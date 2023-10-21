@@ -34,9 +34,9 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
         return
 
     # Load the k-space data
-    kData = np.load(folder + "rawdata" + "/kSpace.npy")  # TODO: Zach
+    kData = np.load(folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.RAWDATA)
     kTraj = np.genfromtxt(
-        r"%s/%s/trajectory.csv" % (folder), delimiter=","  # TODO: Zach
+        folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.TRAJ, delimiter=","
     )  # pe_table a lot by 2 # check rotation
 
     if kTraj.shape[0] > 2:
