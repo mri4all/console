@@ -20,7 +20,7 @@ from sequences import SequenceBase
 from common.types import ScanTask
 
 
-def larmor_step_search(self_val=self, seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
+def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_center=cfg.LARMOR_FREQ, steps=30, step_bw_MHz=5e-3, plot=False,
                        shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, delay_s=1, gui_test=False):
     """
     Run a stepped search through a range of frequencies to find the highest signal response
