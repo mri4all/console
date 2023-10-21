@@ -149,7 +149,7 @@
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>24</number>
+           <number>12</number>
           </property>
           <property name="topMargin">
            <number>0</number>
@@ -160,6 +160,13 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <widget class="QLabel" name="sequenceResolutionLabel">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
