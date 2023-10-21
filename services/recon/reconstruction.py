@@ -33,7 +33,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
         log.error(f"Folder {folder} is empty.")
         return
 
-    # TODO: Load the k-space data
+    # Load the k-space data
     kData = np.load(folder + "rawdata" + "/kSpace.npy")  # TODO: Zach
     kTraj = np.genfromtxt(
         r"%s/%s/trajectory.csv" % (folder), delimiter=","  # TODO: Zach
@@ -47,7 +47,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     kData = kFilter(kData, filterType, center_correction=True)
     log.info(f"kSpace {filterType} filtering finished.")
 
-    #TODO(Zach, Shounak): Use the trajectory information and B0 map
+    # Preform B0 correction and reconstruct the image
     fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
@@ -59,6 +59,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
 
+    # Denoise the image
     try:
         strength = task.processing.denoising_strength
         iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter", strength=strength)
@@ -66,11 +67,11 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     except ValueError:
         log.error(f"Image denoising failed.")
 
-    # TODO(Lavanya): Write the DICOM file to the folder
+    # Create the DICOM file
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
-    # TODO(Radhika): Write ISMRMRD file to the folder
+    # Create the ISMRMRD file
     create_ismrmrd(folder, kData, task)
 
 
