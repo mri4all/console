@@ -189,8 +189,13 @@ class ViewerWidget(QWidget):
         fig.set_figheight(8)
         fig.set_figwidth(5)
 
+        self.widget = QWidget()
+        self.widget.setLayout(QVBoxLayout(self.widget))
+        self.widget.layout().setContentsMargins(0, 0, 0, 0)
+        self.widget.layout().setSpacing(0)
         figCanvas = FigureCanvasQTAgg(fig)
         toolbar = NavigationToolbar2QT(figCanvas, self)
         
-        self.layout().addWidget(figCanvas)
-        self.layout().addWidget(toolbar)
+        self.widget.layout().addWidget(figCanvas)
+        self.widget.layout().addWidget(toolbar)
+        self.layout().addWidget(self.widget)
