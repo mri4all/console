@@ -12,6 +12,8 @@ import common.logger as logger
 
 from sequences import PulseqSequence
 from sequences import make_rf_se
+from sequences import SequenceBase
+
 
 import configparser
 from sequences.common.util import reading_json_parameter, writing_json_parameter
@@ -87,6 +89,50 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         if self.param_N_ITER < 1:
             self.problem_list.append("Cannot have less than 1 iteration")
         return self.is_valid()
+    
+    def new_user_values(values):
+        # gets passed in the new values ... will need to respond
+        # SET SHIMX, SHIMY, SHIMZ
+
+        configuration_data = reading_json_parameter()
+
+        configuration_data.shim_parameters.shim_x = values["x"] / 1000
+        configuration_data.shim_parameters.shim_y = values["y"] / 1000
+        configuration_data.shim_parameters.shim_z = values["z"] / 1000
+
+        writing_json_parameter(config_data=configuration_data)
+
+        print(values)
+
+
+    def new_signal(temp_folder):
+        # Run the rf_se with the updated shim parameters
+        scan_task = ScanTask()
+        
+        temp_folder = "/tmp/" + helper.generate_uid()
+        log.info(f"Using temporary folder: {temp_folder}")
+
+        try:
+            os.mkdir(temp_folder)
+        except:
+            log.error(f"Could not create temporary folder {temp_folder}.")
+            return False
+
+        sequence_name = "rf_se"
+
+        sequence_instance = SequenceBase.get_sequence(sequence_name)()
+        # Get the default parameters from the sequence as an example
+        scan_parameters = sequence_instance.get_default_parameters()
+        scan_parameters["debug_plot"] = False
+        # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
+        sequence_instance.set_parameters(scan_parameters, scan_task)
+        sequence_instance.set_working_folder(temp_folder)
+        sequence_instance.calculate_sequence(scan_task)
+        sequence_instance.run_sequence(scan_task)
+        # return the new signal that is produced by user values. should return the FFT or whatever
+        # MEASURE THE FFT OF THE SIGNAL
+        rxd = abs(sequence_instance.rxd)
+        return rxd.tolist()
 
 
     def calculate_sequence(self, scan_task) -> bool:

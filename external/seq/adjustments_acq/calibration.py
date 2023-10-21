@@ -15,6 +15,7 @@ from external.marcos_client.examples import trap_cent  # pylint: disable=import-
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
 from utils import constants
 import common.helper as helper
+from common.types import ResultItem
 from sequences import SequenceBase
 from common.types import ScanTask
 
@@ -109,10 +110,18 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
     
-        file = open('serialized_plot', 'wb')
-        fig = plt.gcf()
-        pickle.dump(fig, file)
-        file.close()
+        # file = open(self_val.get_working_folder() + "/other/rf_se.plot", 'wb')
+        # fig = plt.gcf()
+        # pickle.dump(fig, file)
+        # file.close()
+        # result = ResultItem()
+        # result.name = "demo"
+        # result.description = "This is just a plot"
+        # result.type = "plot"
+        # result.primary = True
+        # result.autoload_viewer = 1
+        # result.file_path = 'other/rf_se.plot'
+        # scan_task.results.append(result)
 
     # Plot noise figure
     if plot:

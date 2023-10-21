@@ -1,26 +1,23 @@
-import common.logger as logger
-import common.runtime as rt
 import numpy as np
 import os
 from os import path
-
-from recon.kspaceFiltering.kspace_filtering import *
-
-from recon.B0Correction import B0Corrector
-import recon.DICOM.DICOM_utils as DICOM
-from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
-
-from recon.image_filters import denoise
-
-log = logger.get_logger()
-
+import time
+import common.logger as logger
+import common.runtime as rt
 import common.queue as queue
 from common.constants import *
 import common.task as task
 from common.types import ScanTask
-
 import services.recon.utils as utils
-import time
+
+
+from recon.kspaceFiltering.kspace_filtering import *
+from recon.B0Correction import B0Corrector
+import recon.DICOM.DICOM_utils as DICOM
+from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
+from recon.image_filters import denoise
+
+log = logger.get_logger()
 
 
 def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
@@ -48,7 +45,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     log.info(f"kSpace {filterType} filtering finished.")
 
     # Preform B0 correction and reconstruct the image
-    fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
+    fname_B0_map = list(filter(lambda x: mri4all_scanfiles.BDATA in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
     df = np.load(path.join(folder, fname_B0_map[0])) if fname_B0_map else None
@@ -68,7 +65,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
         log.error(f"Image denoising failed.")
 
     # Create the DICOM file
-    DICOM.write_dicom(iData, task, folder)
+    DICOM.write_dicom(iData, task, folder + mri4all_taskdata.DICOM)
     log.info(f"DICOM writting finished.")
 
     # Create the ISMRMRD file

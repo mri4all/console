@@ -71,7 +71,8 @@ class ViewerWidget(QWidget):
         if viewer_mode == "dicom":
             self.load_dicoms(file_path, task)
         elif viewer_mode == "plot":
-            self.load_plot()
+            self.load_pickled_plot(file_path, task)
+            # self.load_plot()
         else:
             self.set_empty_viewer()
 
