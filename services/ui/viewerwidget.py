@@ -1,6 +1,7 @@
 import json
 import glob
 import sip  # type: ignore
+import pickle
 from pathlib import Path
 from typing import Literal, Optional
 from PyQt5 import uic
@@ -14,7 +15,7 @@ import pydicom
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import common.logger as logger
@@ -98,6 +99,8 @@ class ViewerWidget(QWidget):
             if path := next(other_path.glob("**/*.json"), None):
                 self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
             return False
+        elif type == "other":
+            self.load_pickled_plot(file_path, task)
         else:
             return False
 
@@ -167,3 +170,24 @@ class ViewerWidget(QWidget):
         self.widget = QWidget()
         self.widget.setStyleSheet("background-color: #000;")
         self.layout().addWidget(self.widget)
+
+    def load_pickled_plot(self, input_path, task: Optional[ScanTask] = None):
+        if not input_path:
+            self.set_empty_viewer()
+            return
+        
+        pickled_file_path = Path(input_path)
+
+        if not pickled_file_path.is_file():
+            return
+        
+        fig = pickle.load(pickled_file_path)
+        fig.set_figheight(8)
+        fig.set_figwidth(5)
+        pickled_file_path.close()
+
+        figCanvas = FigureCanvasQTAgg(fig)
+        toolbar = NavigationToolbar2QT(figCanvas, self)
+        
+        self.layout().addWidget(toolbar)
+        self.layout().addWidget(figCanvas)

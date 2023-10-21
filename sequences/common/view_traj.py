@@ -23,7 +23,7 @@ def view_traj_2d(k_traj_adc, k_traj):
     # fig, ax = plt.subplots()
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(k_traj[0,:], k_traj[1,:],linewidth=1)
+    # ax.plot(k_traj[0,:], k_traj[1,:],linewidth=1)
     ax.plot(k_traj_adc[0,:], k_traj_adc[1,:], 'm.',markersize=0.5)
     ax.set_aspect('equal')
     ax.set_xlabel('kx')
@@ -41,6 +41,10 @@ def view_traj_2d(k_traj_adc, k_traj):
     # plt.show()  # Display the plots
 
 def view_traj_3d(k_traj_adc, k_traj):
+
+    k_traj_adc = evenly_sample_array(k_traj_adc,300)
+    k_traj = evenly_sample_array(k_traj,300)
+
     plt.style.use("dark_background")
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
@@ -52,3 +56,26 @@ def view_traj_3d(k_traj_adc, k_traj):
     ax.set_zlabel('kz')
     ax.set_title('K-space Trajactory')
     plt.show()  # Display the plots
+
+def evenly_sample_array(x, y):
+    """
+    Evenly sample an array 'x' so that its final length does not exceed 'y'.
+
+    Parameters:
+    x (numpy.ndarray): The input array to be sampled.
+    y (int): The ideal length for the final sampled array.
+
+    Returns:
+    numpy.ndarray: The evenly sampled array with a length not exceeding 'y'.
+    """
+    if len(x) <= y:
+        # If 'x' is already shorter than or equal to 'y', return it as is.
+        return x
+
+    # Calculate the step size for sampling.
+    step = len(x) // y
+
+    # Sample 'x' evenly using the calculated step size.
+    sampled_x = x[::step]
+
+    return sampled_x
