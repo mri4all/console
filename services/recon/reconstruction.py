@@ -70,7 +70,8 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
 
     # Create the ISMRMRD file
     # TODO: Enable ISMRMRD creation after bug fix
-    # create_ismrmrd(folder, kData, task)
+    create_ismrmrd(folder, kData, task)
+    log.info(f"ISMRMRD format writting finished.")
 
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
