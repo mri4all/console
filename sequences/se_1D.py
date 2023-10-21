@@ -24,7 +24,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_TR: int = 3000
     param_NSA: int = 1
     param_FOV: int = 20
-    param_Base_Resolution: int = 250
+    param_Base_Resolution: int = 96
     param_BW: int = 32000
     param_Gradient: str = "y"
 
