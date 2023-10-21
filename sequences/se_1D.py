@@ -157,6 +157,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # view_traj.view_sig(rxd, self.get_working_folder())
 
             log.info("Plotting figure now")
+            plt.clf()
             plt.style.use("dark_background")
             plt.subplot(121)
             plt.title('Acq signal')

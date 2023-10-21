@@ -150,6 +150,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
+            plt.clf()
             plt.style.use("dark_background")
             plt.title('Acq signal')  
             plt.grid(True)
