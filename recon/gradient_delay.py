@@ -21,7 +21,8 @@ def grad_delay_correction(kData, kTraj, delayT, etLength, BW, ESP):
 
     for L in range(etLength):
         idx_trj = np.arange(L, etLength, numPE)
-        phi = 2 * np.pi * nx  * (delayT + ESP - Ns*T_PE/2) * L
+        phi = 2 * np.pi * nx  * delayT * BW  * (L + 1)
+
         tmp = kData[:,kTraj[idx_trj,0], kTraj[idx_trj,1]]
         kData[:,kTraj[idx_trj,0], kTraj[idx_trj,1]] \
         = np.fft.fft(np.fft.ifft(tmp, axis=0) *  np.fft.fftshift(np.exp(-1j * phi)[:,None], axes=0), axis=0)
