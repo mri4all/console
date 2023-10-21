@@ -78,8 +78,16 @@ def process_reconstruction(scan_name: str) -> bool:
 
     # Store the updated scan task
     # TODO: Add error handling
-    scan_task.journal.reconstruction_end = helper.get_datetime()
-    task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
+    try:
+        scan_task.journal.reconstruction_end = helper.get_datetime()
+        task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)
+    except:
+        log.exception(
+            f"Failed to write task file for scan {scan_name}. Make sure changes to task file are consistent with type definition."
+        )
+        move_to_fail(scan_name)
+        return False
+
     log.info("Reconstruction completed.")
 
     if not queue.move_task(
