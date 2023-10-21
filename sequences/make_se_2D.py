@@ -50,6 +50,8 @@ def pypulseq_se2D(
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
     # TODO: coordinate the orientation
+    ch0 = "x"
+    ch1 = "y"
     if Orientation == "Axial":
         ch0 = "x"
         ch1 = "y"
