@@ -1,6 +1,6 @@
 import numpy as np
 
-def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'center_out',
+def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'Center_out',
                     pf: np.ndarray = [8/8, 8/8], save_pe_order: bool = True, save_path: str = 'pe_order.npy') -> np.ndarray:
     
     """
@@ -10,7 +10,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
     ----------
     ndims: number of encoding dimensions: two or three
     npe: number of phase encodes, 2D [nphase1], 3D [nphase1,nphase2]
-    traj: view ordering 'center_out', 'linear-up', and 'hybird' (3D only)
+    traj: view ordering 'Center_out', 'linear-up', and 'hybird' (3D only)
     pf: Partial Fourier
     save_pe_order: save to a numpy file with fixed name for now TODO: agree on the conventions
 
@@ -22,7 +22,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
     if ndims == 2:
         npe = npe[0]
         pf = pf[0]
-        if traj == 'center_out':
+        if traj == 'Center_out':
             pe_order = np.zeros((npe, 1), dtype=int)
             pe_order[0] = 0
             for pe in range(1, npe):
@@ -31,7 +31,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
                 else:
                     pe_order[pe] = pe_order[pe - 1] + pe
 
-        elif traj == 'linear_up':
+        elif traj == 'Linear_up':
             pe_order = np.zeros((npe, 1), dtype=int)
             for pe in range(npe):
                 pe_order[pe] = -(pe - int(npe/2))
@@ -45,7 +45,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
             
 
     if ndims == 3:
-        if traj == 'center_out': # center_out for both phase encoding direction
+        if traj == 'Center_out': # Center_out for both phase encoding direction
             num_total_pe = np.prod(npe[0] * npe[1])
             pe_order = np.zeros((num_total_pe, 2), dtype=int)
             pe_order[0, 0] = 0  # First dimension
@@ -74,7 +74,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
                     pe_order[pe, 0] = pe0_order[pe1]
                     pe_order[pe, 1] = pe1_order[pe2]
 
-        elif traj == 'hybrid': # one linear-up (1st column), one center_out (2nd column), TODO:determine the inner/outer loop
+        elif traj == 'Hybrid': # one linear-up (1st column), one Center_out (2nd column), TODO:determine the inner/outer loop
             num_total_pe = np.prod(npe[0] * npe[1])
             pe_order = np.zeros((num_total_pe, 2), dtype=int)
             pe_order[0, 0] = 0  # First dimension
@@ -95,7 +95,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
                     pe_order[pe, 0] = -(pe1 - int(npe[0]/2))
                     pe_order[pe, 1] = pe1_order[pe2]
 
-        elif traj == 'linear_up': # linear_up for both phase encoding direction
+        elif traj == 'Linear_up': # Linear_up for both phase encoding direction
             num_total_pe = np.prod(npe[0] * npe[1])
             pe_order = np.zeros((num_total_pe, 2), dtype=int)
             pe_order[0, 0] = 0  # First dimension
@@ -129,6 +129,6 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
 if __name__ == "__main__":
     ndims = 3
     Npe = [128, 128]
-    traj = 'center_out'
+    traj = 'Center_out'
     pf = [1, 1]
     choose_pe_order(ndims=ndims, npe=Npe, traj=traj, save_pe_order=True)
