@@ -1,7 +1,8 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
-import recon.kspaceFiltering.kspace_filtering as kFilter
+from recon.kspaceFiltering.kspace_filtering import *
+
 from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
 from recon.image_filters import denoise
@@ -37,13 +38,14 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     
     # TODO: Load the k-space data
     kData = np.load(folder + 'rawdata' + '/kSpace.npy')
+    kTraj = np.genfromtxt(r'%s/%s/trajectory.csv' % (folder), delimiter=',') # pe_table a lot by 2 # check rotation
+    
+    if kTraj.shape[0] > 2:
+        kTraj = np.rot90(kTraj)
+    # grad_delay_correction(kData, kTraj, delayT, param)
 
-    ## delay correction
-    
-    
-    # TODO(Bingyu): K-space filtering
-    filterType = 'sine_bell'
-    kData = kFilter.kspace_filtering(kData, filterType, center_correction=True)
+    filterType = 'fermi'
+    kData = kFilter(kData, filterType, center_correction=True)
     log.info(f"kSpace {filterType} filtering finished.")
 
     # TODO(Zach, Shounak): Use the trajectory information and B0 map
