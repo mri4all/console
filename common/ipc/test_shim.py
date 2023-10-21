@@ -14,14 +14,14 @@ log = logger.get_logger()
 
 
 def new_user_values(values):
-    # gets passed in the new values ... will need to respond
+    # gets passed in the new values ... will need to respond 
     # SET SHIMX, SHIMY, SHIMZ
 
-    configuration_data = reading_json_parameter()
+    configuration_data=reading_json_parameter()
 
-    configuration_data.shim_parameters.shim_x = values["x"] / 1000
-    configuration_data.shim_parameters.shim_y = values["y"] / 1000
-    configuration_data.shim_parameters.shim_z = values["z"] / 1000
+    configuration_data.shim_parameters.shim_x = values['x']/1000
+    configuration_data.shim_parameters.shim_y = values['y']/1000
+    configuration_data.shim_parameters.shim_z = values['z']/1000
 
     writing_json_parameter(config_data=configuration_data)
 
@@ -31,15 +31,6 @@ def new_user_values(values):
 def new_signal(temp_folder):
     # Run the rf_se with the updated shim parameters
     scan_task = ScanTask()
-    
-    temp_folder = "/tmp/" + helper.generate_uid()
-    log.info(f"Using temporary folder: {temp_folder}")
-
-    try:
-        os.mkdir(temp_folder)
-    except:
-        log.error(f"Could not create temporary folder {temp_folder}.")
-        return False
 
     sequence_name = "rf_se"
 
