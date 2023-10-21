@@ -106,7 +106,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         for shim_iter in range(int(n_iter_linear)):
             
             for channel in axes:
-                log.info(f"Updating {channel} linear shim (iter {shim_iter})")
+                log.info(f"Updating {channel} linear shim (iter {shim_iter + 1})")
                 shim_weight = shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=LARMOR_FREQ,
                         channel=channel,
@@ -135,10 +135,10 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 writing_json_parameter(config_data=configuration_data)
             
             # decrease the range a bit with each iteration, to a min bound
-            if range > 0.01:
-                range = range / 2
+            if shim_range > 0.01:
+                shim_range = shim_range / 2
             else:
-                range = range
+                shim_range = shim_range
         
         
         log.info("Done running sequence " + self.get_name())
