@@ -118,11 +118,11 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         )
 
         # Debug 
-        # plt.figure()
-        # plt.plot(np.abs(rxd))
-        # plt.show()
         if 1>0: #todo: debug mode
-            view_traj.view_sig(rxd)
+            # view_traj.view_sig(rxd)
+            plt.figure()
+            plt.plot(np.abs(rxd))
+            plt.show()
 
 
         log.info("Done running sequence " + self.get_name())
