@@ -10,7 +10,7 @@ import numpy as np
 
 from math import ceil, pi
 
-from B0Correction.OCTOPUS.imtransforms import ksp2im, im2ksp, nufft_init
+from recon.B0Correction.OCTOPUS.imtransforms import ksp2im, im2ksp, nufft_init
 
 
 def check_inputs_cartesian(dataInShape, dataInType, ktShape, dfShape):
