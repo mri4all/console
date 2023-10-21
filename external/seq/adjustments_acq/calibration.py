@@ -114,13 +114,13 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
-        plot_result = ResultItem()
-        plot_result.name = "demo"
-        plot_result.description = "This is just a plot"
-        plot_result.type = "plot"
-        plot_result.primary = True
-        plot_result.autoload_viewer = 1
-        plot_result.file_path = 'other/adj_frequency.plot'
+        plot_result_signal = ResultItem()
+        plot_result_signal.name = "demo"
+        plot_result_signal.description = "This is just a plot"
+        plot_result_signal.type = "plot"
+        plot_result_signal.primary = True
+        plot_result_signal.autoload_viewer = 1
+        plot_result_signal.file_path = 'other/adj_frequency.plot'
 
 
     # Plot noise figure
@@ -133,6 +133,18 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('noise_array')
         plt.show()
 
+        file = open(working_folder + "/other/adj_frequency.plot", 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+        plot_result_noise = ResultItem()
+        plot_result_noise.name = "demo"
+        plot_result_noise.description = "This is just a plot"
+        plot_result_noise.type = "plot"
+        plot_result_noise.primary = True
+        plot_result_noise.autoload_viewer = 1
+        plot_result_noise.file_path = 'other/adj_frequency.plot'
+
     # Output of useful data for visualization
     data_dict = {'rx_arr': rx_arr,
                  'rx_t': rx_t,
@@ -140,11 +152,11 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  }
 
     # Return the frequency that worked the best with SNR
-    return max_freq, max_snr_freq, data_dict, plot_result
+    return max_freq, max_snr_freq, data_dict, plot_result_signal, plot_result_noise
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,
-               step_size=0.6, plot=False, shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, gui_test=False):
+               step_size=0.6, plot=False, shim_x=cfg.SHIM_X, shim_y=cfg.SHIM_Y, shim_z=cfg.SHIM_Z, working_folder = ".", gui_test=False):
     """
     Run a gradient descent search from a starting larmor frequency, optimizing to find the frequency
     with the most constant phase.
@@ -268,6 +280,18 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LA
         axs[4].set_xlabel('Frequency (MHz)')
         plt.show()
 
+        file = open(working_folder + "/other/adj_frequency.plot", 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+        plot_result = ResultItem()
+        plot_result.name = "demo"
+        plot_result.description = "This is just a plot"
+        plot_result.type = "plot"
+        plot_result.primary = True
+        plot_result.autoload_viewer = 1
+        plot_result.file_path = 'other/adj_frequency.plot'
+
     # Data saved for visualization
     data_dict = {'rxd': rxd,
                  'rx_t': rx_t,
@@ -275,7 +299,7 @@ def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LA
                  'larmor_freq': larmor_freq
                  }
 
-    return larmor_freq, data_dict
+    return larmor_freq, data_dict, plot_result
 
 
 def rf_max_cal(seq_file = cfg.MGH_PATH + f'cal_seq_files/se_2.seq', larmor_freq=cfg.LARMOR_FREQ, points=20, iterations=2, zoom_factor=2,
