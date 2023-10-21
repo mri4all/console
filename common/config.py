@@ -21,6 +21,7 @@ path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 class Configuration(BaseModel):
     scanner_ip: str = "10.42.0.251"
+    debug_mode: str = "False"
     dicom_targets: List[DicomTarget] = []
     # bar_string: str = ""
     # foo_int: int = 0

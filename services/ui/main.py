@@ -118,6 +118,9 @@ def prepare_system() -> bool:
     # TODO: Check if the acquisition and reconstruction services are running
 
     ui_runtime.load_config()
+    if ui_runtime.config.debug_mode != "False":
+        rt.set_debug(True)
+
     ui_runtime.system_information.name = "dev-system1"
     ui_runtime.system_information.model = "Zeugmatron Z1"
     ui_runtime.system_information.serial_number = "000001"

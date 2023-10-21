@@ -37,7 +37,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration} # , 
+        return {"TE": self.param_TE, "TR": self.param_TR, "NSA": self.param_NSA, "ADC_samples": self.param_ADC_samples, "ADC_duration": self.param_ADC_duration, "N_ITER":self.param_N_ITER} # , 
 
     @classmethod
     def get_default_parameters(
