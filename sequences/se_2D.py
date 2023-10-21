@@ -10,6 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
+from sequences import make_se_2D
 from sequences.common import view_traj
 import common.logger as logger
 
@@ -121,7 +122,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         # ToDo: if self.Trajectory == "Cartesian": (default)
-        pypulseq_se2D(
+        make_se_2D.pypulseq_se2D(
             inputs={"TE": self.param_TE, "TR": self.param_TR, 
                     "NSA": self.param_NSA, 
                     "FOV": self.param_FOV,
