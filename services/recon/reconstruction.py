@@ -69,7 +69,8 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
     log.info(f"DICOM writting finished.")
 
     # Create the ISMRMRD file
-    create_ismrmrd(folder, kData, task)
+    # TODO: Enable ISMRMRD creation after bug fix
+    # create_ismrmrd(folder, kData, task)
 
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
