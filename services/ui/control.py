@@ -51,9 +51,17 @@ def ping(ip: str):
         return False
 
 
+def restart_device():
+    log.info("Hard reset of acquisition device requested")
+    # TODO
+    return True
+
+
 def run_device_bootsequence() -> bool:
+    # TODO
     return True
 
 
 def run_device_test() -> bool:
+    # TODO
     return True

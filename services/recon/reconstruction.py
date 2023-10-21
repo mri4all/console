@@ -1,7 +1,7 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
-import os 
+import os
 from os import path
 
 from recon.kspaceFiltering.kspace_filtering import *
@@ -22,18 +22,22 @@ from common.types import ScanTask
 import services.recon.utils as utils
 import time
 
-def run_recon_Cartesian(self, folder: str, task: ScanTask):
+
+def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
+    """
+    Runs the reconstruction pipeline for Cartesian sampling
+    """
+
     fnames = os.listdir(folder)
     if not fnames:
         log.error(f"Folder {folder} is empty.")
-        return False
-    
-    # TODO: run_cartesian(folder, task) based on recon mode?
-    # TODO: Load the k-space data
-    kData = np.load(folder + "rawdata" + "/kSpace.npy")  #TODO: Zach
+        return
+
+    # Load the k-space data
+    kData = np.load(folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.RAWDATA)
     kTraj = np.genfromtxt(
-        r"%s/%s/trajectory.csv" % (folder), delimiter="," #TODO: Zach
-    )# pe_table a lot by 2 # check rotation
+        folder + mri4all_taskdata.RAWDATA + mri4all_scanfiles.TRAJ, delimiter=","
+    )  # pe_table a lot by 2 # check rotation
 
     if kTraj.shape[0] > 2:
         kTraj = np.rot90(kTraj)
@@ -43,31 +47,33 @@ def run_recon_Cartesian(self, folder: str, task: ScanTask):
     kData = kFilter(kData, filterType, center_correction=True)
     log.info(f"kSpace {filterType} filtering finished.")
 
-    # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    # Preform B0 correction and reconstruct the image
     fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
-    df = np.load(path.join(folder,fname_B0_map[0])) if fname_B0_map else None
+    df = np.load(path.join(folder, fname_B0_map[0])) if fname_B0_map else None
     Lx = 1
     nonCart = None
     params = None
     b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
-    # denoising strength from the user interface? - provided by json
-    # move all to helper function - recon_cartesian based on recon type in json.
+
+    # Denoise the image
     try:
-        iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")
-        log.info(f"Finished image denoising.")
+        strength = task.processing.denoising_strength
+        iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter", strength=strength)
+        log.info(f"Finished image denoising with strength={strength}.")
     except ValueError:
         log.error(f"Image denoising failed.")
 
-    # TODO(Lavanya): Write the DICOM file to the folder
+    # Create the DICOM file
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
-    # TODO(Radhika): Write ISMRMRD file to the folder
+    # Create the ISMRMRD file
     create_ismrmrd(folder, kData, task)
+
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
     """
@@ -88,6 +94,6 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
 
-    run_recon_Cartesian(folder, task)
-    
+    run_reconstruction_cartesian(folder, task)
+
     return True
