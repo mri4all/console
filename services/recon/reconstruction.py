@@ -1,7 +1,7 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
-import os 
+import os
 from os import path
 
 from recon.kspaceFiltering.kspace_filtering import *
@@ -22,7 +22,8 @@ from common.types import ScanTask
 import services.recon.utils as utils
 import time
 
-def run_recon_Cartesian(self, folder: str, task: ScanTask):
+
+def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     """
     Runs the reconstruction pipeline for Cartesian sampling
     """
@@ -30,14 +31,13 @@ def run_recon_Cartesian(self, folder: str, task: ScanTask):
     fnames = os.listdir(folder)
     if not fnames:
         log.error(f"Folder {folder} is empty.")
-        return False
-    
-    # TODO: run_cartesian(folder, task) based on recon mode?
+        return
+
     # TODO: Load the k-space data
-    kData = np.load(folder + "rawdata" + "/kSpace.npy")  #TODO: Zach
+    kData = np.load(folder + "rawdata" + "/kSpace.npy")  # TODO: Zach
     kTraj = np.genfromtxt(
-        r"%s/%s/trajectory.csv" % (folder), delimiter="," #TODO: Zach
-    )# pe_table a lot by 2 # check rotation
+        r"%s/%s/trajectory.csv" % (folder), delimiter=","  # TODO: Zach
+    )  # pe_table a lot by 2 # check rotation
 
     if kTraj.shape[0] > 2:
         kTraj = np.rot90(kTraj)
@@ -51,7 +51,7 @@ def run_recon_Cartesian(self, folder: str, task: ScanTask):
     fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
-    df = np.load(path.join(folder,fname_B0_map[0])) if fname_B0_map else None
+    df = np.load(path.join(folder, fname_B0_map[0])) if fname_B0_map else None
     Lx = 1
     nonCart = None
     params = None
@@ -60,7 +60,6 @@ def run_recon_Cartesian(self, folder: str, task: ScanTask):
     log.info(f"B0 correction finished.")
 
     # denoising strength from the user interface? - provided by json
-    # move all to helper function - recon_cartesian based on recon type in json.
     try:
         iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")
         log.info(f"Finished image denoising.")
@@ -73,6 +72,7 @@ def run_recon_Cartesian(self, folder: str, task: ScanTask):
 
     # TODO(Radhika): Write ISMRMRD file to the folder
     create_ismrmrd(folder, kData, task)
+
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
     """
@@ -93,6 +93,6 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
 
-    run_recon_Cartesian(folder, task)
-    
+    run_reconstruction_cartesian(folder, task)
+
     return True

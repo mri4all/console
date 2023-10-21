@@ -186,6 +186,8 @@ def set_task_state(folder: str, state: str, value: bool) -> bool:
         state_file = Path(folder) / mri4all_files.PREPARED
     elif state == mri4all_files.EDITING:
         state_file = Path(folder) / mri4all_files.EDITING
+    elif state == mri4all_files.STOP:
+        state_file = Path(folder) / mri4all_files.STOP
     else:
         log.error(f"Unknown state {state}.")
         return False
@@ -230,6 +232,17 @@ def set_task_state(folder: str, state: str, value: bool) -> bool:
         return False
 
     return True
+
+
+def has_task_state(folder: str, state: str) -> bool:
+    if not state in [mri4all_files.PREPARED, mri4all_files.EDITING, mri4all_files.STOP]:
+        log.error(f"Unknown state {state}.")
+        return False
+    state_file = Path(folder) / state
+    if state_file.is_file():
+        return True
+    else:
+        return False
 
 
 def clear_task_subfolder(folder: str, subfolder: str) -> bool:
