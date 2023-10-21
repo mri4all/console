@@ -20,28 +20,63 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 70
     param_TR: int = 250
+    param_NSA: int = 1
+    param_FOV: int = 140
+    param_Orientation: str = "Axial"
+    param_Base_Resolution: int = 70
+    param_BW: int = 20
+    param_Trajectory: str = "Catisian"
+    param_PE_Ordering: str = "Center_out"
+    param_PF: int = 1 
+    
 
     @classmethod
     def get_readable_name(self) -> str:
         return "2D Spin-Echo"
 
-    # def setup_ui(self, widget) -> bool:
-    #     seq_path = os.path.dirname(os.path.abspath(__file__))
-    #     uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
-    #     return True
+    def setup_ui(self, widget) -> bool:
+        seq_path = os.path.dirname(os.path.abspath(__file__))
+        uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+        return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR}
+        return {"TE": self.param_TE, 
+        "TR": self.param_TR, 
+        "NSA": self.param_NSA, 
+        "FOV": self.param_FOV,
+        "Orientation":self.param_Orientation,
+        "Base_Resolution": self.param_Base_Resolution,
+        "BW":self.param_BW,
+        "Trajectory":self.param_Trajectory,
+        "PE_Ordering":self.param_PE_Ordering,
+        "PF": self.param_PF}
 
     @classmethod
     def get_default_parameters(self) -> dict:
-        return {"TE": 70, "TR": 250}
+        return {"TE": 70, "TR": 250,
+                "NSA": 1, 
+                "FOV": 140,
+                "Orientation":"axial",
+                "Base_Resolution": 70,
+                "BW":20,
+                "Trajectory":"Cartesian",
+                "PE_Ordering":"center_out",
+                "PF": 1
+                }
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
         try:
             self.param_TE = parameters["TE"]
             self.param_TR = parameters["TR"]
+            self.param_NSA = parameters["NSA"]
+            self.param_FOV = parameters["FOV"]
+            self.param_Orientation = parameters["Orientation"]
+            self.param_Base_Resolution = parameters["Base_Resolution"]
+            self.param_BW = parameters["BW"]
+            self.param_Trajectory = parameters["Trajectory"]
+            self.param_PE_Ordering = parameters["PE_Ordering"]
+            self.param_PF = parameters["PF"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -50,12 +85,29 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def write_parameters_to_ui(self, widget) -> bool:
         widget.TESpinBox.setValue(self.param_TE)
         widget.TRSpinBox.setValue(self.param_TR)
+        widget.NSA_SpinBox.setValue(self.param_NSA)
+        widget.Orientation_ComboBox.setCurrentText(self.param_Orientation)
+        widget.FOV_SpinBox.setValue(self.param_FOV)
+        widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
+        widget.BW_SpinBox.setValue(self.param_BW)
+        widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
+        widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
+        widget.PF_SpinBox.setValue(self.param_PF)
+
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
         self.problem_list = []
         self.param_TE = widget.TESpinBox.value()
         self.param_TR = widget.TRSpinBox.value()
+        self.param_NSA = widget.NSA_SpinBox.value()
+        self.param_Orientation = widget.Orientation_ComboBox.currentText()
+        self.param_FOV = widget.FOV_SpinBox.value()
+        self.Base_Resolution = widget.Base_Resolution_SpinBox.value()
+        self.param_BW = widget.BW_SpinBox.value()
+        self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
+        self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
+        self.param_PF = widget.PF_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -68,13 +120,21 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        # ToDo: if self.trajectory == "Cartesian": (default)
+        # ToDo: if self.Trajectory == "Cartesian": (default)
         pypulseq_se2D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR},
+            inputs={"TE": self.param_TE, "TR": self.param_TR, 
+                    "NSA": self.param_NSA, 
+                    "FOV": self.param_FOV,
+                    "Orientation":self.param_Orientation,
+                    "Base_Resolution": self.Base_Resolution,
+                    "BW":self.BW,
+                    "Trajectory":self.param_Trajectory,
+                    "PE_Ordering":self.param_PE_Ordering,
+                    "PF": self.param_PF},
             check_timing=True,
             output_file=self.seq_file_path,
         )
-        # elif self.trajectory == "Radial":
+        # elif self.Trajectory == "Radial":
         # pypulseq_se2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
         # )
@@ -163,6 +223,14 @@ def pypulseq_se2D(
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
+    num_averages = inputs['NSA']
+    Orientation = inputs['Orientation']
+    fov = inputs['FOV']
+    base_resolution = inputs['base_resolution']
+    BW = inputs['BW']
+    Trajectory = inputs['Trajectory']
+    PE_Ordering = inputs['PE_Ordering']
+    PF = inputs['PF']
 
     # ======
     # INITIATE SEQUENCE
@@ -293,10 +361,10 @@ def pypulseq_se2D(
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
 
-    # Visualize trajactory and other things
+    # Visualize Trajectory and other things
     if visualize:
         [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace()
-        log.info("Completed calculating trajectory")
+        log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
         seq.plot(time_range=(0, 2 * TR))
         view_traj.view_traj_2d(k_traj_adc, k_traj)
@@ -313,7 +381,7 @@ def pypulseq_se2D(
     return True
 
 
-# implement 2D radial trajectory (Ruoxun Zi)
+# implement 2D radial Trajectory (Ruoxun Zi)
 def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
