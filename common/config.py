@@ -16,13 +16,13 @@ class DicomTarget(BaseModel):
     aet_source: Optional[str] = ""
 
 
-path = Path(runtime.get_base_path()) / "config/config.json"
+path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 
 class Configuration(BaseModel):
     scanner_ip: str = "10.42.0.251"
-    bar_string: str = ""
-    foo_int: int = 0
+    # bar_string: str = ""
+    # foo_int: int = 0
     dicom_targets: List[DicomTarget] = []
 
     @classmethod
@@ -31,7 +31,7 @@ class Configuration(BaseModel):
             k = Configuration(
                 dicom_targets=[
                     DicomTarget(
-                        name="target 1", ip="127.0.0.1", port=11112, aet_target="target"
+                        name="Default", ip="127.0.0.1", port=11112, aet_target="target"
                     )
                 ]
             )
