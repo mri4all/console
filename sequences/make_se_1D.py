@@ -128,7 +128,7 @@ def pypulseq_1dse(
         seq.add_block(gx, adc) # Projection
         seq.add_block(pp.make_delay(delay_TR))
 
-    seq.plot(time_range=[0, 5*TR])
+    #seq.plot(time_range=[0, 5*TR])
     seq.write('se_1D_local.seq')
     # Check whether the timing of the sequence is correct
     check_timing = True
