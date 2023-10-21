@@ -13,7 +13,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
 from sequences import PulseqSequence
-from tests.test_sequences import run_sequence_test
+#from tests.test_sequences import run_sequence_test
 
 import common.logger as logger
 
@@ -46,7 +46,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
         
-        run_sequence_test("prescan_frequency")
+        #run_sequence_test("prescan_frequency")
 
         # reading configuration data from config.json
         # configuration_data=reading_json_parameter(file_name='config.json')
