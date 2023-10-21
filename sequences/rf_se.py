@@ -9,6 +9,7 @@ from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
+from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
 import common.logger as logger
@@ -96,6 +97,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
+
+        run_sequence_test("prescan_frequency")
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
