@@ -1,6 +1,8 @@
 import common.logger as logger
 import common.runtime as rt
 import numpy as np
+import os 
+from os import path
 
 from recon.kspaceFiltering.kspace_filtering import *
 
@@ -20,7 +22,12 @@ from common.types import ScanTask
 import services.recon.utils as utils
 import time
 
-def run_recon_Cartesian(self, folder, task):
+def run_recon_Cartesian(self, folder: str, task: ScanTask):
+    fnames = os.listdir(folder)
+    if not fnames:
+        log.error(f"Folder {folder} is empty.")
+        return False
+    
     # TODO: run_cartesian(folder, task) based on recon mode?
     # TODO: Load the k-space data
     kData = np.load(folder + "rawdata" + "/kSpace.npy")  #TODO: Zach
@@ -37,9 +44,10 @@ def run_recon_Cartesian(self, folder, task):
     log.info(f"kSpace {filterType} filtering finished.")
 
     # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
-    df = np.ndarray
+    df = np.load(path.join(folder,fname_B0_map[0])) if fname_B0_map else None
     Lx = 1
     nonCart = None
     params = None
