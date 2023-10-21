@@ -1,5 +1,6 @@
 import common.logger as logger
 import numpy as np
+from scipy.ndimage import gaussian_filter
 from skimage.restoration import (
     denoise_nl_means,
     denoise_bilateral,
@@ -95,3 +96,23 @@ def apply_total_variation_denoise(image, weight=0.1, channel_axis=-1):
         channel_axis=channel_axis,
     )
     return image_tv_chambolle
+
+
+def remove_gaussian_noise(image, sigma=5):
+    """
+    Removes Gaussian noise from the input image.
+
+    Parameters:
+    image (numpy.ndarray): The input image from which noise is to be removed.
+    sigma (float, optional): The standard deviation for the Gaussian kernel. Default is 5.
+
+    Returns:
+    numpy.ndarray: The denoised image.
+    """
+    if np.iscomplexobj(image):
+        log.info("Extracting magnitude of complex image")
+        image = np.abs(image)
+
+    log.info(f"Applying Gaussian filter with sigma={sigma}")
+    image_gaussian = gaussian_filter(image, sigma=sigma)
+    return image_gaussian
