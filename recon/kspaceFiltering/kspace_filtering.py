@@ -36,15 +36,17 @@ def kspace_filtering(kspace, filter_type, center_correction=True, **kwargs):
     - ndarray (optional): The filter mask, only if return_mask is True.
     '''
     # Set isotropic to False by default if not specified
-    isotropic = kwargs.get('isotropic', False)
+    z_type = kwargs.get('z_type', 'fermi')
     return_mask = kwargs.get('return_mask', False)
-
+    width_z = kwargs.get('width_z', 0.1)
     if filter_type == 'fermi':
         radius = kwargs.get('radius', 0.5)
-        width = kwargs.get('width', 10)
-        mask = fermi_filter(shape = kspace.shape, cutoff_radius_ratio = radius, transition_width = width, isotropic = isotropic)
+        width = kwargs.get('width', 0.1)
+        radius_z = kwargs.get('radius_z', 0.9)
+        mask = fermi_filter(shape = kspace.shape, cutoff_radius_ratio = radius, transition_width_ratio = width, cutoff_radius_z_ratio = radius_z, transition_width_z_ratio = width_z, z_type = z_type)
     elif filter_type == 'sine_bell':
-        mask = sine_bell_filter(shape = kspace.shape, isotropic = isotropic)
+        radius_z = kwargs.get('radius_z', 0.2)
+        mask = sine_bell_filter(shape = kspace.shape, cutoff_radius_z_ratio = radius_z, transition_width_z_ratio = width_z, z_type = z_type)
     else:
         raise ValueError('Invalid filter type. Options are: fermi, sine_bell')
     if center_correction:

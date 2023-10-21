@@ -48,6 +48,33 @@
          </property>
         </widget>
        </item>
+       <item alignment="Qt::AlignLeft">
+        <widget class="QPushButton" name="selectAllPushButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Select All</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QComboBox" name="dicomTargetComboBox"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sendDicomsButton">
+           <property name="text">
+            <string>Send</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
      <item>
@@ -113,28 +140,31 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QComboBox" name="dicomTargetComboBox"/>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="sendDicomsButton">
+          <widget class="QPushButton" name="exportPushButton">
            <property name="text">
-            <string>Send</string>
+            <string>Export</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="actionButton2">
+          <widget class="QPushButton" name="definitionPushButton">
            <property name="text">
-            <string>button 2</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="actionButton1">
-           <property name="text">
-            <string>button 3</string>
+            <string>Definition</string>
            </property>
           </widget>
          </item>
