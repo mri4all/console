@@ -103,9 +103,9 @@ class CalShimAmplitudeManual(PulseqSequence, registry_key=Path(__file__).stem):
         print(values)
 
 
-    def new_signal(self, scan_task):
+    def new_signal(self):
         # Run the rf_se with the updated shim parameters
-        
+        scan_task = ScanTask()
         temp_folder = "/tmp/" + helper.generate_uid()
         log.info(f"Using temporary folder: {temp_folder}")
 
