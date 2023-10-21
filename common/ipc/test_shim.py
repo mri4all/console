@@ -1,6 +1,8 @@
 from sequences.adj_shim_amplitude import CalShimAmplitude
 from sequences import SequenceBase
 from sequences.common.util import reading_json_parameter, writing_json_parameter
+from common.types import ScanTask
+from common.ipc import Communicator
 
 from common.ipc import Communicator
 
