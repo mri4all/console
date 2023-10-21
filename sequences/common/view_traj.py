@@ -17,12 +17,13 @@ def view_sig(sig, folder=""):
     ax[0].set_title("acq signal")
     ax[1].plot(np.abs(recon))
     ax[1].set_title("fft signal")
-    plt.show()
     if folder != "":
-        file = open(folder + "/other/sig_plot", 'wb')
+        file = open(folder + "/other/sig.plot", 'wb')
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
+    else:
+        plt.show()
 
 def view_traj_2d(k_traj_adc, k_traj, folder=""):
 
@@ -39,22 +40,14 @@ def view_traj_2d(k_traj_adc, k_traj, folder=""):
     ax.set_xlabel('kx')
     ax.set_ylabel('ky')
     ax.set_title('K-space Trajactory')
-    plt.show()  # Display the plots
 
     if folder != "":
-        file = open(folder + "/other/traj_plot", 'wb')
+        file = open(folder + "/other/traj.plot", 'wb')
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
-    # plt.figure()
-    # plt.style.use("dark_background")
-    # plt.plot(k_traj[0,:], k_traj[1,:],color='b',linewidth=1)
-    # plt.plot(k_traj_adc[0,:], k_traj_adc[1,:], color ='r',marker='.',markersize=0.5)
-    # plt.axis('equal')
-    # plt.xlabel('kx')
-    # plt.ylabel('ky')
-    # plt.title('K-space Trajactory')
-    # plt.show()  # Display the plots
+    else:
+        plt.show()
 
 def view_traj_3d(k_traj_adc, k_traj, folder=""):
 
@@ -71,13 +64,14 @@ def view_traj_3d(k_traj_adc, k_traj, folder=""):
     ax.set_ylabel('ky')
     ax.set_zlabel('kz')
     ax.set_title('K-space Trajactory')
-    plt.show()  # Display the plots
 
     if folder != "":
-        file = open(folder + "/other/traj_plot", 'wb')
+        file = open(folder + "/other/traj.plot", 'wb')
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
+    else:
+        plt.show()
 
 def evenly_sample_array(x, y):
     """

@@ -183,13 +183,14 @@ class ViewerWidget(QWidget):
         if not pickled_file_path.is_file():
             return
         
-        fig = pickle.load(pickled_file_path)
+        with open(pickled_file_path, 'rb') as pickle_file:
+            fig = pickle.load(pickle_file)
+        
         fig.set_figheight(8)
         fig.set_figwidth(5)
-        pickled_file_path.close()
 
         figCanvas = FigureCanvasQTAgg(fig)
         toolbar = NavigationToolbar2QT(figCanvas, self)
         
-        self.layout().addWidget(toolbar)
         self.layout().addWidget(figCanvas)
+        self.layout().addWidget(toolbar)
