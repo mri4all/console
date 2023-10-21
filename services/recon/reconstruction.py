@@ -59,10 +59,10 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
 
-    # denoising strength from the user interface? - provided by json
     try:
-        iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")
-        log.info(f"Finished image denoising.")
+        strength = task.processing.denoising_strength
+        iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter", strength=strength)
+        log.info(f"Finished image denoising with strength={strength}.")
     except ValueError:
         log.error(f"Image denoising failed.")
 
