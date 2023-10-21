@@ -55,7 +55,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
     rx_arr[:, 0] = rxd
     noise_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
-    signal_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
+    signal_array = np.zeros((int(rxd.shape[0]/2)+1, steps), dtype=np.cdouble)
 
     # Pause for spin recovery
     time.sleep(delay_s)
