@@ -63,7 +63,7 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
-    # TODO(Radhika): Write ISMMRML file to the folder
-    # Should it be done on background?
+    # TODO(Radhika): Write ISMRMRD file to the folder
+    # Should it be done on background? (Could be out of this function)
 
     return True
