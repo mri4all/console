@@ -9,9 +9,11 @@ from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
+from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
 import common.logger as logger
+from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -97,6 +99,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
+        run_sequence_test("prescan_frequency")
+
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
             rf_center=cfg.LARMOR_FREQ,
@@ -114,9 +118,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         )
 
         # Debug 
-        plt.figure()
-        plt.plot(np.abs(rxd))
-        plt.show()
+        if 1>0: #todo: debug mode
+            # view_traj.view_sig(rxd)
+            plt.figure()
+            plt.plot(np.abs(rxd))
+            plt.show()
+
 
         log.info("Done running sequence " + self.get_name())
         return True

@@ -40,20 +40,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         max_freq, data_dict = larmor_step_search(
             seq_file=self.seq_file_path,
             step_search_center=configuration_data.rf_parameters.larmor_frequency_MHz,
-            steps=30,
-            step_bw_MHz=10e-3,
-            plot=True,  # For Debug
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            delay_s=1,
-            gui_test=False,
-        )
-
-        opt_max_snr_freq, data_dict = larmor_step_search(
-            seq_file=self.seq_file_path,
-            step_search_center=max_freq,
-            steps=30,
+            steps=2,
             step_bw_MHz=5e-3,
             plot=True,  # For Debug
             shim_x=cfg.SHIM_X,
@@ -63,38 +50,10 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
         )
 
-        larmor_freq, data_dict = larmor_cal(
-            seq_file=self.seq_file_path,
-            larmor_start=opt_max_snr_freq,
-            iterations=10,
-            delay_s=1,
-            echo_count=1,
-            step_size=0.6,
-            plot=True,  # For debug
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            gui_test=False,
-        )
-
-        calibrated_larmor_freq, data_dict = larmor_cal(
-            seq_file=self.seq_file_path,
-            larmor_start=larmor_freq,
-            iterations=10,
-            delay_s=1,
-            echo_count=1,
-            step_size=0.2,
-            plot=True,  # For debug
-            shim_x=cfg.SHIM_X,
-            shim_y=cfg.SHIM_Y,
-            shim_z=cfg.SHIM_Z,
-            gui_test=False,
-        )
-
-        print("Final Larmor frequency : " + str(calibrated_larmor_freq) + " MHz")
+        print("Final Larmor frequency : " + str(max_freq) + " MHz")
 
         # updating the Larmor frequency in the config.json file
-        configuration_data.rf_parameters.larmor_frequency_MHz = calibrated_larmor_freq
+        configuration_data.rf_parameters.larmor_frequency_MHz = max_freq
         writing_json_parameter(config_data=configuration_data)
 
         log.info("Done running sequence " + self.get_name())

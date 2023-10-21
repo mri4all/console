@@ -112,8 +112,8 @@ class ViewerWidget(QWidget):
             lstFilesDCM = input_path
         else:
             path = Path(input_path)
-            if path.is_dir():
-                lstFilesDCM = [str(name) for name in path.glob("*.dcm")]
+            if not path.is_file():
+                lstFilesDCM = [str(name) for name in glob.glob(input_path + "*.dcm")]
             else:
                 lstFilesDCM = [input_path]
         lstFilesDCM.sort()

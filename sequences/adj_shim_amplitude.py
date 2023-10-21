@@ -30,7 +30,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
         log.info("Calculating sequence " + self.get_name())
-        make_rf_se.pypulseq_rfse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+                              "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -41,11 +42,11 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         # calculate the linear shim 
         axes = ['x', 'y', 'z']
         log.info("Running sequence " + self.get_name())
-        for ii in range(n_iter_linear):
+        for shim_iter in range(n_iter_linear):
             
             for channel in axes:
-                log.info(f"Updating {channel} linear shim")
-                shim_weight =shim_cal_linear(seq_file=self.seq_file_path,
+                log.info(f"Updating {channel} linear shim (iter {shim_iter})")
+                shim_weight = shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=LARMOR_FREQ,
                         channel=channel,
                         range=0.05,

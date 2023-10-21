@@ -159,12 +159,18 @@
            <property name="text">
             <string>Export</string>
            </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="definitionPushButton">
            <property name="text">
             <string>Definition</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
