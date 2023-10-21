@@ -12,17 +12,14 @@ def create_ismrmrd(folder, raw_data, task):
     # Opening JSON file
     #f = open(json_file)
     data = task
-
-    # Create the XML header and write it to the file (creation mode)
-    header = ismrmrd.xsd.ismrmrdHeader()
     ##?############# Following block of code will get replaced by whatever numpy is given to us ##?###############?###############?###############?###############?###############?#############
     repetitions = 1 #! check
     coils = 1 #! check
     acceleration = 1 #! check
     ##?###############?###############?###############?###############?###############?###############?############# ##?###############?###############?###########?###############?###############?#################
     # The number of points in x,y,kx,ky
-    nx, ny = raw_data.shape[0], raw_data.shape[1]
-    nkx, nky = raw_data.shape[0], raw_data.shape[1]
+    nx, ny, nz = raw_data.shape[0], raw_data.shape[1], raw_data.shape[2]
+    nkx, nky, nkz = raw_data.shape[0], raw_data.shape[1], raw_data.shape[2]
 
     # Open the dataset (creation mode)
     filename_to_save = os.path.join(folder, "ismrmrd_file.h5")
@@ -58,16 +55,13 @@ def create_ismrmrd(folder, raw_data, task):
     efov.y = raw_data.shape[1]
     efov.z = raw_data.shape[2]
 
-
     rfov = ismrmrd.xsd.fieldOfViewMm() 
     rfov.x = raw_data.shape[0]
     rfov.y = raw_data.shape[1]
     rfov.z = raw_data.shape[2]
 
-
     ematrix = ismrmrd.xsd.matrixSizeType()
     rmatrix = ismrmrd.xsd.matrixSizeType()
-
 
     ematrix.x = raw_data.shape[0]
     ematrix.y = raw_data.shape[1]
@@ -121,7 +115,7 @@ def create_ismrmrd(folder, raw_data, task):
 
     # Synthesize the k-space data
     #Ktrue = transform_image_to_kspace(coil_images,(1,2))
-    Ktrue = raw_data
+    Ktrue = raw_data[np.newaxis,np.newaxis,...]
 
     # Create an acquistion and reuse it
     acq = ismrmrd.Acquisition()
@@ -140,29 +134,28 @@ def create_ismrmrd(folder, raw_data, task):
     # Loop over the repetitions, add noise and write to disk
     # simulating a T-SENSE type scan
     for rep in range(repetitions):
-        #noise = noise_level * (np.random.randn(coils, nky, nkx) + 1j * np.random.randn(coils, nky, nkx))
-        # here's where we would make the noise correlated
-        #K = Ktrue + noise
-        K = Ktrue
+        K = Ktrue  
         acq.idx.repetition = rep
-        for acc in range(acceleration):
-            for line in np.arange(acc,nky,acceleration):
-                # set some fields in the header
-                acq.scan_counter = counter
-                acq.idx.kspace_encode_step_1 = line
-                acq.clearAllFlags()
-                if line == 0:
-                        acq.setFlag(ismrmrd.ACQ_FIRST_IN_ENCODE_STEP1)
-                        acq.setFlag(ismrmrd.ACQ_FIRST_IN_SLICE)
-                        acq.setFlag(ismrmrd.ACQ_FIRST_IN_REPETITION)
-                elif line == nky - 1:
-                        acq.setFlag(ismrmrd.ACQ_LAST_IN_ENCODE_STEP1)
-                        acq.setFlag(ismrmrd.ACQ_LAST_IN_SLICE)
-                        acq.setFlag(ismrmrd.ACQ_LAST_IN_REPETITION)
-                # set the data and append
-                acq.data[:] = K[:,line,:]
-                dset.append_acquisition(acq)
-                counter += 1
+        for slice_num in range(nz):
+            acq.idx.slice += 1
+            for acc in range(acceleration):
+                for line in np.arange(acc,nky,acceleration):
+                    # set some fields in the header
+                    acq.scan_counter = counter
+                    acq.idx.kspace_encode_step_1 = line
+                    acq.clearAllFlags()
+                    if line == 0:
+                            acq.setFlag(ismrmrd.ACQ_FIRST_IN_ENCODE_STEP1)
+                            acq.setFlag(ismrmrd.ACQ_FIRST_IN_SLICE)
+                            acq.setFlag(ismrmrd.ACQ_FIRST_IN_REPETITION)
+                    elif line == nky - 1:
+                            acq.setFlag(ismrmrd.ACQ_LAST_IN_ENCODE_STEP1)
+                            acq.setFlag(ismrmrd.ACQ_LAST_IN_SLICE)
+                            acq.setFlag(ismrmrd.ACQ_LAST_IN_REPETITION)
+                    # set the data and append
+                    acq.data[:] = K[rep,acc,:,line,slice_num]
+                    dset.append_acquisition(acq)
+                    counter += 1
 
     # Clean up
     dset.close()
