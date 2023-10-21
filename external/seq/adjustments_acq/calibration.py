@@ -59,7 +59,6 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
-    signal_array = []
     snr_array = []
     for i in range(1, steps):
         print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
@@ -70,6 +69,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          gui_test=gui_test)
         # Calculate signal to noise ratio
         noise_array = []
+        signal_array = []
         for index in range(0,len(rx_arr[:, i])):
             if index >= steps/4 and index < steps - steps/4:
                 signal_array.append(rx_arr[index, i])
