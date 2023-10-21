@@ -118,13 +118,13 @@ def remove_gaussian_noise(image, sigma=0.2):
     return image_gaussian
 
 
-def remove_gaussian_noise_complex(image_complex, sigma=5):
+def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
     """
     Removes Gaussian noise from the real and imaginary parts of the input complex image, separately.
 
     Parameters:
     image_complex (numpy.ndarray) : A complex input image from which noise is to be removed.
-    sigma (float, optional): The standard deviation for the Gaussian kernel. Default is 5.
+    method (str, optional): The method used for denoising. Default is 'gaussian_filter'.
 
     Returns:
     numpy.ndarray: The denoised complex image.
@@ -138,11 +138,14 @@ def remove_gaussian_noise_complex(image_complex, sigma=5):
     real_part = np.real(image_complex)
     imag_part = np.imag(image_complex)
 
-    # Apply the Gaussian filter to the real and imaginary parts separately
-    real_part_gaussian = gaussian_filter(real_part, sigma=sigma)
-    imag_part_gaussian = gaussian_filter(imag_part, sigma=sigma)
+    # Apply the filter to the real and imaginary parts separately
+    if method == "gaussian_filter":
+        real_part_denoised = remove_gaussian_noise(real_part)
+        imag_part_denoised = remove_gaussian_noise(imag_part)
+    else:
+        log.error(f"Method {method} not recognized.")
 
     # Combine the denoised real and imaginary parts to form the denoised complex image
-    image_gaussian_complex = real_part_gaussian + 1j * imag_part_gaussian
+    image_denoised_complex = real_part_denoised + 1j * imag_part_denoised
 
-    return image_gaussian_complex
+    return image_denoised_complex
