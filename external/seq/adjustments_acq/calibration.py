@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, '.')
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 import scipy.signal as sig
 import time
 import os
@@ -93,6 +94,9 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     max_snr_ind = np.argmax(snr_array)
     max_snr_freq = swept_freqs[max_snr_ind]
     print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
+    
+    # Plot setup for UI 
+    plt.style.use("dark_background")
 
     # Plot figure
     if plot:
@@ -104,6 +108,11 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].plot(np.abs(rx_arr))
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
+    
+        file = open('serialized_plot', 'wb')
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
 
     # Plot noise figure
     if plot:
@@ -122,7 +131,7 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                  }
 
     # Return the frequency that worked the best with SNR
-    return max_freq, data_dict
+    return max_freq, max_snr_freq, data_dict
 
 
 def larmor_cal(seq_file =constants.DATA_PATH_ACQ/'se_6.seq', larmor_start=cfg.LARMOR_FREQ, iterations=10, delay_s=1, echo_count=2,

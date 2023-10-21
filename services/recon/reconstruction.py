@@ -23,6 +23,7 @@ from common.types import ScanTask
 import services.recon.utils as utils
 import time
 
+<<<<<<< HEAD
 
 def run_reconstruction(folder: str, task: ScanTask) -> bool:
     """
@@ -46,6 +47,9 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     # list fnames in folder
     fnames = os.listdir(folder)
 
+=======
+def run_recon_Cartesian():
+>>>>>>> 7cddbe97f34dd109ef0d4d4a732d4ea05e60652b
     # TODO: run_cartesian(folder, task) based on recon mode?
     # TODO: Load the k-space data
     kData = np.load(folder + "rawdata" + "/kSpace.npy")
@@ -87,4 +91,26 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
 
     # TODO(Radhika): Write ISMRMRD file to the folder
     create_ismrmrd(folder, kData, task)
+
+def run_reconstruction(folder: str, task: ScanTask) -> bool:
+    """
+    Perform the reconstruction of the scan contained in the given folder. Scan information such
+    as sequence, protocol name, patient information and system information can be found in the
+    task object.
+    """
+    log.info(f"Folder where the task is = {folder}")
+    log.info(f"JSON information = {task}")
+
+    log.info(f"Starting reconstruction.")
+
+    if task.processing.recon_mode == "bypass":
+        return True
+
+    if task.processing.recon_mode == "fake_dicoms":
+        utils.generate_fake_dicoms(folder, task)
+        time.sleep(2)
+        return True
+
+    run_recon_Cartesian()
+    
     return True

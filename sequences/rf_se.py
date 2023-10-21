@@ -3,6 +3,7 @@ from pathlib import Path
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 from PyQt5 import uic
 
@@ -12,6 +13,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
+from sequences import make_rf_se
 import common.logger as logger
 from sequences.common import view_traj
 
@@ -97,7 +99,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(
+        make_rf_se.pypulseq_rfse(
             inputs={
                 "TE": self.param_TE,
                 "TR": self.param_TR,
@@ -141,9 +143,17 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
-            plt.figure()
+            plt.style.use("dark_background")
+            plt.title('Acq signal')  
+            plt.grid(True)
             plt.plot(np.abs(rxd))
             plt.show()
+            
+            file = open('rf_se_plot', 'wb')
+            fig = plt.gcf()
+            pickle.dump(fig, file)
+            
+            file.close()
 
         log.info("Done running sequence " + self.get_name())
         return True
