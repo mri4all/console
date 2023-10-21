@@ -10,6 +10,8 @@ from sequences import PulseqSequence
 import common.logger as logger
 from sequences.common import view_traj
 
+log = logger.get_logger()
+
 def pypulseq_tse2D(
     inputs=None, check_timing=True, output_file="", visualize=True
 ) -> bool:
