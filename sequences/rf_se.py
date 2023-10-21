@@ -143,7 +143,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.rxd = rxd
 
         # Debug
-        Debug = self.param_debug_plot
+        Debug = True
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
@@ -151,7 +151,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             plt.title('Acq signal')  
             plt.grid(True)
             plt.plot(np.abs(rxd))
-            plt.show()
+            if self.param_debug_plot:
+                plt.show()
+                
             
             file = open('rf_se_plot', 'wb')
             fig = plt.gcf()
