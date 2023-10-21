@@ -105,17 +105,9 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         print(values)
 
 
-    def new_signal(self, scan_task):
+    def new_signal(self, temp_folder):
         # Run the rf_se with the updated shim parameters
-        
-        temp_folder = "/tmp/" + helper.generate_uid()
-        log.info(f"Using temporary folder: {temp_folder}")
-
-        try:
-            os.mkdir(temp_folder)
-        except:
-            log.error(f"Could not create temporary folder {temp_folder}.")
-            return False
+        scan_task = ScanTask()
 
         sequence_name = "rf_se"
 
@@ -149,12 +141,11 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         
         # calculate the linear shim 
-        axes = ['x', 'y', 'z']
         log.info("Running manual shimming")
     
         k = Communicator(Communicator.RECON)
 
         result = k.do_shim(self.new_user_values, self.new_signal)
         
-        log.info("Manual shimming finished")
+        log.info(f"Manual shimming finished, final = {result}")
         return True

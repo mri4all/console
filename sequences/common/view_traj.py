@@ -9,7 +9,7 @@ import pickle
 
 from PyQt5 import uic
 
-def view_sig_1d(sig, folder=""):
+def view_sig(sig, folder=""):
     recon = np.fft.fft(np.fft.fftshift(sig))
     plt.style.use("dark_background")
     fig, ax = plt.subplots(2,1)
@@ -64,8 +64,6 @@ def view_traj_3d(k_traj_adc, k_traj, folder=""):
     ax.set_ylabel('ky')
     ax.set_zlabel('kz')
     ax.set_title('K-space Trajactory')
-
-    plt.show() # TODO: get rid of this line
 
     if folder != "":
         file = open(folder + "/other/traj.plot", 'wb')

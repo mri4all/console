@@ -123,7 +123,6 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         plt.show()
         fig_noise = plt.gcf()
 
-
     # Output of useful data for visualization
     data_dict = {'rx_arr': rx_arr,
                  'rx_t': rx_t,
