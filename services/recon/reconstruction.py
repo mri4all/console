@@ -79,5 +79,5 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"DICOM writting finished.")
 
     # TODO(Radhika): Write ISMRMRD file to the folder
-    create_ismrmrd(folder, kData, json_file)
+    create_ismrmrd(folder, kData, task)
     return True

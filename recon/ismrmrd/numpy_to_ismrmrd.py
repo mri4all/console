@@ -8,10 +8,10 @@ import os
 
 #json_file = "/opt/mri4all/data/acq_queue/e05a03dc-6f73-11ee-b9cb-4be9ddc04f52#scan_1/scan.json"
 
-def create_ismrmrd(folder, raw_data, json_file):
+def create_ismrmrd(folder, raw_data, task):
     # Opening JSON file
-    f = open(json_file)
-    data = json.load(f)
+    #f = open(json_file)
+    data = task
 
     # Create the XML header and write it to the file (creation mode)
     header = ismrmrd.xsd.ismrmrdHeader()
