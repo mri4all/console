@@ -8,7 +8,7 @@ from sequences.common.pydanticConfig import Config
 import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
-from sequences import pypulseq_rfse  # type: ignore
+from sequences import make_rf_se  # type: ignore
 
 
 log = logger.get_logger()
@@ -22,7 +22,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
-        pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+        make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
                               "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path)
 
         log.info("Done calculating sequence " + self.get_name())
@@ -47,6 +47,47 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             shim_y=cfg.SHIM_Y,
             shim_z=cfg.SHIM_Z,
             delay_s=1,
+            gui_test=False,
+        )
+
+        opt_max_snr_freq, data_dict = larmor_step_search(
+            seq_file=self.seq_file_path,
+            step_search_center=max_freq,
+            steps=30,
+            step_bw_MHz=5e-3,
+            plot=True,  # For Debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
+            delay_s=1,
+            gui_test=False,
+        )
+
+        larmor_freq, data_dict = larmor_cal(
+            seq_file=self.seq_file_path,
+            larmor_start=opt_max_snr_freq,
+            iterations=10,
+            delay_s=1,
+            echo_count=1,
+            step_size=0.6,
+            plot=True,  # For debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
+            gui_test=False,
+        )
+
+        calibrated_larmor_freq, data_dict = larmor_cal(
+            seq_file=self.seq_file_path,
+            larmor_start=larmor_freq,
+            iterations=10,
+            delay_s=1,
+            echo_count=1,
+            step_size=0.2,
+            plot=True,  # For debug
+            shim_x=cfg.SHIM_X,
+            shim_y=cfg.SHIM_Y,
+            shim_z=cfg.SHIM_Z,
             gui_test=False,
         )
 
