@@ -139,6 +139,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
+        log.info("Pulseq ran, plotting")
+
 
         self.rxd = rxd
 
