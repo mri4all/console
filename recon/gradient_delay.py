@@ -1,16 +1,17 @@
 import numpy as np
 
-def grad_delay_correction(kData, kTraj, delayT, param):
+def grad_delay_correction(kData, kTraj, delayT, etLength, BW, ESP):
     ## JChen
     ## 10.20.2023
     # to be passed by imaging parameters
     # kData.shape = kx, ky, kz
     # kTraj pe table, numPE x (pe_y, pe_z)
-    etLength = param.etLength
-    BW = param.BW
+    # BW # Hz
+    # ESP # sec
+    
     numPE = kTraj.shape[0]
     Ns = kData.shape[0]
-    ESP = param.ESP
+
     T_PE =1/BW
     
     if Ns%2:

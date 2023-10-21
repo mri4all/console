@@ -38,7 +38,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
 
     if kTraj.shape[0] > 2:
         kTraj = np.rot90(kTraj)
-    # grad_delay_correction(kData, kTraj, delayT, param)
+    # kData = grad_delay_correction(kData, kTraj, delayT, etLength, BW, ESP)
 
     filterType = "fermi"
     kData = kFilter(kData, filterType, center_correction=True)
