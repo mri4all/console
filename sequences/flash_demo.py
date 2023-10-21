@@ -3,6 +3,12 @@ import time
 from pathlib import Path
 from PyQt5 import uic
 
+import common.logger as logger
+
+log = logger.get_logger()
+
+import common.task as task
+from common.constants import *
 from . import PulseqSequence
 
 
@@ -89,6 +95,12 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
         return self.is_valid()
 
     def run_sequence(self, scan_task) -> bool:
-        time.sleep(2)
+        for i in range(0, 10):
+            time.sleep(1)
+            if task.has_task_state(self.get_working_folder(), mri4all_files.STOP):
+                log.info("Termination of sequence requested")
+                log.info("Stopping sequence")
+                return False
+
         scan_task.processing.recon_mode = "fake_dicoms"
         return True
