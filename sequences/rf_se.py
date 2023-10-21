@@ -96,7 +96,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.calculated = True
         return True
 
-    def run_sequence(self, scan_task, Debug=True) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
 
         # run_sequence_test("prescan_frequency")
@@ -120,8 +120,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.rxd = rxd
         
         # Debug 
+        Debug = True
         if Debug is True: #todo: debug mode
-            log.info("Plotting figur    e now")
+            log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
             plt.figure()
             plt.plot(np.abs(rxd))

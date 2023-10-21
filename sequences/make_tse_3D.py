@@ -6,6 +6,7 @@ import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from sequences.common.get_trajectory import choose_pe_order
 import common.logger as logger
+from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -227,6 +228,12 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
         else:
             log.info("Timing check failed. Error listing follows:")
             [print(e) for e in error_report]
+
+    if visualize:
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_k)
+        log.info("Completed calculating Trajectory")
+        log.info("Generating plots...")
+        view_traj.view_traj_2d(k_traj_adc, k_traj)
 
     log.debug(output_file)
     try:

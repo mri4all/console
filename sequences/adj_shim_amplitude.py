@@ -42,6 +42,9 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         # calculate the linear shim 
         axes = ['x', 'y', 'z']
         log.info("Running sequence " + self.get_name())
+        
+        range = 0.1
+        
         for shim_iter in range(n_iter_linear):
             
             for channel in axes:
@@ -49,7 +52,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 shim_weight = shim_cal_linear(seq_file=self.seq_file_path,
                         larmor_freq=LARMOR_FREQ,
                         channel=channel,
-                        range=0.05,
+                        range=range,
                         shim_points=5,
                         points=2,
                         iterations=1,
@@ -72,6 +75,12 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 elif channel == 'z':
                     configuration_data.shim_parameters.shim_z = shim_weight
                 writing_json_parameter(config_data=configuration_data)
+            
+            # decrease the range a bit with each iteration, to a min bound
+            if range > 0.01:
+                range = range / 2
+            else:
+                range = range
         
         # refine the multicoil shim 
         if refine_multicoil:

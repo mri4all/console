@@ -54,6 +54,8 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     # Create array for storing data
     rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
     rx_arr[:, 0] = rxd
+    noise_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
+    signal_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
 
     # Pause for spin recovery
     time.sleep(delay_s)
@@ -67,28 +69,16 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
+        
         # Calculate signal to noise ratio
-        # noise_array = []
-        # signal_array = []
-        # for index in range(0,len(rx_arr[:, i])):
-        #     if index >= len(rx_arr[:, i])/4 and index < len(rx_arr[:, i]) - len(rx_arr[:, i])/4:
-        #         signal_array[i].append(rx_arr[index, i])
-        #     else:
-        #         noise_array[i].append(rx_arr[index, i])
-        # snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
-        # print("SNR= " + str(snr))
-        # snr_array.append(snr)
-        # # Plot noise figure
-        # if plot:
-        #     fig, axs = plt.subplots(2, 1, constrained_layout=True)
-        #     fig.suptitle('NOISE')
-        #     axs[0].plot(np.abs(signal_array))
-        #      # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
-        #     axs[0].set_title('signal_array')
-        #     axs[1].plot(np.abs(noise_array))
-        #     axs[1].set_title('noise_array')
-        #     plt.show()
-        #     time.sleep(delay_s)
+        for index in range(0,rxd.shape[0]):
+            if index > rxd.shape[0]/4 and index < (rxd.shape[0] - rxd.shape[0]/4):
+                signal_array[index,i] = rx_arr[index, i]
+            else:
+                noise_array[index,i] = rx_arr[index, i]
+        snr = np.mean(np.abs(signal_array[:,i])) / np.std(np.abs(noise_array[:,i]))
+        print("SNR= " + str(snr))
+        snr_array.append(snr)
 
     # Find the frequency data with the largest maximum absolute value
     max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
@@ -96,9 +86,9 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     print(f'Max frequency: {max_freq:.4f} MHz')
 
     # Find the frequency data with the largest maximum SNR value
-    # max_snr_ind = np.argmax(snr_array)
-    # max_snr_freq = swept_freqs[max_snr_ind]
-    # print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
+    max_snr_ind = np.argmax(snr_array)
+    max_snr_freq = swept_freqs[max_snr_ind]
+    print(f'Max SNR frequency: {max_snr_freq:.4f} MHz')
 
     # Plot figure
     if plot:
@@ -111,16 +101,15 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
         axs[1].set_title('Concatenated signal -- Magnitude')
         plt.show()
 
-    # # Plot noise figure
-    # if plot:
-    #     fig, axs = plt.subplots(2, 1, constrained_layout=True)
-    #     fig.suptitle('NOISE')
-    #     axs[0].plot(np.abs(signal_array))
-    #     # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
-    #     axs[0].set_title('signal_array')
-    #     axs[1].plot(np.abs(noise_array))
-    #     axs[1].set_title('noise_array')
-    #     plt.show()
+    # Plot noise figure
+    if plot:
+        fig, axs = plt.subplots(2, 1, constrained_layout=True)
+        fig.suptitle('NOISE')
+        axs[0].plot(np.abs(signal_array))
+        axs[0].set_title('signal_array')
+        axs[1].plot(np.abs(noise_array))
+        axs[1].set_title('noise_array')
+        plt.show()
 
     # Output of useful data for visualization
     data_dict = {'rx_arr': rx_arr,
