@@ -48,7 +48,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     log.info(f"kSpace {filterType} filtering finished.")
 
     # Preform B0 correction and reconstruct the image
-    fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
+    fname_B0_map = list(filter(lambda x: mri4all_scanfiles.BDATA in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
     df = np.load(path.join(folder, fname_B0_map[0])) if fname_B0_map else None
