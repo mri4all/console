@@ -101,6 +101,8 @@ class StudyViewer(QDialog):
         self.closeButton.setIcon(qta.icon("fa5s.check"))
         self.closeButton.setIconSize(QSize(20, 20))
 
+        self.selectAllPushButton.clicked.connect(self.select_all_clicked)
+
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
 
@@ -214,3 +216,8 @@ class StudyViewer(QDialog):
 
     def close_clicked(self):
         self.close()
+
+    def select_all_clicked(self):
+        for i in range(self.scanListWidget.count()):
+            item = self.scanListWidget.item(i)
+            item.setCheckState(Qt.CheckState.Checked)
