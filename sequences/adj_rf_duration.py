@@ -11,7 +11,7 @@ from sequences.common.util import reading_json_parameter, writing_json_parameter
 import common.logger as logger
 
 from sequences import PulseqSequence
-from sequences.rf_se import pypulseq_rfse
+from sequences import make_rf_se
 
 
 log = logger.get_logger()
@@ -31,7 +31,7 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
         for i in range(points):
             self.seq_file_path = self.get_working_folder() + "/seq/rf_duration_calib_"+str(i+1)+".seq"
             log.info("Calculating sequence " + self.get_name())
-            pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
+            make_rf_se.pypulseq_rfse(inputs={"TE":70, "TR":250, "NSA":1, "ADC_samples": 4096, \
                               "ADC_duration": 6400}, check_timing=True, output_file=self.seq_file_path, rf_duration=rf_duration_vals[i])
             log.info("Done calculating sequence " + self.get_name())
             self.calculated = True
