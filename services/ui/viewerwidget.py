@@ -95,10 +95,11 @@ class ViewerWidget(QWidget):
             self.load_dicoms(file_path, task)
             return True
         elif type == "plot":
-            other_path = Path(file_path) / "other"
-            if path := next(other_path.glob("**/*.json"), None):
-                self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
-            return False
+            self.load_pickled_plot(file_path, task)
+            # other_path = Path(file_path) / "other"
+            # if path := next(other_path.glob("**/*.json"), None):
+            #     self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
+            # return False
         elif type == "other":
             self.load_pickled_plot(file_path, task)
         else:
