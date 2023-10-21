@@ -17,6 +17,7 @@ import common.logger as logger
 from services.ui import ui_runtime
 from services.ui import dicomexport
 from services.ui.viewerwidget import ViewerWidget
+from services.ui import taskviewer
 
 log = logger.get_logger()
 
@@ -102,6 +103,7 @@ class StudyViewer(QDialog):
         self.closeButton.setIconSize(QSize(20, 20))
 
         self.selectAllPushButton.clicked.connect(self.select_all_clicked)
+        self.definitionPushButton.clicked.connect(self.show_definition)
 
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
@@ -221,3 +223,8 @@ class StudyViewer(QDialog):
         for i in range(self.scanListWidget.count()):
             item = self.scanListWidget.item(i)
             item.setCheckState(Qt.CheckState.Checked)
+
+    def show_definition(self):
+        exam = self.exams[self.examListWidget.currentRow()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+        taskviewer.show_taskviewer(scan.dir)
