@@ -118,7 +118,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         )
 
         # Debug 
-        if 1>0: #todo: debug mode
+        Debug = True
+        if Debug is True: #todo: debug mode
             # view_traj.view_sig(rxd)
             plt.figure()
             plt.plot(np.abs(rxd))
