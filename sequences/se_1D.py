@@ -48,9 +48,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def get_default_parameters(self) -> dict:
         return {"TE": 20, "TR": 3000,
         "NSA": 1, 
-        "FOV": 140,
+        "FOV": 20,
         "Base_Resolution": 70,
-        "BW":20,
+        "BW": 32e3,
         "Gradient":"x",}
 
     def set_parameters(self, parameters, scan_task) -> bool:
