@@ -25,10 +25,8 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     as sequence, protocol name, patient information and system information can be found in the
     task object.
     """
-    log.info("Hello recon team, here is your entry point!")
     log.info(f"Folder where the task is = {folder}")
     log.info(f"JSON information = {task}")
-    log.info(f"Access data in the JSON like this: {task.protocol_name}")
 
     log.info(f"Starting reconstruction.")
 
@@ -73,6 +71,5 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"DICOM writting finished.")
 
     # TODO(Radhika): Write ISMRMRD file to the folder
-    # Should it be done on background? (Could be out of this function)
 
     return True
