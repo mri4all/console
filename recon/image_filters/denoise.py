@@ -124,8 +124,8 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
 
     Parameters:
     image_complex (numpy.ndarray) : A complex input image from which noise is to be removed.
-    method (str, optional): The method used for denoising. Options are 'gaussian_filter' and 'bilateral'.
-                            Default is 'gaussian_filter'.
+    method (str, optional): The method used for denoising. Options are 'gaussian_filter', 'bilateral',
+                            'nl_means', and 'total_variation'. Default is 'gaussian_filter'.
 
     Returns:
     numpy.ndarray: The denoised complex image.
@@ -133,6 +133,7 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
 
     # Check that the input is a complex ndarray
     if not np.iscomplexobj(image_complex):
+        log.error("The input image must be a complex ndarray.")
         raise ValueError("The input image must be a complex ndarray.")
 
     # Separate the complex image into the real and imaginary parts
@@ -146,6 +147,12 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
     elif method == "bilateral":
         real_part_denoised = apply_bilateral_denoise(real_part)
         imag_part_denoised = apply_bilateral_denoise(imag_part)
+    elif method == "nl_means":
+        real_part_denoised = apply_nl_means_denoise(real_part)
+        imag_part_denoised = apply_nl_means_denoise(imag_part)
+    elif method == "total_variation":
+        real_part_denoised = apply_total_variation_denoise(real_part)
+        imag_part_denoised = apply_total_variation_denoise(imag_part)
     else:
         log.error(f"Method {method} not recognized.")
 
