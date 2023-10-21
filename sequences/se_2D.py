@@ -29,6 +29,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_Trajectory: str = "Catisian"
     param_PE_Ordering: str = "Center_out"
     param_PF: int = 1 
+    param_view_traj: bool = True
     
 
     @classmethod
@@ -50,7 +51,8 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         "BW":self.param_BW,
         "Trajectory":self.param_Trajectory,
         "PE_Ordering":self.param_PE_Ordering,
-        "PF": self.param_PF}
+        "PF": self.param_PF,
+        "view_traj": self.param_view_traj}
 
     @classmethod
     def get_default_parameters(self) -> dict:
@@ -62,7 +64,8 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                 "BW": 32000,
                 "Trajectory":"Cartesian",
                 "PE_Ordering":"Center_out",
-                "PF": 1
+                "PF": 1,
+                "view_traj": True
                 }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -78,6 +81,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_Trajectory = parameters["Trajectory"]
             self.param_PE_Ordering = parameters["PE_Ordering"]
             self.param_PF = parameters["PF"]
+            self.param_view_traj = parameters["view_traj"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -94,6 +98,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
         widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
         widget.PF_SpinBox.setValue(self.param_PF)
+        widget.visualize_traj_CheckBox.setCheckState(self.param_view_traj)
 
         return True
 
@@ -109,6 +114,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
         self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
         self.param_PF = widget.PF_SpinBox.value()
+        self.param_view_traj = widget.visualize_traj_CheckBox.isChecked()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -131,7 +137,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                     "BW":self.param_BW,
                     "Trajectory":self.param_Trajectory,
                     "PE_Ordering":self.param_PE_Ordering,
-                    "PF": self.param_PF},
+                    "PF": self.param_PF,"view_traj": self.param_view_traj},
             check_timing=True,
             output_file=self.seq_file_path,
         )

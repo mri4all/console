@@ -41,6 +41,7 @@ def control_services(action: ServiceAction) -> None:
 def ping(ip: str):
     """Returns True if host responds to a ping request on Ubuntu."""
     command = ["ping", "-w", "1", "-c", "1", ip]
+    log.info(f"Trying to ping device: {' '.join(command)}")
     try:
         subprocess.check_output(
             command, stderr=subprocess.STDOUT, universal_newlines=True

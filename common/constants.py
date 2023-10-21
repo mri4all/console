@@ -54,8 +54,3 @@ class ServiceAction(Enum):
     STOP = "stop"
     KILL = "kill"
     STATUS = "status"
-
-
-class Scanner(Enum):
-    # TODO: change for the actual IP
-    IP = "localhost"
