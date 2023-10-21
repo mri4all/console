@@ -54,8 +54,6 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     # Create array for storing data
     rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
     rx_arr[:, 0] = rxd
-    noise_array = np.zeros((2048, steps), dtype=np.cdouble)
-    signal_array = np.zeros((2048, steps), dtype=np.cdouble)
 
     # Pause for spin recovery
     time.sleep(delay_s)
@@ -70,15 +68,27 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
                                          grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
                                          gui_test=gui_test)
         # Calculate signal to noise ratio
+        noise_array = []
+        signal_array = []
         for index in range(0,len(rx_arr[:, i])):
             if index >= len(rx_arr[:, i])/4 and index < len(rx_arr[:, i]) - len(rx_arr[:, i])/4:
-                signal_array[:,i].append(rx_arr[index, i])
+                signal_array[i].append(rx_arr[index, i])
             else:
-                noise_array[:, i].append(rx_arr[index, i])
+                noise_array[i].append(rx_arr[index, i])
         snr = np.mean(np.abs(signal_array)) / np.std(np.abs(noise_array))
         print("SNR= " + str(snr))
         snr_array.append(snr)
-        time.sleep(delay_s)
+        # Plot noise figure
+        if plot:
+            fig, axs = plt.subplots(2, 1, constrained_layout=True)
+            fig.suptitle('NOISE')
+            axs[0].plot(np.abs(signal_array))
+             # axs[0].legend([f'{freq:.4f} MHz' for freq in swept_freqs])
+            axs[0].set_title('signal_array')
+            axs[1].plot(np.abs(noise_array))
+            axs[1].set_title('noise_array')
+            plt.show()
+            time.sleep(delay_s)
 
     # Find the frequency data with the largest maximum absolute value
     max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
