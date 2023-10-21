@@ -25,28 +25,56 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    fovx = 140e-3  # Define FOV and resolution
-    fovy = 140e-3
-    fovz = 140e-3
-    Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
-    Ny = 70
-    Nz = 28
-    dim0 = Ny
-    dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
+    # fovx = 140e-3  # Define FOV and resolution
+    # fovy = 140e-3
+    #cfovz = 140e-3
+    # Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
+    # Ny = 70
+    # Nz = 28
     alpha1 = 90  # flip angle
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
-    num_averages = 1
-    traj = "center_out"
-    BW = 20e3
-    adc_dwell = 1 / BW
-    adc_duration = Nx * adc_dwell  # 6.4e-3
+    
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
-    ETL = 2
+    # ETL = 2
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
+    ETL = inputs["ETL"]
+    fovx = inputs["FOV"] / 1000
+    fovy = fovx
+    fovz = fovx # TODO: add on UI
+    Nx = inputs["Base_Resolution"]
+    Ny = Nx
+    Nz = 28 # TODO: add on UI
+    dim0 = Ny
+    dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
+    num_averages = inputs["NSA"]
+    Orientation = inputs["Orientation"]
+    
+    BW = inputs["BW"] # 20e3
+    adc_dwell = 1 / BW
+    adc_duration = Nx * adc_dwell  # 6.4e-3
+
+    traj = "center_out" # TODO: add linear, hybrid trajectory
+
+    # TODO: coordinate the orientation
+    ch0 = "x"
+    ch1 = "y"
+    ch2 = "z"
+    if Orientation == "Axial":
+        ch0 = "x"
+        ch1 = "y"
+        ch2 = "z"
+    elif Orientation == "Sagittal":
+        ch0 = "x"
+        ch1 = "z"
+        ch2 = "y"
+    elif Orientation == "coronal":
+        ch0 = "y"
+        ch1 = "z"
+        ch2 = "x"
 
     # ======
     # INITIATE SEQUENCE
@@ -97,13 +125,13 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     delta_ky = 1 / fovy
     delta_kz = 1 / fovz
     gx = pp.make_trapezoid(
-        channel="x", flat_area=Nx * delta_kx, flat_time=adc_duration, system=system
+        channel=ch0, flat_area=Nx * delta_kx, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
         num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel="x", area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
+        channel=ch0, area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
     )
 
     pe_order = choose_pe_order(
@@ -114,7 +142,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     phase_areas1 = pe_order[:, 0] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_kx, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
 
     # ======
     # CALCULATE DELAYS
@@ -166,13 +194,13 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
             for echo in range(ETL):
                 pe_idx = (ETL * i) + echo
                 gy_pre = pp.make_trapezoid(
-                    channel="y",
+                    channel=ch1,
                     area=phase_areas0[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
                 gz_pre = pp.make_trapezoid(
-                    channel="y",
+                    channel=ch2,
                     area=phase_areas1[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
