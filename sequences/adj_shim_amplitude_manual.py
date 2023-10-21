@@ -156,5 +156,5 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
         result = k.do_shim(self.new_user_values, self.new_signal)
         
-        log.info("Manual shimming finished")
+        log.info(f"Manual shimming finished, final = {result}")
         return True
