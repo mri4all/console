@@ -40,31 +40,30 @@ class B0Corrector:
         
         self.Y = Y  # raw k-space (rads)
         self.kt = kt  # k-space trajectory, acq times for each frequency encode (s) 
-        self.df = df  # delta B0field map (Hz) 
-        self.Lx = Lx  # number of base images to use for conjugate phase methods
+        self.df = df  # delta B0 field map (Hz) 
+        self.Lx = Lx  # number of basis images to use for conjugate phase methods
         self.nonCart = nonCart # non-Cartesian trajectory?
-        self.params = params  # parameters for B0 correction
+        self.params = params  # trajectory parameters for B0 correction
                     
     def __call__(self) -> np.ndarray:
         if self.df is None:  # if no B0, directly perform ifft
-            return self.reconstruct(self.Y)
+            return self.direct_recon()
         
         return self.correct_MFI()  # default method
     
     
-    def reconstruct(self, ksp) -> np.ndarray: 
+    def direct_recon(self) -> np.ndarray: 
         '''
         Directly reconstruct raw k-space data given trajectory.
         '''
-        # log.info("Running reconstruction")
         if not self.nonCart: 
             log.info("Performing n-dim IFFT reconstruction")
-            return ru.centered_ifft(ksp)
+            return ru.centered_ifft(self.Y)
         
         log.info("Performing non-Cartesian reconstruction") 
         cartesian_opt = 0
-        NufftObj = oc.imtransforms.nufft_init(kt, params)
-        return os.imtransforms.ksp2im(ksp, cartesian_opt, NufftObj, params)
+        NufftObj = oc.imtransforms.nufft_init(self.kt, self.params)
+        return oc.imtransforms.ksp2im(self.Y, cartesian_opt, NufftObj, self.params)
     
     def correct_MFI(self) -> np.ndarray: 
         '''
@@ -94,7 +93,7 @@ class B0Corrector:
         M_hat : numpy.ndarray
             Corrected image data.
         '''
-        # log.info("Running multi-frequency interpolation for off-resonance corrected reconstruction")
+        log.info("Running multi-frequency interpolation for off-resonance corrected reconstruction")
         if len(self.Y.shape) <= 2:
             return oc.MFI(self.Y, 'raw', self.kt, self.df, Lx=self.Lx, nonCart=self.nonCart, params=self.params) 
         elif len(self.Y.shape)  == 3:
