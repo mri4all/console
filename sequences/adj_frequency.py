@@ -90,6 +90,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         return "Adjust Frequency"
 
     def calculate_sequence(self, scan_task) -> bool:
+        scan_task.processing.recon_mode = "bypass"
+
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
