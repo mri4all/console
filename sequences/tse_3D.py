@@ -29,6 +29,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_Trajectory: str = "Catisian"
     param_PE_Ordering: str = "Center_out"
     param_Slice_Ordering: str = "Center_out"
+    param_view_traj: bool = True
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -49,7 +50,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         "BW":self.param_BW,
         "Trajectory":self.param_Trajectory,
         "PE_Ordering":self.param_PE_Ordering,
-        "Slice_Ordering":self.param_Slice_Ordering}
+        "Slice_Ordering":self.param_Slice_Ordering,
+        "view_traj": self.param_view_traj,}
 
     @classmethod
     def get_default_parameters(
@@ -64,7 +66,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         "BW": 32000,
         "Trajectory":"Cartesian",
         "PE_Ordering":"Center_out",
-        "Slice_Ordering":"Center_out"}
+        "Slice_Ordering":"Center_out",
+        "view_traj": True,}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -80,6 +83,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_Trajectory = parameters["Trajectory"]
             self.param_PE_Ordering = parameters["PE_Ordering"]
             self.param_Slice_Ordering = parameters["Slice_Ordering"]
+            self.param_view_traj = parameters["view_traj"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -97,6 +101,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
         widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
         widget.Slice_Ordering_ComboBox.setCurrentText(self.param_Slice_Ordering)
+        widget.visualize_traj_CheckBox.setCheckState(self.param_view_traj)
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -112,6 +117,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
         self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
         self.param_Slice_Ordering = widget.Slice_Ordering_ComboBox.currentText()
+        self.param_view_traj = widget.visualize_traj_CheckBox.isChecked()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -135,7 +141,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             "BW":self.param_BW,
             "Trajectory":self.param_Trajectory,
             "PE_Ordering":self.param_PE_Ordering,
-            "Slice_Ordering":self.param_Slice_Ordering
+            "Slice_Ordering":self.param_Slice_Ordering,
+            "view_traj": self.param_view_traj,
             },
             check_timing=True,
             output_file=self.seq_file_path,
