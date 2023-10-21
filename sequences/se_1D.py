@@ -104,7 +104,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def calculate_sequence(self, scan_task) -> bool:
         scan_task.processing.recon_mode = "bypass"
-        
+
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -154,7 +154,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # plt.plot(np.abs(recon))
             # plt.title("fft signal")
             # plt.show()
-            view_traj.view_sig(rxd, self.get_working_folder())
+            #view_traj.view_sig(rxd, self.get_working_folder())
 
             log.info("Plotting figure now")
             plt.style.use("dark_background")
