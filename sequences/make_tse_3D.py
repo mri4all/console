@@ -38,7 +38,6 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     alpha2_duration = 100e-6  # pulse duration
     
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
-    # ETL = 2
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
@@ -84,7 +83,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
 
     seq = pp.Sequence()
     n_shots = int(
-        Ny / ETL
+        Ny*Nz / ETL
     )  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
 
     # ======
@@ -212,18 +211,10 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
                 seq.add_block(rf2)
                 seq.add_block(pp.make_delay(tau2))
                 seq.add_block(gx, adc)
-
-                [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_kx)
-                view_traj.view_traj_3d(k_traj_adc, k_traj)
-
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(gx_spoil, gy_pre, gz_pre)  # TODO: Figure if we need spoiling5
+                seq.add_block(gx_spoil, gy_pre, gz_pre)  # TODO: Figure if we need spoiling
                 seq.add_block(pp.make_delay(tau2))
-
-                [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_kx)
-                view_traj.view_traj_3d(k_traj_adc, k_traj)
-
 
             seq.add_block(pp.make_delay(delay_TR))
 

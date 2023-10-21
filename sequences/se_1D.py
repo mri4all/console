@@ -24,9 +24,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_TR: int = 3000
     param_NSA: int = 1
     param_FOV: int = 20
-    param_Base_Resolution: int = 250
+    param_Base_Resolution: int = 96
     param_BW: int = 32000
-    param_Gradient: str = "x"
+    param_Gradient: str = "y"
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -52,7 +52,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         "FOV": 20,
         "Base_Resolution": 250,
         "BW": 32000,
-        "Gradient":"x",}
+        "Gradient":"y",}
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -118,7 +118,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
-        iterations = 1000
+        iterations = 5
         for iter in range(iterations):
             rxd, rx_t = run_pulseq(
                 seq_file=self.seq_file_path,

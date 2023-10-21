@@ -118,7 +118,7 @@ def remove_gaussian_noise(image, sigma=0.2):
     return image_gaussian
 
 
-def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
+def remove_gaussian_noise_complex(image_complex, method="gaussian_filter", strength=50):
     """
     Removes Gaussian noise from the real and imaginary parts of the input complex image, separately.
 
@@ -126,6 +126,8 @@ def remove_gaussian_noise_complex(image_complex, method="gaussian_filter"):
     image_complex (numpy.ndarray) : A complex input image from which noise is to be removed.
     method (str, optional): The method used for denoising. Options are 'gaussian_filter', 'bilateral',
                             'nl_means', and 'total_variation'. Default is 'gaussian_filter'.
+    strength (int, optional): The strength of the denoising process. Higher values indicate stronger denoising.
+                             Default is 50.
 
     Returns:
     numpy.ndarray: The denoised complex image.
