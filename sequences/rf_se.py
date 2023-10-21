@@ -27,6 +27,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_NSA: int = 1
     param_ADC_samples: int = 4096
     param_ADC_duration: int = 6400
+    param_debug_plot: bool = True
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -44,6 +45,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": self.param_NSA,
             "ADC_samples": self.param_ADC_samples,
             "ADC_duration": self.param_ADC_duration,
+            "debug_plot": self.param_debug_plot,
         }  # ,
 
     @classmethod
@@ -54,6 +56,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": 1,
             "ADC_samples": 4096,
             "ADC_duration": 6400,
+            "debug_plot": True
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -64,6 +67,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_NSA = parameters["NSA"]
             self.param_ADC_samples = parameters["ADC_samples"]
             self.param_ADC_duration = parameters["ADC_duration"]
+            self.param_debug_plot = parameters["debug_plot"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -139,7 +143,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.rxd = rxd
 
         # Debug
-        Debug = True
+        Debug = self.param_debug_plot
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
