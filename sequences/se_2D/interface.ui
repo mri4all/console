@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>16</x>
@@ -209,7 +209,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Sagital</string>
+          <string>Sagittal</string>
          </property>
         </item>
        </widget>

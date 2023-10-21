@@ -57,11 +57,11 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return {"TE": 70, "TR": 250,
                 "NSA": 1, 
                 "FOV": 140,
-                "Orientation":"axial",
+                "Orientation":"Axial",
                 "Base_Resolution": 70,
                 "BW":20,
                 "Trajectory":"Cartesian",
-                "PE_Ordering":"center_out",
+                "PE_Ordering":"Center_out",
                 "PF": 1
                 }
 
