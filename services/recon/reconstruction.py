@@ -6,6 +6,8 @@ from recon.kspaceFiltering.kspace_filtering import *
 
 from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
+from recon.ismrmrd.numpy_to_ismrmrd import create_ismrmrd
+
 from recon.image_filters import denoise
 
 log = logger.get_logger()
@@ -74,5 +76,5 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     log.info(f"DICOM writting finished.")
 
     # TODO(Radhika): Write ISMRMRD file to the folder
-
+    create_ismrmrd(folder, kData, json_file)
     return True
