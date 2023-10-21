@@ -24,6 +24,10 @@ import time
 
 
 def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
+    """
+    Runs the reconstruction pipeline for Cartesian sampling
+    """
+
     fnames = os.listdir(folder)
     if not fnames:
         log.error(f"Folder {folder} is empty.")
@@ -43,7 +47,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     kData = kFilter(kData, filterType, center_correction=True)
     log.info(f"kSpace {filterType} filtering finished.")
 
-    # TODO(Zach, Shounak): Use the trajectory information and B0 map
+    #TODO(Zach, Shounak): Use the trajectory information and B0 map
     fname_B0_map = list(filter(lambda x: "B0" in x, fnames))
     Y = np.ndarray
     kt = np.ndarray
@@ -54,6 +58,7 @@ def run_reconstruction_cartesian(self, folder: str, task: ScanTask):
     b0_corrector = B0Corrector(Y, kt, df, Lx, nonCart, params)
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
+
     # denoising strength from the user interface? - provided by json
     try:
         iData = denoise.remove_gaussian_noise_complex(iData, method="gaussian_filter")

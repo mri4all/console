@@ -189,9 +189,10 @@ def new_signal(temp_folder):
 
     sequence_instance = SequenceBase.get_sequence(sequence_name)()
     # Get the default parameters from the sequence as an example
-    default_parameters = sequence_instance.get_default_parameters()
+    scan_parameters = sequence_instance.get_default_parameters()
+    scan_parameters["debug_plot"] = False
     # Configure the sequence with the default parameters. Normally, the parameters would come from the JSON file.
-    sequence_instance.set_parameters(default_parameters, scan_task)
+    sequence_instance.set_parameters(scan_parameters, scan_task)
     sequence_instance.set_working_folder(temp_folder)
     sequence_instance.calculate_sequence(scan_task)
     sequence_instance.run_sequence(scan_task)
