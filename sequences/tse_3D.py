@@ -10,6 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
+from sequences import make_tse_3D
 import common.logger as logger
 
 log = logger.get_logger()
@@ -70,7 +71,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
-        pypulseq_tse3D(
+        make_tse_3D.pypulseq_tse3D(
             inputs={"TE": self.param_TE, "TR": self.param_TR},
             check_timing=True,
             output_file=self.seq_file_path,
