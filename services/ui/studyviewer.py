@@ -1,5 +1,5 @@
 from typing import List, Optional
-import numpy as np
+import os
 from pathlib import Path
 from pydantic import BaseModel
 from PyQt5 import uic
@@ -29,11 +29,7 @@ def show_viewer():
 
 
 class ScanData(BaseModel):
-    # id: str
     task: ScanTask
-    # dicom: list[float]
-    # rawdata: list[float]
-    # metadata: ScanTask
     dir: Path
 
 
@@ -58,6 +54,8 @@ class StudyViewer(QDialog):
     dicomTargetComboBox: QComboBox
     selected_scan: Optional[ScanData]
 
+    # Caching and timer for preventing loading multiple studies
+    # when updating the list widgets
     loaded_path = ""
     load_scan_path = ""
     load_result_type = ""
@@ -77,8 +75,12 @@ class StudyViewer(QDialog):
 
         self.setWindowTitle("Exam Viewer")
 
-        self.archive_path = Path(rt.get_base_path()) / "data/archive"
-        self.exams = self.organize_scan_data_from_folders()
+        self.exams = self.organize_scan_data_from_folders(
+            Path(mri4all_paths.DATA_COMPLETE)
+        )
+        self.exams += self.organize_scan_data_from_folders(
+            Path(mri4all_paths.DATA_ARCHIVE)
+        )
 
         if not self.exams:
             return
@@ -209,8 +211,7 @@ class StudyViewer(QDialog):
         scan = exam.scans[row]
 
         if not scan.task.results:
-            for result in ["DICOM", "PLOT", "RAWDATA"]:
-                self.resultListWidget.addItem(result)
+            self.viewer.clear_view()
         else:
             for result in scan.task.results:
                 self.resultListWidget.addItem(
@@ -227,9 +228,12 @@ class StudyViewer(QDialog):
             self.scanListWidget.addItem(item)
         self.scanListWidget.setCurrentRow(0)
 
-    def organize_scan_data_from_folders(self) -> List[ExamData]:
+    def organize_scan_data_from_folders(self, folder: Path) -> List[ExamData]:
         exams: List[ExamData] = []
-        for exam_dir in self.archive_path.iterdir():
+
+        # Sort by creation time
+        folders = sorted(folder.iterdir(), key=os.path.getmtime, reverse=True)
+        for exam_dir in folders:
             if not exam_dir.is_dir():
                 continue
 

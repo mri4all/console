@@ -11,8 +11,7 @@ log = logger.get_logger()
 
 
 def pypulseq_se2D(
-    inputs=None, check_timing=True, output_file="", visualize=True
-) -> bool:
+    inputs=None, check_timing=True, output_file="") -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -40,6 +39,7 @@ def pypulseq_se2D(
     fov = inputs["FOV"] / 1000
     Nx = inputs["Base_Resolution"]
     BW = inputs["BW"]
+    visualize = inputs["view_traj"]
     # Trajectory = inputs['Trajectory']     TODO
     # PE_Ordering = inputs['PE_Ordering']   TODO
     # PF = inputs['PF']                     TODO
@@ -72,15 +72,26 @@ def pypulseq_se2D(
     # SET SYSTEM CONFIG TODO --> ?
     # ======
 
+    # system = pp.Opts(
+    #     max_grad=12,
+    #     grad_unit="mT/m",
+    #     max_slew=25,
+    #     slew_unit="T/m/s",
+    #     rf_ringdown_time=20e-6,
+    #     rf_dead_time=100e-6,
+    #     rf_raster_time=1e-6,
+    #     adc_dead_time=20e-6,
+    # )
+
     system = pp.Opts(
-        max_grad=12,
+        max_grad=400,
         grad_unit="mT/m",
-        max_slew=25,
+        max_slew=4000,
         slew_unit="T/m/s",
-        rf_ringdown_time=20e-6,
+        rf_ringdown_time=100e-6,
         rf_dead_time=100e-6,
         rf_raster_time=1e-6,
-        adc_dead_time=20e-6,
+        adc_dead_time=10e-6,
     )
 
     # ======
@@ -251,15 +262,26 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     # SET SYSTEM CONFIG TODO --> ?
     # ======
 
+    # system = pp.Opts(
+    #     max_grad=12,
+    #     grad_unit="mT/m",
+    #     max_slew=25,
+    #     slew_unit="T/m/s",
+    #     rf_ringdown_time=20e-6,
+    #     rf_dead_time=100e-6,
+    #     rf_raster_time=1e-6,
+    #     adc_dead_time=20e-6,
+    # )
+
     system = pp.Opts(
-        max_grad=12,
+        max_grad=400,
         grad_unit="mT/m",
-        max_slew=25,
+        max_slew=4000,
         slew_unit="T/m/s",
-        rf_ringdown_time=20e-6,
+        rf_ringdown_time=100e-6,
         rf_dead_time=100e-6,
         rf_raster_time=1e-6,
-        adc_dead_time=20e-6,
+        adc_dead_time=10e-6,
     )
 
     # ======

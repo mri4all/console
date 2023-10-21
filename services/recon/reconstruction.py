@@ -25,12 +25,13 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     as sequence, protocol name, patient information and system information can be found in the
     task object.
     """
-    log.info("Hello recon team, here is your entry point!")
     log.info(f"Folder where the task is = {folder}")
     log.info(f"JSON information = {task}")
-    log.info(f"Access data in the JSON like this: {task.protocol_name}")
 
     log.info(f"Starting reconstruction.")
+
+    if task.processing.recon_mode == "bypass":
+        return True
 
     if task.processing.recon_mode == "fake_dicoms":
         utils.generate_fake_dicoms(folder, task)
@@ -62,15 +63,16 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     iData = b0_corrector()
     log.info(f"B0 correction finished.")
 
-    # TODO(Kranthi): Image denoising (Gaussian)
-    iData = denoise.apply_nl_means_denoise(iData)
-    log.info(f"Finished image denoising.")
+    try:
+        iData = denoise.remove_gaussian_noise_complex(iData)
+        log.info(f"Finished image denoising.")
+    except ValueError:
+        log.error(f"Image denoising failed.")
 
     # TODO(Lavanya): Write the DICOM file to the folder
     DICOM.write_dicom(iData, task, folder)
     log.info(f"DICOM writting finished.")
 
     # TODO(Radhika): Write ISMRMRD file to the folder
-    # Should it be done on background? (Could be out of this function)
 
     return True
