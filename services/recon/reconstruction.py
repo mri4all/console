@@ -2,7 +2,7 @@ import common.logger as logger
 import common.runtime as rt
 import numpy as np
 
-# from recon.kspaceFiltering.kspace_filtering import *
+from recon.kspaceFiltering.kspace_filtering import *
 
 from recon.B0Correction import B0Corrector
 import recon.DICOM.DICOM_utils as DICOM
