@@ -9,6 +9,7 @@ from skimage.restoration import (
 
 log = logger.get_logger()
 
+MAX_DENOISE_STRENGTH = 9
 
 def apply_bilateral_denoise(image, sigma_color=0.05, sigma_spatial=15, channel_axis=-1):
     """
@@ -120,7 +121,7 @@ def remove_gaussian_noise(image, sigma=0.2):
 
 def _apply_filter(real_part, imag_part, method, strength):
     # Normalize strength to be between 0 and 1
-    normalized_strength = strength / 100
+    normalized_strength = strength / MAX_DENOISE_STRENGTH
 
     # Apply the filter to the real and imaginary parts separately
     if method == "gaussian_filter":
