@@ -315,6 +315,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="whatsThis">
+         <string>not currently working</string>
+        </property>
         <item>
          <property name="text">
           <string>Center_out</string>
@@ -374,6 +377,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="whatsThis">
+         <string>currently controlling both trajs</string>
+        </property>
         <item>
          <property name="text">
           <string>Center_out</string>
@@ -382,6 +388,11 @@
         <item>
          <property name="text">
           <string>Linear_up</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Hybrid</string>
          </property>
         </item>
        </widget>
