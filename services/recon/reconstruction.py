@@ -94,6 +94,10 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(2)
         return True
 
-    run_reconstruction_cartesian(folder, task)
+    if task.processing.trajectory == "cartesian":
+        run_reconstruction_cartesian(folder, task)
+    else:
+        log.error(f"Unknown trajectory type: {task.processing.trajectory}")
+        return False
 
     return True
