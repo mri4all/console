@@ -29,6 +29,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_Base_Resolution: int = 96
     param_BW: int = 32000
     param_Gradient: str = "y"
+    param_debug_plot: bool = True
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -45,7 +46,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         "FOV": self.param_FOV,
         "Base_Resolution": self.param_Base_Resolution,
         "BW":self.param_BW,
-        "Gradient":self.param_Gradient,}
+        "Gradient":self.param_Gradient,
+        "debug_plot": self.param_debug_plot}
 
     @classmethod
     def get_default_parameters(self) -> dict:
@@ -66,6 +68,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_Base_Resolution = parameters["Base_Resolution"]
             self.param_BW = parameters["BW"]
             self.param_Gradient = parameters["Gradient"]
+            self.param_debug_plot = parameters["debug_plot"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -100,6 +103,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
+        scan_task.processing.recon_mode = "bypass"
+
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
@@ -149,8 +154,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # plt.plot(np.abs(recon))
             # plt.title("fft signal")
             # plt.show()
-
-            # view_traj.view_sig(rxd, self.get_working_folder())
+            #view_traj.view_sig(rxd, self.get_working_folder())
 
             log.info("Plotting figure now")
             plt.style.use("dark_background")

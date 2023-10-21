@@ -53,12 +53,11 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     num_averages = inputs["NSA"]
     Orientation = inputs["Orientation"]
     visualize = inputs["view_traj"]
+    traj = inputs["PE_Ordering"]
     
     BW = inputs["BW"] # 20e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
-
-    traj = "center_out" # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
