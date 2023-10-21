@@ -54,23 +54,23 @@ def larmor_step_search(seq_file=constants.DATA_PATH_ACQ/'se_6.seq', step_search_
     # Create array for storing data
     rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
     rx_arr[:, 0] = rxd
-    noise_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
-    signal_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
+    # noise_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
+    # signal_array = np.zeros((int(rxd.shape[0]/2), steps), dtype=np.cdouble)
 
     # Pause for spin recovery
     time.sleep(delay_s)
 
     # Repeat for each frequency after the first
-    # snr_array = []
-    # for i in range(1, steps):
-    #     print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
-    #     rx_arr[:, i], _ = scr.run_pulseq(seq_file, rf_center=swept_freqs[i],
-    #                                      tx_t=1, grad_t=10, tx_warmup=100,
-    #                                      shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
-    #                                      grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
-    #                                      gui_test=gui_test)
+    for i in range(1, steps):
+        print(f'{swept_freqs[i]:.4f} MHz ({i}/{steps})')
+        rx_arr[:, i], _ = scr.run_pulseq(seq_file, rf_center=swept_freqs[i],
+                                         tx_t=1, grad_t=10, tx_warmup=100,
+                                         shim_x=shim_x, shim_y=shim_y, shim_z=shim_z,
+                                         grad_cal=False, save_np=False, save_mat=False, save_msgs=False,
+                                         gui_test=gui_test)
         
     #     # Calculate signal to noise ratio
+    #     snr_array = []
     #     for index in range(0,rxd.shape[0]):
     #         if index > rxd.shape[0]/4 and index < (rxd.shape[0] - rxd.shape[0]/4):
     #             signal_array[index,i] = rx_arr[index, i]
