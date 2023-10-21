@@ -49,6 +49,17 @@ def pypulseq_se2D(
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
+    # TODO: coordinate the orientation
+    if Orientation == "Axial":
+        ch0 = "x"
+        ch1 = "y"
+    elif Orientation == "Sagittal":
+        ch0 = "x"
+        ch1 = "z"
+    elif Orientation == "coronal":
+        ch0 = "y"
+        ch1 = "z"
+
     # ======
     # INITIATE SEQUENCE
     # ======
@@ -93,19 +104,19 @@ def pypulseq_se2D(
     # Define other gradients and ADC events
     delta_k = 1 / fov
     gx = pp.make_trapezoid(
-        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
         num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel="x", area=gx.area / 2, duration=prephaser_duration, system=system
+        channel=ch0, area=gx.area / 2, duration=prephaser_duration, system=system
     )
 
     phase_areas = -(np.arange(Ny) - Ny / 2) * delta_k
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_k, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_k, system=system)
 
     # ======
     # CALCULATE DELAYS
@@ -155,7 +166,7 @@ def pypulseq_se2D(
             # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
             seq.add_block(rf1)
             gy_pre = pp.make_trapezoid(
-                channel="y",
+                channel=ch1,
                 area=phase_areas[i],
                 duration=pp.calc_duration(gx_pre),
                 system=system,
@@ -271,27 +282,27 @@ def pypulseq_se2D_radial(inputs=None, check_timing=True, output_file="") -> bool
     # Define other gradients and ADC events
     delta_k = 1 / fov  # frequency-oversampling is not implemented
     gx = pp.make_trapezoid(
-        channel="x", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+        channel=ch0, flat_area=Nx * delta_k, flat_time=adc_duration, system=system
     )
     gy = pp.make_trapezoid(
-        channel="y", flat_area=Nx * delta_k, flat_time=adc_duration, system=system
+        channel=ch1, flat_area=Nx * delta_k, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
         num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel="x", area=gx.area / 2, duration=prephaser_duration, system=system
+        channel=ch0, area=gx.area / 2, duration=prephaser_duration, system=system
     )
     gy_pre = pp.make_trapezoid(
-        channel="y", area=gy.area / 2, duration=prephaser_duration, system=system
+        channel=ch1, area=gy.area / 2, duration=prephaser_duration, system=system
     )
 
     amp_pre_max = gx_pre.amplitude
     amp_enc_max = gx.amplitude
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    gx_spoil = pp.make_trapezoid(channel="x", area=2 * Nx * delta_k, system=system)
-    gy_spoil = pp.make_trapezoid(channel="y", area=2 * Nx * delta_k, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_k, system=system)
+    gy_spoil = pp.make_trapezoid(channel=ch1, area=2 * Nx * delta_k, system=system)
 
     # ======
     # CALCULATE DELAYS

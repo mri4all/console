@@ -13,7 +13,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
 from sequences import PulseqSequence
-from tests.test_sequences import run_sequence_test
+from external.seq.adjustments_acq.calibration import run_sequence_test
 
 import common.logger as logger
 
