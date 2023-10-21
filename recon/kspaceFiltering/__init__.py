@@ -72,7 +72,7 @@ def debug_filter_on_demo_data(file_name, slc = 18, isimg=True, filter_type = 'fe
     for i in range(slices_to_plot):
         slc = i * slice_spacing
         if slc < total_slices:
-            ax3.plot(mask[:, 64, slc], label=f"Slice {slc}")
+            ax3.plot(mask[:, kspace.shape[0]//2, slc], label=f"Slice {slc}")
             
 
     # Add legend to the plot
