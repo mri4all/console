@@ -29,6 +29,8 @@ class SequenceBase(Generic[SequenceVar]):
     working_folder: str = ""
     calculated = False
     problem_list: list[str] = []
+    main_widget = None
+    info_widget = None
 
     def __init__(self):
         pass
@@ -91,14 +93,25 @@ class SequenceBase(Generic[SequenceVar]):
         """
         return True
 
+    def init_ui(self, widget, info_widget) -> bool:
+        self.main_widget = widget
+        self.info_widget = info_widget
+        return self.setup_ui(widget)
+
     def setup_ui(self, widget) -> bool:
         """
         Creates the user interface of the sequence. The UI can be created with Qt Creator
         and loaded with uic.loadUi, or it can be created manually. The UI controls must
-        be inserted into the provided widget.
+        be inserted into the provided widget. info_widget is a label that can be used to
+        to display additional information about the sequence, such as acquisition time
+        and resolution.
         ** Must be implemented by the individual sequence. **
         """
         return True
+
+    def show_ui_info_text(self, text: str):
+        if self.info_widget:
+            self.info_widget.setText(text)
 
     def write_parameters_to_ui(self, widget) -> bool:
         """
