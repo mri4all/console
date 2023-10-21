@@ -75,7 +75,7 @@ def run_tests() -> bool:
     log.info("")
     # Comment all test sequences except one when testing without connecting RedPitaya
     # run_sequence_test("cal_grad_duration")
-    run_sequence_test('adj_shim_amplitude')
+    #run_sequence_test('adj_shim_amplitude')
     # run_sequence_test('adj_rf_duration')
     #run_sequence_test('adj_rf_amplitude')
     run_sequence_test('adj_frequency')
@@ -84,7 +84,7 @@ def run_tests() -> bool:
     # run_sequence_test("se_1D")      # TODO: trajectory options; Useful for testing a projection, next iteration include 1 k-space line
     # run_sequence_test("se_2D")      # TODO: trajectory options; Useful for testing a projection, next iteration include 1 k-space line
     # run_sequence_test("tse_2D")       # TODO: trajectory options; STE and step towards the workhorse
-    run_sequence_test("tse_3D")
+    #run_sequence_test("tse_3D")
     return True
 
 
