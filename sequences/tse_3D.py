@@ -10,7 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
-from sequences import make_tse_3D
+from sequences.common import make_tse_3D
 import common.logger as logger
 from common.types import ResultItem
 
@@ -42,33 +42,39 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR,
-        "ETL": self.param_ETL,
-        "NSA": self.param_NSA,
-        "Orientation":self.param_Orientation, 
-        "FOV": self.param_FOV,
-        "Base_Resolution": self.param_Base_Resolution,
-        "BW":self.param_BW,
-        "Trajectory":self.param_Trajectory,
-        "PE_Ordering":self.param_PE_Ordering,
-        "Slice_Ordering":self.param_Slice_Ordering,
-        "view_traj": self.param_view_traj,}
+        return {
+            "TE": self.param_TE,
+            "TR": self.param_TR,
+            "ETL": self.param_ETL,
+            "NSA": self.param_NSA,
+            "Orientation": self.param_Orientation,
+            "FOV": self.param_FOV,
+            "Base_Resolution": self.param_Base_Resolution,
+            "BW": self.param_BW,
+            "Trajectory": self.param_Trajectory,
+            "PE_Ordering": self.param_PE_Ordering,
+            "Slice_Ordering": self.param_Slice_Ordering,
+            "view_traj": self.param_view_traj,
+        }
 
     @classmethod
     def get_default_parameters(
         self,
     ) -> dict:
-        return {"TE": 70, "TR": 250,
-        "ETL": 2,
-        "NSA": 1, 
-        "Orientation":"Axial",
-        "FOV": 140,
-        "Base_Resolution": 70,
-        "BW": 32000,
-        "Trajectory":"Cartesian",
-        "PE_Ordering":"Center_out",
-        "Slice_Ordering":"Center_out",
-        "view_traj": True,}
+        return {
+            "TE": 70,
+            "TR": 250,
+            "ETL": 2,
+            "NSA": 1,
+            "Orientation": "Axial",
+            "FOV": 140,
+            "Base_Resolution": 70,
+            "BW": 32000,
+            "Trajectory": "Cartesian",
+            "PE_Ordering": "Center_out",
+            "Slice_Ordering": "Center_out",
+            "view_traj": True,
+        }
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -133,17 +139,19 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
         make_tse_3D.pypulseq_tse3D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR,
-            "NSA": self.param_NSA, 
-            "ETL":self.param_ETL,
-            "FOV": self.param_FOV,
-            "Orientation":self.param_Orientation,
-            "Base_Resolution": self.param_Base_Resolution,
-            "BW":self.param_BW,
-            "Trajectory":self.param_Trajectory,
-            "PE_Ordering":self.param_PE_Ordering,
-            "Slice_Ordering":self.param_Slice_Ordering,
-            "view_traj": self.param_view_traj,
+            inputs={
+                "TE": self.param_TE,
+                "TR": self.param_TR,
+                "NSA": self.param_NSA,
+                "ETL": self.param_ETL,
+                "FOV": self.param_FOV,
+                "Orientation": self.param_Orientation,
+                "Base_Resolution": self.param_Base_Resolution,
+                "BW": self.param_BW,
+                "Trajectory": self.param_Trajectory,
+                "PE_Ordering": self.param_PE_Ordering,
+                "Slice_Ordering": self.param_Slice_Ordering,
+                "view_traj": self.param_view_traj,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -165,7 +173,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1
-            result.file_path = 'other/traj.plot'
+            result.file_path = "other/traj.plot"
             scan_task.results.append(result)
 
         return True

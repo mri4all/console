@@ -7,7 +7,7 @@ from sequences.common.util import reading_json_parameter, writing_json_parameter
 import common.logger as logger
 
 from sequences import PulseqSequence  # type: ignore
-from sequences import make_rf_se  # type: ignore
+from sequences.common import make_rf_se  # type: ignore
 
 
 log = logger.get_logger()
