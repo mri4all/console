@@ -76,7 +76,6 @@ install_console() {
   cd $MRI4ALL_BASE
   sudo su $MRI4ALL_USER -c "git clone https://github.com/mri4all/console.git console" 
   cd console
-  sudo su $MRI4ALL_USER -c "git checkout hackathon"
   if [ ! -e "$MRI4ALL_BASE/console/external/marcos_client/local_config.py" ]; then
     sudo su $MRI4ALL_USER -c "cp $MRI4ALL_BASE/console/external/marcos_client/local_config.py.example $MRI4ALL_BASE/console/external/marcos_client/local_config.py"
   fi
