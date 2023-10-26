@@ -13,7 +13,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
-from sequences import make_se_1D
+from sequences.common import make_se_1D
 import common.logger as logger
 from sequences.common import view_traj
 
@@ -41,22 +41,28 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, "TR": self.param_TR,
-        "NSA": self.param_NSA, 
-        "FOV": self.param_FOV,
-        "Base_Resolution": self.param_Base_Resolution,
-        "BW":self.param_BW,
-        "Gradient":self.param_Gradient,
-        "debug_plot": self.param_debug_plot}
+        return {
+            "TE": self.param_TE,
+            "TR": self.param_TR,
+            "NSA": self.param_NSA,
+            "FOV": self.param_FOV,
+            "Base_Resolution": self.param_Base_Resolution,
+            "BW": self.param_BW,
+            "Gradient": self.param_Gradient,
+            "debug_plot": self.param_debug_plot,
+        }
 
     @classmethod
     def get_default_parameters(self) -> dict:
-        return {"TE": 20, "TR": 3000,
-        "NSA": 1, 
-        "FOV": 20,
-        "Base_Resolution": 250,
-        "BW": 32000,
-        "Gradient":"y",}
+        return {
+            "TE": 20,
+            "TR": 3000,
+            "NSA": 1,
+            "FOV": 20,
+            "Base_Resolution": 250,
+            "BW": 32000,
+            "Gradient": "y",
+        }
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -108,12 +114,15 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
 
         make_se_1D.pypulseq_1dse(
-            inputs={"TE": self.param_TE, "TR": self.param_TR,
-            "NSA": self.param_NSA, 
-            "FOV": self.param_FOV,
-            "Base_Resolution": self.param_Base_Resolution,
-            "BW":self.param_BW,
-            "Gradient":self.param_Gradient},
+            inputs={
+                "TE": self.param_TE,
+                "TR": self.param_TR,
+                "NSA": self.param_NSA,
+                "FOV": self.param_FOV,
+                "Base_Resolution": self.param_Base_Resolution,
+                "BW": self.param_BW,
+                "Gradient": self.param_Gradient,
+            },
             check_timing=True,
             output_file=self.seq_file_path,
         )
@@ -143,7 +152,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             )
 
         # Debug
-        if 1>0: # TODO: set debug mode
+        if 1 > 0:  # TODO: set debug mode
             # plt.figure()
             # plt.subplot(121)
             # plt.plot(np.abs(rxd))
@@ -160,7 +169,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             plt.style.use("dark_background")
             plt.clf()
             plt.subplot(121)
-            plt.title('Acq signal')
+            plt.title("Acq signal")
             plt.grid(False)
             plt.plot(np.abs(rxd))
             plt.subplot(122)
@@ -169,7 +178,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             plt.title("FFT signal")
             if self.param_debug_plot:
                 plt.show()
-            file = open(self.get_working_folder() + "/other/se_1D.plot", 'wb')
+            file = open(self.get_working_folder() + "/other/se_1D.plot", "wb")
             fig = plt.gcf()
             pickle.dump(fig, file)
             file.close()
@@ -179,13 +188,11 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1
-            result.file_path = 'other/se_1D.plot'
+            result.file_path = "other/se_1D.plot"
             scan_task.results.append(result)
-
 
         log.info("Done running sequence " + self.get_name())
 
-        
         # save the raw data file
         self.raw_file_path = self.get_working_folder() + "/rawdata/raw.npy"
         np.save(self.raw_file_path, rxd)
@@ -193,4 +200,3 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Saving rawdata, sequence " + self.get_name())
 
         return True
-

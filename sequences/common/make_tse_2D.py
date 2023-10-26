@@ -1,12 +1,7 @@
-import os
-from pathlib import Path
 import math
 import numpy as np
-from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.scripts import run_pulseq
-from sequences import PulseqSequence
 import common.logger as logger
 from sequences.common import view_traj
 

@@ -11,12 +11,10 @@ from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
-from external.seq.adjustments_acq.calibration import run_sequence_test
 
 from sequences import PulseqSequence
-from sequences import make_rf_se
+from sequences.common import make_rf_se
 import common.logger as logger
-from sequences.common import view_traj
 
 log = logger.get_logger()
 
@@ -57,7 +55,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": 1,
             "ADC_samples": 4096,
             "ADC_duration": 6400,
-            "debug_plot": True
+            "debug_plot": True,
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -142,7 +140,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         )
         log.info("Pulseq ran, plotting")
 
-
         self.rxd = rxd
 
         # Debug
@@ -152,14 +149,13 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             # view_traj.view_sig(rxd)
             plt.style.use("dark_background")
             plt.clf()
-            plt.title('Acq signal')  
+            plt.title("Acq signal")
             plt.grid(True)
             plt.plot(np.abs(rxd))
             if self.param_debug_plot:
                 plt.show()
-                
-            
-            file = open(self.get_working_folder() + "/other/rf_se.plot", 'wb')
+
+            file = open(self.get_working_folder() + "/other/rf_se.plot", "wb")
             fig = plt.gcf()
             pickle.dump(fig, file)
             file.close()
@@ -170,7 +166,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1
-            result.file_path = 'other/rf_se.plot'
+            result.file_path = "other/rf_se.plot"
             scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())

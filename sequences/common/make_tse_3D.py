@@ -1,7 +1,6 @@
 import math
 import numpy as np
 
-
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from sequences.common.get_trajectory import choose_pe_order
@@ -11,7 +10,9 @@ from sequences.common import view_traj
 log = logger.get_logger()
 
 
-def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file="", output_folder="") -> bool:
+def pypulseq_tse3D(
+    inputs=None, check_timing=True, output_file="", pe_order_file="", output_folder=""
+) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -28,7 +29,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
 
     # fovx = 140e-3  # Define FOV and resolution
     # fovy = 140e-3
-    #cfovz = 140e-3
+    # cfovz = 140e-3
     # Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
     # Ny = 70
     # Nz = 28
@@ -36,7 +37,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     alpha1_duration = 100e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
-    
+
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     TR = inputs["TR"] / 1000
@@ -44,21 +45,21 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     ETL = inputs["ETL"]
     fovx = inputs["FOV"] / 1000
     fovy = fovx
-    fovz = fovx # TODO: add on UI
+    fovz = fovx  # TODO: add on UI
     Nx = inputs["Base_Resolution"]
     Ny = Nx
-    Nz = 28 # TODO: add on UI
+    Nz = 28  # TODO: add on UI
     dim0 = Ny
     dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
     num_averages = inputs["NSA"]
     Orientation = inputs["Orientation"]
     visualize = inputs["view_traj"]
-    
-    BW = inputs["BW"] # 20e3
+
+    BW = inputs["BW"]  # 20e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
-    traj = "center_out" # TODO: add linear, hybrid trajectory
+    traj = "center_out"  # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
@@ -83,7 +84,7 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
 
     seq = pp.Sequence()
     n_shots = int(
-        Ny*Nz / ETL
+        Ny * Nz / ETL
     )  # TODO: Needs to be an int; throw exception else later; finally suggest specific values
 
     # ======
@@ -136,7 +137,11 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
     )
 
     pe_order = choose_pe_order(
-        ndims=3, npe=[dim0, dim1], traj=traj, save_pe_order=True, save_path = pe_order_file
+        ndims=3,
+        npe=[dim0, dim1],
+        traj=traj,
+        save_pe_order=True,
+        save_path=pe_order_file,
     )
     npe = pe_order.shape[0]
     phase_areas0 = pe_order[:, 0] * delta_ky
@@ -213,7 +218,9 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
                 seq.add_block(gx, adc)
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(gx_spoil, gy_pre, gz_pre)  # TODO: Figure if we need spoiling
+                seq.add_block(
+                    gx_spoil, gy_pre, gz_pre
+                )  # TODO: Figure if we need spoiling
                 seq.add_block(pp.make_delay(tau2))
 
             seq.add_block(pp.make_delay(delay_TR))
@@ -228,7 +235,9 @@ def pypulseq_tse3D(inputs=None, check_timing=True, output_file="", pe_order_file
             [print(e) for e in error_report]
 
     if visualize:
-        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(spoil_val=2 * Nx * delta_kx)
+        [k_traj_adc, k_traj, t_excitation, t_refocusing, t_adc] = seq.calculate_kspace(
+            spoil_val=2 * Nx * delta_kx
+        )
         log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
         view_traj.view_traj_3d(k_traj_adc, k_traj, output_folder)

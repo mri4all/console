@@ -10,7 +10,7 @@ import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
-from sequences import make_se_2D
+from sequences.common import make_se_2D
 from sequences.common import view_traj
 import common.logger as logger
 from common.types import ResultItem
@@ -29,9 +29,8 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_BW: int = 32000
     param_Trajectory: str = "Catisian"
     param_PE_Ordering: str = "Center_out"
-    param_PF: int = 1 
+    param_PF: int = 1
     param_view_traj: bool = True
-    
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -43,31 +42,35 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def get_parameters(self) -> dict:
-        return {"TE": self.param_TE, 
-        "TR": self.param_TR, 
-        "NSA": self.param_NSA, 
-        "FOV": self.param_FOV,
-        "Orientation":self.param_Orientation,
-        "Base_Resolution": self.param_Base_Resolution,
-        "BW":self.param_BW,
-        "Trajectory":self.param_Trajectory,
-        "PE_Ordering":self.param_PE_Ordering,
-        "PF": self.param_PF,
-        "view_traj": self.param_view_traj}
+        return {
+            "TE": self.param_TE,
+            "TR": self.param_TR,
+            "NSA": self.param_NSA,
+            "FOV": self.param_FOV,
+            "Orientation": self.param_Orientation,
+            "Base_Resolution": self.param_Base_Resolution,
+            "BW": self.param_BW,
+            "Trajectory": self.param_Trajectory,
+            "PE_Ordering": self.param_PE_Ordering,
+            "PF": self.param_PF,
+            "view_traj": self.param_view_traj,
+        }
 
     @classmethod
     def get_default_parameters(self) -> dict:
-        return {"TE": 20, "TR": 3000,
-                "NSA": 1, 
-                "FOV": 20,
-                "Orientation":"Axial",
-                "Base_Resolution": 96,
-                "BW": 32000,
-                "Trajectory":"Cartesian",
-                "PE_Ordering":"Center_out",
-                "PF": 1,
-                "view_traj": True
-                }
+        return {
+            "TE": 20,
+            "TR": 3000,
+            "NSA": 1,
+            "FOV": 20,
+            "Orientation": "Axial",
+            "Base_Resolution": 96,
+            "BW": 32000,
+            "Trajectory": "Cartesian",
+            "PE_Ordering": "Center_out",
+            "PF": 1,
+            "view_traj": True,
+        }
 
     def set_parameters(self, parameters, scan_task) -> bool:
         self.problem_list = []
@@ -130,15 +133,19 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         # ToDo: if self.Trajectory == "Cartesian": (default)
         make_se_2D.pypulseq_se2D(
-            inputs={"TE": self.param_TE, "TR": self.param_TR, 
-                    "NSA": self.param_NSA, 
-                    "FOV": self.param_FOV,
-                    "Orientation":self.param_Orientation,
-                    "Base_Resolution": self.param_Base_Resolution,
-                    "BW":self.param_BW,
-                    "Trajectory":self.param_Trajectory,
-                    "PE_Ordering":self.param_PE_Ordering,
-                    "PF": self.param_PF,"view_traj": self.param_view_traj},
+            inputs={
+                "TE": self.param_TE,
+                "TR": self.param_TR,
+                "NSA": self.param_NSA,
+                "FOV": self.param_FOV,
+                "Orientation": self.param_Orientation,
+                "Base_Resolution": self.param_Base_Resolution,
+                "BW": self.param_BW,
+                "Trajectory": self.param_Trajectory,
+                "PE_Ordering": self.param_PE_Ordering,
+                "PF": self.param_PF,
+                "view_traj": self.param_view_traj,
+            },
             check_timing=True,
             output_file=self.seq_file_path,
             output_folder=self.get_working_folder(),
@@ -159,7 +166,7 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1
-            result.file_path = 'other/traj.plot'
+            result.file_path = "other/traj.plot"
             scan_task.results.append(result)
 
         return True
@@ -212,11 +219,9 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         plt.title("imag")
         plt.show()
 
-
         # save the raw data file
         self.raw_file_path = self.get_working_folder() + "/rawdata/raw.npy"
         np.save(self.raw_file_path, rxd)
 
         log.info("Saving rawdata, sequence " + self.get_name())
         return True
-

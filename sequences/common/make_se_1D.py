@@ -3,7 +3,6 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.scripts import run_pulseq
 
 import common.logger as logger
 
@@ -33,12 +32,12 @@ def pypulseq_1dse(
     # TR = 3000e-3
     # num_averages = 1
     # channel = "y"
-    TR = inputs["TR"] / 1000 # ms to s
+    TR = inputs["TR"] / 1000  # ms to s
     TE = inputs["TE"] / 1000
     num_averages = inputs["NSA"]
-    fov = inputs['FOV'] / 1000
-    Nx = inputs['Base_Resolution']
-    BW = inputs['BW']
+    fov = inputs["FOV"] / 1000
+    Nx = inputs["Base_Resolution"]
+    BW = inputs["BW"]
     channel = inputs["Gradient"]
 
     # fov = 20e-3  # Define FOV and resolution - 37.5e-3
@@ -73,37 +72,70 @@ def pypulseq_1dse(
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration,
-                          delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
     readout_time = 2.5e-3 + (2 * system.adc_dead_time)
     delta_k = 1 / fov
-    gx = pp.make_trapezoid(channel=channel, flat_area=Nx * delta_k, flat_time=readout_time, rise_time=rise_time, system=system)
-    gx_pre = pp.make_trapezoid(channel=channel, area=gx.area / 2, duration=prephaser_duration, rise_time=rise_time, system=system)
-    adc = pp.make_adc(num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, phase_offset=np.pi/2, system=system)
-
+    gx = pp.make_trapezoid(
+        channel=channel,
+        flat_area=Nx * delta_k,
+        flat_time=readout_time,
+        rise_time=rise_time,
+        system=system,
+    )
+    gx_pre = pp.make_trapezoid(
+        channel=channel,
+        area=gx.area / 2,
+        duration=prephaser_duration,
+        rise_time=rise_time,
+        system=system,
+    )
+    adc = pp.make_adc(
+        num_samples=Nx,
+        duration=gx.flat_time,
+        delay=gx.rise_time,
+        phase_offset=np.pi / 2,
+        system=system,
+    )
 
     # ======
     # CALCULATE DELAYS
     # ======
     tau1 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+            (
+                TE / 2
+                - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
+                - pp.calc_duration(gx_pre)
+            )
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
 
     tau2 = (
-        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre) - 2*rise_time) / seq.grad_raster_time)
+        math.ceil(
+            (
+                TE / 2
+                - 0.5 * (pp.calc_duration(rf2))
+                - pp.calc_duration(gx_pre)
+                - 2 * rise_time
+            )
+            / seq.grad_raster_time
+        )
     ) * seq.grad_raster_time  # TODO: gradient delays need to be calibrated
-
 
     # tau2 = (
     #     math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx)) / seq.grad_raster_time)
@@ -125,11 +157,11 @@ def pypulseq_1dse(
         seq.add_block(pp.make_delay(tau1))
         seq.add_block(rf2)
         seq.add_block(pp.make_delay(tau2))
-        seq.add_block(gx, adc) # Projection
+        seq.add_block(gx, adc)  # Projection
         seq.add_block(pp.make_delay(delay_TR))
 
-    #seq.plot(time_range=[0, 5*TR])
-    seq.write('se_1D_local.seq')
+    # seq.plot(time_range=[0, 5*TR])
+    seq.write("se_1D_local.seq")
     # Check whether the timing of the sequence is correct
     check_timing = True
     if check_timing:

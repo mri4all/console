@@ -3,13 +3,15 @@ import numpy as np
 
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
-from external.seq.adjustments_acq.scripts import run_pulseq
 
 import common.logger as logger
 
 log = logger.get_logger()
 
-def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=100e-6) -> bool:
+
+def pypulseq_rfse(
+    inputs=None, check_timing=True, output_file="", rf_duration=100e-6
+) -> bool:
     if not output_file:
         log.error("No output file specified")
         return False
@@ -27,11 +29,11 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # adc_num_samples = 4096
     # adc_duration = 6.4e-3
 
-    TR = inputs["TR"] / 1000 # ms to s
+    TR = inputs["TR"] / 1000  # ms to s
     TE = inputs["TE"] / 1000
     num_averages = inputs["NSA"]
-    adc_num_samples = inputs['ADC_samples']
-    adc_duration = inputs['ADC_duration'] / 1e6 # us to s
+    adc_num_samples = inputs["ADC_samples"]
+    adc_duration = inputs["ADC_duration"] / 1e6  # us to s
 
     # ======
     # INITIATE SEQUENCE
@@ -57,14 +59,20 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     # ======
     # CREATE EVENTS
     # ======
-    rf1 = pp.make_block_pulse(flip_angle=alpha1 * math.pi / 180, duration=alpha1_duration, delay=100e-6, system=system, use='excitation')
+    rf1 = pp.make_block_pulse(
+        flip_angle=alpha1 * math.pi / 180,
+        duration=alpha1_duration,
+        delay=100e-6,
+        system=system,
+        use="excitation",
+    )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
         delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
-        use='refocusing'
+        use="refocusing",
     )
 
     # ======
@@ -76,7 +84,9 @@ def pypulseq_rfse(inputs=None, check_timing=True, output_file="", rf_duration=10
     assert np.all(tau1 >= 0)
 
     # Define ADC events
-    adc = pp.make_adc(num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system)
+    adc = pp.make_adc(
+        num_samples=adc_num_samples, delay=tau2, duration=adc_duration, system=system
+    )
 
     # ======
     # CONSTRUCT SEQUENCE

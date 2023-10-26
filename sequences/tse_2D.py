@@ -6,7 +6,7 @@ from PyQt5 import uic
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 from external.seq.adjustments_acq.scripts import run_pulseq
-from sequences.make_tse_2D import pypulseq_tse2D, pypulseq_tse2D_radial
+from sequences.common.make_tse_2D import pypulseq_tse2D, pypulseq_tse2D_radial
 from sequences import PulseqSequence
 import common.logger as logger
 from sequences.common import view_traj
@@ -63,7 +63,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def validate_parameters(self, scan_task) -> bool:
         if self.param_TE > self.param_TR:
             self.problem_list.append("TE cannot be longer than TR")
-        log.info('Validated acquisition parameters')
+        log.info("Validated acquisition parameters")
         return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
@@ -105,17 +105,14 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         )
 
         log.info("Done running sequence " + self.get_name())
-        
+
         log.info("Completing post-acquisition processes for" + self.get_name())
         # TODO: Build this sequence info object over all other places to build the JSON for recon
         seq_info = {
             "raw_file_path": self.get_working_folder() + "/rawdata/raw.npy",
-            "traj_file_path": self.get_working_folder() + "/data/traj.npy"
+            "traj_file_path": self.get_working_folder() + "/data/traj.npy",
         }
         post_acq_do(seq_info)
-        log.info("Sequence completed" + self.get_name() )
-        
+        log.info("Sequence completed" + self.get_name())
+
         return True
-
-
-
