@@ -1,0 +1,567 @@
+[*]
+[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
+[*] Sun Apr 18 19:45:06 2021
+[*]
+[dumpfile] "/home/vlad/Documents/mri/marga/build/marga_sim.fst"
+[dumpfile_mtime] "Sun Apr 18 19:42:36 2021"
+[dumpfile_size] 915449
+[savefile] "/home/vlad/Documents/mri/marga/src/marga_sim.sav"
+[timestart] 0
+[size] 1920 1029
+[pos] -1 -1
+*-13.595366 12990 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.marga_model.
+[treeopen] TOP.marga_model.UUT.
+[sst_width] 391
+[signals_width] 338
+[sst_expanded] 1
+[sst_vpaned_height] 589
+@28
+TOP.s0_axi_aclk
+TOP.s0_axi_aresetn
+@200
+-
+@c00200
+-s0_axi
+@22
+TOP.s0_axi_araddr[18:0]
+@28
+TOP.s0_axi_aresetn
+TOP.s0_axi_arprot[2:0]
+@22
+TOP.s0_axi_arready
+@28
+TOP.s0_axi_arvalid
+@22
+TOP.s0_axi_awaddr[18:0]
+@28
+TOP.s0_axi_awprot[2:0]
+TOP.s0_axi_awready
+TOP.s0_axi_awvalid
+TOP.s0_axi_bready
+TOP.s0_axi_bresp[1:0]
+TOP.s0_axi_bvalid
+@22
+TOP.s0_axi_rdata[31:0]
+@28
+TOP.s0_axi_rready
+TOP.s0_axi_rresp[1:0]
+TOP.s0_axi_rvalid
+@22
+TOP.s0_axi_wdata[31:0]
+@28
+TOP.s0_axi_wready
+@22
+TOP.s0_axi_wstrb[3:0]
+@28
+TOP.s0_axi_wvalid
+@1401200
+-s0_axi
+@200
+-
+@c00200
+-slv_regs
+@22
+TOP.marga_model.UUT.fld.slv_reg0[31:0]
+TOP.marga_model.UUT.fld.slv_reg1[31:0]
+TOP.marga_model.UUT.fld.slv_reg2[31:0]
+TOP.marga_model.UUT.fld.slv_reg3[31:0]
+@c00022
+TOP.marga_model.UUT.fld.slv_reg4[31:0]
+@28
+(0)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(1)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(2)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(3)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(4)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(5)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(6)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(7)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(8)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(9)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(10)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(11)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(12)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(13)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(14)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(15)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(16)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(17)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(18)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(19)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(20)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(21)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(22)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(23)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(24)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(25)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(26)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(27)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(28)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(29)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(30)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+(31)TOP.marga_model.UUT.fld.slv_reg4[31:0]
+@1401200
+-group_end
+@22
+TOP.marga_model.UUT.fld.slv_reg5[31:0]
+TOP.marga_model.UUT.fld.slv_reg6[31:0]
+TOP.marga_model.UUT.fld.slv_reg7[31:0]
+TOP.marga_model.UUT.fld.slv_reg8[31:0]
+@c00022
+TOP.marga_model.UUT.fld.slv_reg9[31:0]
+@28
+(0)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(1)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(2)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(3)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(4)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(5)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(6)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(7)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(8)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(9)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(10)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(11)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(12)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(13)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(14)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(15)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(16)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(17)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(18)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(19)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(20)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(21)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(22)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(23)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(24)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(25)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(26)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(27)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(28)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(29)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(30)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+(31)TOP.marga_model.UUT.fld.slv_reg9[31:0]
+@1401200
+-group_end
+@c00022
+TOP.marga_model.UUT.fld.slv_reg10[31:0]
+@28
+(0)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(1)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(2)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(3)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(4)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(5)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(6)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(7)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(8)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(9)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(10)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(11)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(12)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(13)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(14)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(15)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(16)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(17)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(18)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(19)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(20)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(21)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(22)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(23)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(24)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(25)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(26)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(27)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(28)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(29)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(30)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+(31)TOP.marga_model.UUT.fld.slv_reg10[31:0]
+@1401200
+-group_end
+@22
+TOP.marga_model.UUT.fld.slv_reg11[31:0]
+TOP.marga_model.UUT.fld.slv_reg12[31:0]
+TOP.marga_model.UUT.fld.slv_reg13[31:0]
+TOP.marga_model.UUT.fld.slv_reg14[31:0]
+@28
+TOP.marga_model.UUT.fld.slv_reg_rden
+TOP.marga_model.UUT.fld.slv_reg_wen
+@1401200
+-slv_regs
+@c00022
+TOP.leds_o[7:0]
+@28
+(0)TOP.leds_o[7:0]
+(1)TOP.leds_o[7:0]
+(2)TOP.leds_o[7:0]
+(3)TOP.leds_o[7:0]
+(4)TOP.leds_o[7:0]
+(5)TOP.leds_o[7:0]
+(6)TOP.leds_o[7:0]
+(7)TOP.leds_o[7:0]
+@1401200
+-group_end
+@200
+-
+@800200
+-tx_iq
+@c00420
+[color] 3
+TOP.marga_model.UUT.tx0_i[15:0]
+@28
+[color] 3
+(0)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(1)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(2)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(3)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(4)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(5)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(6)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(7)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(8)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(9)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(10)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(11)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(12)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(13)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(14)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(15)TOP.marga_model.UUT.tx0_i[15:0]
+@1401200
+-group_end
+@c08420
+[color] 3
+TOP.marga_model.UUT.tx0_i[15:0]
+@28
+[color] 3
+(0)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(1)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(2)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(3)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(4)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(5)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(6)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(7)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(8)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(9)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(10)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(11)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(12)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(13)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(14)TOP.marga_model.UUT.tx0_i[15:0]
+[color] 3
+(15)TOP.marga_model.UUT.tx0_i[15:0]
+@1401200
+-group_end
+@20000
+-
+-
+-
+@420
+[color] 3
+TOP.marga_model.UUT.tx0_q[15:0]
+@8420
+[color] 3
+TOP.marga_model.UUT.tx0_q[15:0]
+@20000
+-
+-
+-
+@420
+TOP.marga_model.UUT.tx1_i[15:0]
+@8420
+TOP.marga_model.UUT.tx1_i[15:0]
+@20000
+-
+-
+-
+@420
+TOP.marga_model.UUT.tx1_q[15:0]
+@8420
+TOP.marga_model.UUT.tx1_q[15:0]
+@20000
+-
+-
+-
+-
+-
+-
+@1000200
+-tx_iq
+@200
+-
+@c00200
+-ddses
+@c08024
+[color] 3
+TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+@28
+(0)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(1)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(2)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(3)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(4)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(5)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(6)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(7)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(8)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(9)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(10)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(11)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(12)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(13)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(14)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(15)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(16)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(17)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(18)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(19)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(20)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(21)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(22)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+(23)TOP.marga_model.dds0_phase_axis_tdata_o[23:0]
+@1401200
+-group_end
+@20000
+-
+-
+@8024
+TOP.marga_model.dds1_phase_axis_tdata_o[23:0]
+@20000
+-
+-
+@24
+TOP.marga_model.dds2_phase_axis_tdata_o[23:0]
+@20000
+-
+-
+@1401200
+-ddses
+@200
+-
+@c00200
+-rx_input
+@28
+TOP.marga_model.rx0_axis_tvalid_i
+TOP.marga_model.rx0_axis_tready_o
+@200
+-
+@28
+TOP.marga_model.rx1_axis_tvalid_i
+TOP.marga_model.rx1_axis_tready_o
+@1401200
+-rx_input
+@200
+-
+@c00200
+-mardecode
+@24
+TOP.marga_model.UUT.fld.mar_bram_raddr[15:0]
+[color] 2
+TOP.marga_model.UUT.fld.mar_bram_raddr_r2[15:0]
+@8024
+[color] 2
+TOP.marga_model.UUT.fld.mar_bram_raddr_r2[15:0]
+@20000
+-
+-
+@22
+TOP.marga_model.UUT.fld.state[3:0]
+TOP.marga_model.UUT.fld.mar_bram_rdata_r[31:0]
+@24
+[color] 2
+TOP.marga_model.UUT.fld.tmr[23:0]
+@8024
+[color] 2
+TOP.marga_model.UUT.fld.tmr[23:0]
+@20000
+-
+-
+@22
+TOP.marga_model.UUT.fld.status_i[31:0]
+TOP.marga_model.UUT.fld.status_r[31:0]
+TOP.marga_model.UUT.fld.status_latch_i[31:0]
+TOP.marga_model.UUT.fld.status_latch_r2[31:0]
+@1401200
+-mardecode
+@200
+-
+@c00200
+-fhdo
+@28
+TOP.marga_model.UUT.fhdo_err
+TOP.marga_model.fhdo.clk
+TOP.marga_model.UUT.gpa_fhdo_if.valid_i
+TOP.marga_model.UUT.gpa_fhdo_if.busy_o
+@200
+-
+@28
+TOP.marga_model.fhdo.csn
+TOP.marga_model.fhdo.sdi
+TOP.marga_model.fhdo.sdo
+@24
+[color] 2
+TOP.marga_model.fhdo.voutx[15:0]
+@8022
+[color] 2
+TOP.marga_model.fhdo.voutx[15:0]
+@20000
+-
+-
+-
+@24
+[color] 3
+TOP.marga_model.fhdo.vouty[15:0]
+@8022
+[color] 3
+TOP.marga_model.fhdo.vouty[15:0]
+@20000
+-
+-
+-
+@24
+TOP.marga_model.fhdo.voutz[15:0]
+@8022
+TOP.marga_model.fhdo.voutz[15:0]
+@20000
+-
+-
+-
+@24
+[color] 7
+TOP.marga_model.fhdo.voutz2[15:0]
+@8022
+[color] 7
+TOP.marga_model.fhdo.voutz2[15:0]
+@20000
+-
+-
+-
+@1401200
+-fhdo
+@c00200
+-ocra1
+@24
+[color] 2
+TOP.marga_model.ocra1.voutx[17:0]
+@8420
+[color] 2
+TOP.marga_model.ocra1.voutx[17:0]
+@20000
+-
+-
+-
+@24
+[color] 3
+TOP.marga_model.ocra1.vouty[17:0]
+@8420
+[color] 3
+TOP.marga_model.ocra1.vouty[17:0]
+@20000
+-
+-
+-
+@24
+TOP.marga_model.ocra1.voutz[17:0]
+@8420
+TOP.marga_model.ocra1.voutz[17:0]
+@20000
+-
+-
+-
+@24
+[color] 7
+TOP.marga_model.ocra1.voutz2[17:0]
+@8420
+[color] 7
+TOP.marga_model.ocra1.voutz2[17:0]
+@20000
+-
+-
+-
+@1401200
+-ocra1
+@c00200
+-oc1_iface
+@28
+TOP.marga_model.UUT.ocra1_en
+TOP.marga_model.UUT.grad_data_valid
+TOP.marga_model.UUT.ocra1_if.rst_n
+TOP.marga_model.UUT.ocra1_if.busy_o
+TOP.marga_model.UUT.ocra1_if.data_lost_o
+@22
+TOP.marga_model.UUT.ocra1_if.data_i[31:0]
+@800022
+TOP.marga_model.UUT.ocra1_if.data_present[3:0]
+@28
+(0)TOP.marga_model.UUT.ocra1_if.data_present[3:0]
+(1)TOP.marga_model.UUT.ocra1_if.data_present[3:0]
+(2)TOP.marga_model.UUT.ocra1_if.data_present[3:0]
+(3)TOP.marga_model.UUT.ocra1_if.data_present[3:0]
+@1001200
+-group_end
+@1401200
+-oc1_iface
+@200
+-
+@c00200
+-rx0_model
+@22
+TOP.marga_model.rx0.axis_tdata_o[63:0]
+@28
+TOP.marga_model.rx0.axis_tvalid_o
+TOP.marga_model.rx0.rst_n
+@22
+TOP.marga_model.rx0.rx_iq_axis_tdata_i[31:0]
+@28
+TOP.marga_model.rx0.rx_iq_axis_tvalid_i
+@1401200
+-rx0_model
+@c00200
+-rx1_model
+@22
+TOP.marga_model.rx1.axis_tdata_o[63:0]
+@28
+TOP.marga_model.rx1.axis_tvalid_o
+TOP.marga_model.rx1.rst_n
+@22
+TOP.marga_model.rx1.rx_iq_axis_tdata_i[31:0]
+@28
+TOP.marga_model.rx1.rx_iq_axis_tvalid_i
+@1401200
+-rx1_model
+[pattern_trace] 1
+[pattern_trace] 0

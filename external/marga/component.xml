@@ -1,0 +1,2673 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>marcos</spirit:vendor>
+  <spirit:library>marcos</spirit:library>
+  <spirit:name>marga</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:busInterfaces>
+    <spirit:busInterface>
+      <spirit:name>dds0_iq_axis_i</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds0_iq_axis_tdata_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds0_iq_axis_tvalid_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>dds0_phase_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds0_phase_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds0_phase_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>dds1_iq_axis_i</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds1_iq_axis_tdata_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds1_iq_axis_tvalid_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>dds1_phase_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds1_phase_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds1_phase_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>dds2_iq_axis_i</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds2_iq_axis_tdata_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds2_iq_axis_tvalid_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>dds2_phase_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds2_phase_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>dds2_phase_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx0_axis_i</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_axis_tdata_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_axis_tvalid_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_axis_tready_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx0_dds_iq_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_dds_iq_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_dds_iq_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx0_rate_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_rate_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_rate_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx1_axis_i</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_axis_tdata_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_axis_tvalid_i</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_axis_tready_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx1_dds_iq_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_dds_iq_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_dds_iq_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx1_rate_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_rate_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_rate_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>tx0_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>tx0_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>tx0_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>tx1_axis_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>tx1_axis_tdata_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>TVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>tx1_axis_tvalid_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>s0_axi</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="aximm" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="aximm_rtl" spirit:version="1.0"/>
+      <spirit:slave>
+        <spirit:memoryMapRef spirit:memoryMapRef="s0_axi"/>
+      </spirit:slave>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>AWADDR</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_awaddr</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>AWPROT</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_awprot</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>AWVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_awvalid</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>AWREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_awready</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>WDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_wdata</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>WSTRB</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_wstrb</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>WVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_wvalid</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>WREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_wready</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>BRESP</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_bresp</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>BVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_bvalid</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>BREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_bready</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>ARADDR</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_araddr</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>ARPROT</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_arprot</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>ARVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_arvalid</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>ARREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_arready</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RDATA</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_rdata</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RRESP</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_rresp</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RVALID</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_rvalid</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RREADY</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_rready</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>s0_axi_aresetn</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RST</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_aresetn</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+      <spirit:parameters>
+        <spirit:parameter>
+          <spirit:name>POLARITY</spirit:name>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.S0_AXI_ARESETN.POLARITY" spirit:choiceRef="choice_list_9d8b0d81">ACTIVE_LOW</spirit:value>
+        </spirit:parameter>
+      </spirit:parameters>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>s0_axi_aclk</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="clock" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="clock_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>CLK</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>s0_axi_aclk</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+      <spirit:parameters>
+        <spirit:parameter>
+          <spirit:name>ASSOCIATED_BUSIF</spirit:name>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.S0_AXI_ACLK.ASSOCIATED_BUSIF">s0_axi:tx1_axis_o:tx0_axis_o:rx1_rate_axis_o:rx1_dds_iq_axis_o:rx1_axis_i:rx0_rate_axis_o:rx0_dds_iq_axis_o:rx0_axis_i:dds2_phase_axis_o:dds2_iq_axis_i:dds1_phase_axis_o:dds1_iq_axis_i:dds0_phase_axis_o:dds0_iq_axis_i</spirit:value>
+        </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>ASSOCIATED_RESET</spirit:name>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.S0_AXI_ACLK.ASSOCIATED_RESET">s0_axi_aresetn:rx0_rst_n_o:rx1_rst_n_o</spirit:value>
+        </spirit:parameter>
+      </spirit:parameters>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx0_rst_n_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RST</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx0_rst_n_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>rx1_rst_n_o</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RST</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>rx1_rst_n_o</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+  </spirit:busInterfaces>
+  <spirit:memoryMaps>
+    <spirit:memoryMap>
+      <spirit:name>s0_axi</spirit:name>
+      <spirit:addressBlock>
+        <spirit:name>mardecode</spirit:name>
+        <spirit:baseAddress spirit:format="long">0</spirit:baseAddress>
+        <spirit:range spirit:format="long">524288</spirit:range>
+        <spirit:width spirit:format="long">0</spirit:width>
+      </spirit:addressBlock>
+    </spirit:memoryMap>
+  </spirit:memoryMaps>
+  <spirit:model>
+    <spirit:views>
+      <spirit:view>
+        <spirit:name>xilinx_xpgui</spirit:name>
+        <spirit:displayName>UI Layout</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:xgui.ui</spirit:envIdentifier>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_xpgui_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>db7e66a2</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagesynthesis</spirit:name>
+        <spirit:displayName>Synthesis</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
+        <spirit:modelName>marga</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagesynthesis_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>5a547cfe</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagebehavioralsimulation</spirit:name>
+        <spirit:displayName>Simulation</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
+        <spirit:modelName>marga_tb</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>7aeeaa17</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+    </spirit:views>
+    <spirit:ports>
+      <spirit:port>
+        <spirit:name>ocra1_clk_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_syncn_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_ldacn_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_sdox_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_sdoy_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_sdoz_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>ocra1_sdoz2_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>fhdo_clk_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>fhdo_sdo_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>fhdo_ssn_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>fhdo_sdi_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>tx_gate_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx_gate_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds0_phase_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">23</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds1_phase_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">23</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds2_phase_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">23</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds0_phase_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds1_phase_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds2_phase_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_rst_n_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_rst_n_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_en_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_en_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_rate_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">15</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_rate_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">15</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_rate_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_rate_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>trig_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>trig_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_axis_tvalid_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_axis_tdata_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">63</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_axis_tready_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_axis_tvalid_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_axis_tdata_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">63</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_axis_tready_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds0_iq_axis_tdata_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds1_iq_axis_tdata_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds2_iq_axis_tdata_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds0_iq_axis_tvalid_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds1_iq_axis_tvalid_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>dds2_iq_axis_tvalid_i</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_dds_iq_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_dds_iq_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx0_dds_iq_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>rx1_dds_iq_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>tx0_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>tx0_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>tx1_axis_tdata_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>reg</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>tx1_axis_tvalid_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>leds_o</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">7</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_aclk</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_aresetn</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_awaddr</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_S0_AXI_ADDR_WIDTH&apos;)) - 1)">18</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_awprot</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">2</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_awvalid</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_awready</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_wdata</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_S0_AXI_DATA_WIDTH&apos;)) - 1)">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_wstrb</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="((spirit:decode(id(&apos;MODELPARAM_VALUE.C_S0_AXI_DATA_WIDTH&apos;)) / 8) - 1)">3</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">1</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_wvalid</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_wready</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_bresp</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">1</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_bvalid</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_bready</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_araddr</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_S0_AXI_ADDR_WIDTH&apos;)) - 1)">18</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_arprot</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">2</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_arvalid</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_arready</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_rdata</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_S0_AXI_DATA_WIDTH&apos;)) - 1)">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_rresp</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">1</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_rvalid</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>s0_axi_rready</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+    </spirit:ports>
+    <spirit:modelParameters>
+      <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="integer">
+        <spirit:name>C_S0_AXI_DATA_WIDTH</spirit:name>
+        <spirit:displayName>C S0 Axi Data Width</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_S0_AXI_DATA_WIDTH">32</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>C_S0_AXI_ADDR_WIDTH</spirit:name>
+        <spirit:displayName>C S0 Axi Addr Width</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_S0_AXI_ADDR_WIDTH">19</spirit:value>
+      </spirit:modelParameter>
+    </spirit:modelParameters>
+  </spirit:model>
+  <spirit:choices>
+    <spirit:choice>
+      <spirit:name>choice_list_9d8b0d81</spirit:name>
+      <spirit:enumeration>ACTIVE_HIGH</spirit:enumeration>
+      <spirit:enumeration>ACTIVE_LOW</spirit:enumeration>
+    </spirit:choice>
+  </spirit:choices>
+  <spirit:fileSets>
+    <spirit:fileSet>
+      <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>xgui/marga_v1_0.tcl</spirit:name>
+        <spirit:fileType>tclSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_db7e66a2</spirit:userFileType>
+        <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagesynthesis_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>hdl/mardecode.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marfifo.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marbuffer.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/gpa_fhdo_iface.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ocra1_iface.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marga.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_dbd140fa</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>hdl/ad5781_model_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/dac80504_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ad5781_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ocra1_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/gpa_fhdo_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/dac80504_model_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ocra1_iface_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marga_simple_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ads8684_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/mardecode_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/rx_chain_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marbuffer_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/ads8684_model_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/marfifo_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/gpa_fhdo_iface_tb.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+    </spirit:fileSet>
+  </spirit:fileSets>
+  <spirit:description>MaRCoS real-time FPGA control subsystem</spirit:description>
+  <spirit:parameters>
+    <spirit:parameter>
+      <spirit:name>Component_Name</spirit:name>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">marga_v1_0</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_S0_AXI_DATA_WIDTH</spirit:name>
+      <spirit:displayName>C S0 Axi Data Width</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_S0_AXI_DATA_WIDTH">32</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_S0_AXI_ADDR_WIDTH</spirit:name>
+      <spirit:displayName>C S0 Axi Addr Width</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_S0_AXI_ADDR_WIDTH">19</spirit:value>
+    </spirit:parameter>
+  </spirit:parameters>
+  <spirit:vendorExtensions>
+    <xilinx:coreExtensions>
+      <xilinx:supportedFamilies>
+        <xilinx:family xilinx:lifeCycle="Pre-Production">zynq</xilinx:family>
+      </xilinx:supportedFamilies>
+      <xilinx:taxonomies>
+        <xilinx:taxonomy>AXI_Peripheral</xilinx:taxonomy>
+      </xilinx:taxonomies>
+      <xilinx:displayName>marga</xilinx:displayName>
+      <xilinx:coreRevision>18</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-03-11T14:01:57Z</xilinx:coreCreationDateTime>
+      <xilinx:tags>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a33a1d6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga/marga_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@451a3554_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga/marga_1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@659bb58f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b105b15_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@531133f2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c412d0f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@63510591_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6633f7a8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@530e2b0c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d41baf7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4831f00c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16c07252_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64ef280_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f673977_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1bf4998b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77e2f9fc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@268ffe8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bd641b4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7333856d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@616ac680_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@167f371b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@80504af_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d8fb2e7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5317d084_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4733c1f5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32b25728_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a2efcca_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a9e06b9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5cb0c1e2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5493cf1a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c5e732a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@670cf664_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d8e1372_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16e901ff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@254c2566_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2fbe5caa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e6c6be3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4810a7a8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40631295_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71281959_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11bc32ec_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@266165e0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d3918f3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70f80a5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14df9f40_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60f464d5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77bba873_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65c4885a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25676f06_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c7facf8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5222730e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f694ef4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b9ad0b4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f2a72e7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ba5e86a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65ad17f6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d9206f0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5df46deb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e61004e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@334de101_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57932fbc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54080482_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18964e1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f69dc41_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25eab6fd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c0a23e9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e770d9b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5aa2dbe2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bc5b8bf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e92636b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@edade42_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@438ba5d7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@648d8d67_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@426a775c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@31524c5a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75e76b72_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@198aae35_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c88574c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1113b2cd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9c7f7e2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@146bbd77_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3db20b5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b64d6a3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2aac636b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4bd047fa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79a2bde0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f4abad_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46376f7f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f744e17_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@416d5469_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d62d299_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72092e1b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@17b34d1c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@639bf7e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@504975c5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f76466d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@113b1a7f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66ec98d4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1318a31_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3614f070_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@cdabb3c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a25ced8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@74b6bdcb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4183a60_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@67b4cc94_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ef185ea_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2aa01dca_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70c3ea8a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3284aa84_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@362bb291_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@31c83661_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e779307_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22d6c6e1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ed4e3c6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@309bf95_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a38bd88_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@902cca1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e99d2b3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28efc89b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44514fca_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@713d946_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f3b9ffc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@749f2d1f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2783aa4d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61be7cc2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7900f5c7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2cbea256_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3651a46b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c99275b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27858388_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f8b6ec1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@227c2c26_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5999c0bb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e283304_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d89aa7f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7fe27c4a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b98990d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d140ebc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@da8e7d5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@223f4cdf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71ddb4b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b03d48d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2df6045e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16a206e5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@678ed113_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b621806_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@779aac86_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25471d96_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e5e91c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7042ae45_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@387be61c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b76433c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@433a9223_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55dcdc43_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b46c51c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36b6a823_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e676c9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1fa4e623_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@578a9de6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46adc31d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77921268_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11b10688_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77bf7e8a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5afbd887_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@205e1956_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@cfff606_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e8a1282_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b6115f9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d5c7f47_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@943ebd1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e52da50_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a445c54_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@67f1c660_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f0f0b39_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ee3ba54_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c31c0eb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5501fcd1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b78c022_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@484954f5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@194caca3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@566eeef6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bed223a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@712bc55e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b93dfdd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7c41e5b7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e09d4a7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66876422_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2915755d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40647ba4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@795be75f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1aff4114_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1450ca45_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38951e54_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@171f480f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@63099059_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@49b80cb4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28bd408e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6af6da1c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9be6d94_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@382903de_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c964059_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ffa0b6e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e4dd0b6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b3f6088_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38731579_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3212939b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73e9323d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@372b83a1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d351e37_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ef6c9cd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@687ae3c6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1627d51b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e0ea46f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b7db4f0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b47bbe3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@372a7e04_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c75a02b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ca1900c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@405e5f9d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e232da2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@763d1a3e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1864be37_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ea386f6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@256adf3f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6fcf9a0b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@326ef310_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72c69d22_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5bb9e003_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16c18898_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a99def5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a4fc40b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@370059ba_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@461ca386_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a24d789_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@293a28bd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@19b3f4cb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@296ee03c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76b7da91_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68ae26f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4921f84a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@225b07aa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@721f8498_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11a05b25_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72af35cc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71352696_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d15c491_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2eb6e1e3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a341d7d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@8ce7e75_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2706d03b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55fe834b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b1ab25c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7089be8f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@10d4efc1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9bd7345_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@102ad283_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a58d297_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@c6a93cb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77d4394a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bc419c6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c1d4643_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77a8eec1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f61b6f4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@690ebb7e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28512101_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a3ab599_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e5d0375_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@178f1416_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1de93a87_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bb69a8f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ea20d26_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d29df53_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77c444a4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@74544625_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@555cf8c9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ad356f1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@677aef35_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55a017a1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b2cd560_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@478b452f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48eaae2f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@49d5d611_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2688dba1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47b0bc00_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44a0fe5b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65e6d02f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57ec414f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d691c48_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ad2519f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e6415b0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@687b0e02_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@120ee959_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@765d0516_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@37aa16f8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b26ae1b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53a88167_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27e12a4f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@417af003_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48ff1473_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@758bacca_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47c1626c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@513c0b52_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@233cdd30_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20167c43_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@638950ec_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d7107b3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@641a3f32_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@19e903f1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@128d15e6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@531729c1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@631bf006_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11422372_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7cd3236_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9bcdc8a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1799fb87_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7defa449_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75f3306e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b045eaa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7300974_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47630bb2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21aff74c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@10f4494f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4dde80b6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c4afee2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d40616c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d282d86_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1290be14_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58b2e080_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bf9ad44_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bad7ab2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40d3087a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56b1bcbc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27727a80_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f6dcf04_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40db7435_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6da377e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@750ccd2c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1204fdd0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56c70868_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7cb9516d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20a8c005_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38bbfa7d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@33bd2a6f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41e8b563_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4571fff4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5bbffa5e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1faad0ab_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a994a43_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d90bd97_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5101f3ff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@35e5f1b8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14e19cb4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1988658c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@629b2ce1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@741e8b46_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6734f15_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@508142bc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f57c96a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d52ecbf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69ec94e0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d9f5413_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76207a7d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72fee760_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f0ddb6c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c49f27e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c6534d3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a062ee0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3854413b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5144f0c8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14c6c96e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40b7eb74_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@50eaa5c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b31f533_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@500a39d3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@734a16bd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@430d7960_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a39cbd7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23b83e34_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@125af003_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75ef9380_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55aa90e8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25bbfced_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@81e1b3a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@306fb926_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5960c47b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61c7082d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45e4ec03_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54e45758_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@298aacd0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e54dd2b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2420d618_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@364a5e12_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28cad4c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@26eca6a0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bb85dab_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@556ddbd0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6581b284_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46ea222e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@35450e01_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4bb4d103_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40a2df86_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eae3f37_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48964990_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@513ec443_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2da5f053_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@550a76af_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@8895ced_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c0f6b40_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70b8ecf3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bb2abf9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@388d258b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58f412cd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@634ab1c3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@97d6576_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@114b4571_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18fb702a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39c32fc4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@583caa0d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70dff5a3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4fd3addd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b914a2c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b5c8362_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bf6ae46_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6887da52_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@407900f7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c963aff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@371ce007_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@716d758b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4097d5e0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a92a2c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@549e738_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7360ec53_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5bbc69bd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41f42924_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e5dd9aa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b539558_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2107dc35_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d12aef3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71b245d5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@dc1d503_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3122fb6e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1313a2a8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2691c3f0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7758134e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7444780f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b4c06a6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3425df87_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6250583e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76f7f918_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2fb18aa2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@659ed1e3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d805527_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@33072d24_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60f785b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32e5cda2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d537835_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54637a32_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b649f9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22bcf94e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7dbc342b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b25ace3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a119bc3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1062e4c7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d68a4d6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52c90e54_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d8ee2ee_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b19cd70_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79b8c4f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5dde3896_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ecaaefe_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@233ac619_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f8aa696_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d4ea09c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1ae04334_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c6b4ecf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57bfc787_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f0f0454_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a929f56_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18072f91_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d2a5af8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4543c69f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@446cc881_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45e53f50_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@29ec3570_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32ec65e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@512d3b15_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25c5e178_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e7b1615_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27535fc1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57f78394_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18750475_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@259826d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@123af569_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b8faa30_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c48cd08_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a5e19a7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40f029cf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2719b670_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68a72c2a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38ba4d5d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f7cc157_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b98888f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b3736eb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5147f9b0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@dbb8534_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4527e3c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@195d3803_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@609e67b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52bbc493_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57872927_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e9fb760_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@17a881e0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65152fc0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d025998_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bc267b1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55424d6b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22cf756c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27d4ed41_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21a7dcff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7287564c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@361679cb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76c04f96_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1578ab2f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@447e4491_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@359bc3d3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e2b0ebc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@158f93a7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2dc04312_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53d6fddb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57e99134_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6aa87d11_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ad3ec1b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61bc4629_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e86ee7e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21f2733_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62a1000a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@648058d1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d8b4c1b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54522c34_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@31474653_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30d60fcf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b311605_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3403991b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7014871c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@439d239b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@146891c0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c3022d0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70fd115_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b2c84c6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@174087a0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2470d470_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53e2cbdc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1950d7c4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@438c7f51_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2da09f20_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@390b06cd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@520420aa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5867cdff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3f4433d9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ce4de3e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40bb2087_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62350138_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64a03547_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1a7c9a8d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@704f5993_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e06919f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28cbbf79_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ddb6346_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e1d9dc7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c0c4ee4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@50633c30_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@537c246c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b67387f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bb3dd8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c208769_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fa199df_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54db5fc2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@227f72b6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1da41e7b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7828e258_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39bb08f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a02a5a8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23097a17_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4db22ddd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a0a12de_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7732918f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fa4b03a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78e46d61_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@178945c8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6524ae02_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ab402a5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bc0fb0e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5596ea31_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46e7f8cb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a243807_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cbebacf_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30b1d17e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e733ac4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e86db9a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2aa85ab0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6352f609_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5bbc9ed3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@445dd384_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b12e807_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cc647f0_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bfe90a5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69e2abf8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@812f44a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15582e9d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a7983f5_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7aaa93d6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65227f95_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4da86145_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ec7bad8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a5dfe2c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@768cec69_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15166561_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d449b04_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a7a0569_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79f1b831_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18266805_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f09743c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e463fcb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@589c5ade_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ed6a2cd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27070f76_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7247cd74_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@19ed85fb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@24725c7d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bb3ebea_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ad175e1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4610d143_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5802289c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@619d0ecd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f41a908_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ac10263_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11fe59e1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@263aa45b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71eacd5b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@50399779_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3434e587_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b77de63_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@31656bcb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b211ba_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b9fa8d8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40221d35_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f068d0c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66f136dc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4152f5ff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bda7e46_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a0e19fb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1814658e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7761cf5d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9abc66_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@283fccd4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@337fe7bd_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c180486_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@357e2e39_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d551c99_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b6f694_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@129b8c08_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@445f22b9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@fc8838f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@43d175cc_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11072f73_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38f40cff_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72ee077b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56bd873_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@120b5469_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@227fe7b7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78b3663e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bfe1724_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2902ae3f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16bd75e4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@681a9740_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6456fb98_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@aee6c04_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40324140_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@438e9ab1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@629f2354_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44ab6ea8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54a56bee_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32838f1f_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44e3cf33_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3be4cf7d_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ced34e9_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4884edf4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7db56b54_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@750e08d7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a0645b2_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1776acb1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36af70d8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73b5d336_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78c8a4f1_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@594d790_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@352532d7_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73399127_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77d004a8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@787617fe_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d4d60a4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@8493c16_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3f1b9f5b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ae9c666_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71478492_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78171279_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6de33707_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a581850_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11647b29_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72a55dde_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72ae03aa_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@448f4590_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a92a33c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e7120cb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77745922_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@597ea177_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ae33829_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@395cde3c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6298ddac_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69470611_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@597f64b8_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57a5aa00_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72c1c632_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60cef263_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@177a6233_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4fe35fb3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@629788e3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@cefd424_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64bf962e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57cdc37_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70acde47_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d3a2e87_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20d26f0a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@426e44ec_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15afa73e_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ab4045a_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ede9bd4_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b8f4aef_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@552fc5bb_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b31ba39_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7c463d6b_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b586d7c_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@367f6ef6_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4919d5ba_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40b2ab3_ARCHIVE_LOCATION">/home/vlad/Documents/mri/marga</xilinx:tag>
+      </xilinx:tags>
+    </xilinx:coreExtensions>
+    <xilinx:packagingInfo>
+      <xilinx:xilinxVersion>2019.2</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="4d25fb8c"/>
+      <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="6822ad07"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="111480d8"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="e13b8f84"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="897470b5"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="0ff9c970"/>
+    </xilinx:packagingInfo>
+  </spirit:vendorExtensions>
+</spirit:component>

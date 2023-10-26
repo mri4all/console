@@ -1,0 +1,22 @@
+#+TITLE: MaRCoS SDRLab-122 Server
+
+* Overview
+
+This handles communication between the [[https://github.com/vnegnev/marcos_client][MaRCoS client]] and the MaRCoS [[https://github.com/vnegnev/marga][FPGA firmware]]. For more information and a getting-started guide for the MaRCoS system as a whole, please see the [[https://github.com/vnegnev/marcos_extras/wiki][MaRCoS wiki]].
+
+Utilises the [[https://github.com/ludocode/mpack][MPack]] C library for server-client communications via the msgpack protocol.
+
+* Setup
+
+** Compilation
+
+On the SDRLab, inside the repo after cloning and choosing the right branch:
+
+#+BEGIN_SRC sh
+  mkdir build
+  cd build
+  cmake ../src
+  make -j4
+#+END_SRC
+
+Have a look at the [[https://github.com/vnegnev/marcos_extras/wiki][MaRCoS wiki]] for additional information.

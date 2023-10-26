@@ -1,0 +1,2 @@
+mri4all ALL=(root) NOPASSWD: /bin/systemctl --no-block start mri4all_acq, /bin/systemctl --no-block stop mri4all_acq, /bin/systemctl --no-block restart mri4all_acq, /bin/systemctl --no-block kill mri4all_acq, /bin/systemctl --no-block status mri4all_acq
+mri4all ALL=(root) NOPASSWD: /bin/systemctl --no-block start mri4all_recon, /bin/systemctl --no-block stop mri4all_recon, /bin/systemctl --no-block restart mri4all_recon, /bin/systemctl --no-block kill mri4all_recon, /bin/systemctl --no-block status mri4all_recon

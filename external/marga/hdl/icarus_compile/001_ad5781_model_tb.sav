@@ -1,0 +1,62 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Sep  3 10:13:53 2020
+[*]
+[dumpfile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/000_ad5781_model_tb.lxt"
+[dumpfile_mtime] "Thu Sep  3 10:13:50 2020"
+[dumpfile_size] 1488
+[savefile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/001_ad5781_model_tb.sav"
+[timestart] 2804
+[size] 1920 1025
+[pos] -1 -1
+*-5.399549 2918 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] ad5781_model_tb.
+[sst_width] 230
+[signals_width] 242
+[sst_expanded] 1
+[sst_vpaned_height] 290
+@28
+ad5781_model_tb.clrn[0]
+ad5781_model_tb.ldacn[0]
+ad5781_model_tb.resetn[0]
+ad5781_model_tb.sclk[0]
+ad5781_model_tb.sdin[0]
+ad5781_model_tb.sdo[0]
+ad5781_model_tb.syncn[0]
+@22
+ad5781_model_tb.vout[17:0]
+@200
+-
+-Testbench-specific
+@22
+ad5781_model_tb.word_to_send[23:0]
+@200
+-
+-DAC model internals
+@28
+ad5781_model_tb.UUT.spi_addr[2:0]
+@24
+ad5781_model_tb.UUT.spi_counter[5:0]
+@22
+ad5781_model_tb.UUT.spi_input[23:0]
+@28
+ad5781_model_tb.UUT.spi_transfer_done[0]
+ad5781_model_tb.UUT.read_mode[0]
+@200
+-
+@22
+ad5781_model_tb.UUT.dac_reg[23:0]
+ad5781_model_tb.UUT.ctrl_reg[23:0]
+ad5781_model_tb.UUT.clearcode_reg[23:0]
+ad5781_model_tb.UUT.soft_ctrl_reg[23:0]
+@29
+ad5781_model_tb.UUT.ctrl[2:0]
+@22
+ad5781_model_tb.UUT.vout_r[17:0]
+@200
+-
+@28
+ad5781_model_tb.UUT.dactri[0]
+ad5781_model_tb.UUT.opgnd[0]
+[pattern_trace] 1
+[pattern_trace] 0

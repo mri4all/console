@@ -1,0 +1,53 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Sep  5 14:45:54 2020
+[*]
+[dumpfile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/000_dac80504_model_tb.lxt"
+[dumpfile_mtime] "Sat Sep  5 14:45:44 2020"
+[dumpfile_size] 1220
+[savefile] "/home/vlad/Documents/mri/ocra_grad_ctrl/ocra_grad_ctrl_1.0/hdl/icarus_compile/001_dac80504_model_tb.sav"
+[timestart] 0
+[size] 1920 1025
+[pos] -316 -211
+*-8.607683 1749 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] dac80504_model_tb.
+[sst_width] 230
+[signals_width] 190
+[sst_expanded] 1
+[sst_vpaned_height] 292
+@28
+dac80504_model_tb.csn[0]
+dac80504_model_tb.sclk[0]
+dac80504_model_tb.sdi[0]
+dac80504_model_tb.sdo[0]
+@29
+dac80504_model_tb.ldacn[0]
+@200
+-
+@22
+dac80504_model_tb.vout0[15:0]
+dac80504_model_tb.vout1[15:0]
+dac80504_model_tb.vout2[15:0]
+dac80504_model_tb.vout3[15:0]
+@200
+-
+-DAC internals
+@22
+dac80504_model_tb.UUT.sync_reg[15:0]
+dac80504_model_tb.UUT.brdcast_reg[15:0]
+dac80504_model_tb.UUT.config_reg[15:0]
+dac80504_model_tb.UUT.dac0_reg[15:0]
+dac80504_model_tb.UUT.dac1_reg[15:0]
+dac80504_model_tb.UUT.dac2_reg[15:0]
+dac80504_model_tb.UUT.dac3_reg[15:0]
+dac80504_model_tb.UUT.spi_addr[3:0]
+@24
+dac80504_model_tb.UUT.spi_counter[5:0]
+@28
+dac80504_model_tb.UUT.read_mode[0]
+dac80504_model_tb.UUT.spi_transfer_done[0]
+@22
+dac80504_model_tb.UUT.spi_payload[15:0]
+dac80504_model_tb.UUT.dac_sync_en[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
