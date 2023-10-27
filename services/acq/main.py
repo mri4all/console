@@ -6,12 +6,13 @@ sys.path.append("/opt/mri4all/console/external/")
 
 import signal
 import asyncio
-import time
 import common.logger as logger
 import common.runtime as rt
 
 rt.set_service_name("acq")
 log = logger.get_logger()
+sys.stdout = logger.LoggerStdCapture(log.debug)
+sys.stderr = logger.LoggerStdCapture(log.warning)
 
 from common.ipc import Communicator
 import common.helper as helper

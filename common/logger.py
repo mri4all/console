@@ -67,3 +67,16 @@ def get_loglevel() -> int:
         return logging.DEBUG
 
     return logging.INFO
+
+
+class LoggerStdCapture:
+    def __init__(self, level):
+        self.level = level
+
+    def write(self, message):
+        # The check for empty lines reduces the amount printed to the logger
+        if message != "\n":
+            self.level(message)
+
+    def flush(self):
+        self.level(sys.stderr)
