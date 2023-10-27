@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from pydantic import BaseModel
 import common.runtime as rt
 from PyQt5.QtCore import *

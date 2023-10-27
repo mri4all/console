@@ -66,4 +66,6 @@ class LogViewerWindow(QDialog):
             log_content = "- Unable to load log -"
 
         self.logEdit.setPlainText(log_content)
-        self.logEdit.verticalScrollBar().setValue(self.logEdit.verticalScrollBar().maximum())
+        self.logEdit.verticalScrollBar().setValue(
+            self.logEdit.verticalScrollBar().maximum()
+        )

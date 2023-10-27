@@ -14,7 +14,6 @@ import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-erro
 import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.marcos_client.examples import trap_cent  # pylint: disable=import-error
 import external.seq.adjustments_acq.scripts as scr  # pylint: disable=import-error
-from utils import constants
 import common.helper as helper
 from common.types import ResultItem
 from sequences import SequenceBase
@@ -166,7 +165,7 @@ def larmor_step_search(
 
 
 def larmor_cal(
-    seq_file=constants.DATA_PATH_ACQ / "se_6.seq",
+    seq_file=Path(mri4all_paths.DATA_ACQ) / "se_6.seq",
     larmor_start=cfg.LARMOR_FREQ,
     iterations=10,
     delay_s=1,

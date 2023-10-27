@@ -2,12 +2,11 @@ import shlex
 from pathlib import Path
 import subprocess
 
-import common.runtime as rt
 import common.logger as logger
 
 log = logger.get_logger()
 
-from common.config import Configuration, DicomTarget
+from common.config import DicomTarget
 
 
 DCMSEND_ERROR_CODES = {

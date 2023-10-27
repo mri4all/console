@@ -34,14 +34,18 @@ def get_logger():
         logging.addLevelName(logging.WARNING, "WRN")
         logging.addLevelName(logging.ERROR, "ERR")
         logging.addLevelName(logging.CRITICAL, "CTL")
-        formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(taskID)s | %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s | %(name)s | %(levelname)s | %(taskID)s | %(message)s"
+        )
 
         # Create console handler
         ch = logging.StreamHandler()
         ch.setFormatter(formatter)
         logger.addHandler(ch)
 
-        file_handler = RotatingFileHandler(f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=1000000, backupCount=5)
+        file_handler = RotatingFileHandler(
+            f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=1000000, backupCount=5
+        )
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 

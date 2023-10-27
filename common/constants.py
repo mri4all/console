@@ -25,9 +25,10 @@ class mri4all_files:
     STOP = "STOP"
     TASK = "scan.json"
 
+
 class mri4all_scanfiles:
-    RAWDATA = "raw.npy" 
-    TRAJ = "traj.csv"    # csv format with rows: z phase encode, columns: y phase encodes
+    RAWDATA = "raw.npy"
+    TRAJ = "traj.csv"  # csv format with rows: z phase encode, columns: y phase encodes
     BDATA = "B0.npy"
 
 

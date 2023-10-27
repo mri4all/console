@@ -2,8 +2,6 @@ from asyncio.locks import _ContextManagerMixin
 import os
 import sys
 
-# sys.path.insert(0, ".")
-# sys.path.insert(0, "./external/")
 sys.path.append("/opt/mri4all/console/external/")
 
 import signal

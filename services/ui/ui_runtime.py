@@ -2,8 +2,7 @@ import os
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-from typing import Tuple, Dict, List, cast
-from typing_extensions import Literal
+from typing import Tuple, List, cast
 from typing import Any
 
 from common.types import (

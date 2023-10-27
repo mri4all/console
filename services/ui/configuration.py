@@ -81,14 +81,6 @@ class ConfigurationWindow(QDialog):
                     n, editable(QTreeWidgetItem([key, str(getattr(self.config, key))]))
                 )
                 n = n + 1
-            # elif typing.get_origin(value.annotation) == typing.Union:
-            #     log.info(issubclass(typing.get_args(value.annotation)[0], BaseModel))
-            #     if issubclass(typing.get_args(value.annotation)[0], BaseModel):
-            #         log.info("asdfasdf")
-            #         self.settingsWidget.insertTopLevelItem(
-            #             n, QTreeWidgetItem([key, ""])
-            #         )
-            #     n = n + 1
         self.tree.currentItemChanged.connect(self.start_edit)
         self.settingsWidget.currentItemChanged.connect(self.start_edit)
         self.generalSettingsWidget.setStyleSheet(

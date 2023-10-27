@@ -1,19 +1,16 @@
-import json
 import glob
 import sip  # type: ignore
 import pickle
 from pathlib import Path
 from typing import Literal, Optional
-from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-import qtawesome as qta  # type: ignore
 
 import pyqtgraph as pg  # type: ignore
 import pydicom
 import numpy as np
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
@@ -177,15 +174,15 @@ class ViewerWidget(QWidget):
         if not input_path:
             self.set_empty_viewer()
             return
-        
+
         pickled_file_path = Path(input_path)
 
         if not pickled_file_path.is_file():
             return
-        
-        with open(pickled_file_path, 'rb') as pickle_file:
+
+        with open(pickled_file_path, "rb") as pickle_file:
             fig = pickle.load(pickle_file)
-        
+
         fig.set_figheight(8)
         fig.set_figwidth(5)
 
@@ -195,7 +192,7 @@ class ViewerWidget(QWidget):
         self.widget.layout().setSpacing(0)
         figCanvas = FigureCanvasQTAgg(fig)
         toolbar = NavigationToolbar2QT(figCanvas, self)
-        
+
         self.widget.layout().addWidget(figCanvas)
         self.widget.layout().addWidget(toolbar)
         self.layout().addWidget(self.widget)

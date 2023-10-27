@@ -25,7 +25,8 @@ class SemanticVersion:
 
     def parse_version_string(self) -> bool:
         """Checks if the version string read from the VERSION file is valid and parses it into
-        numerical values stored in the object. Returns False is the version string is invalid."""
+        numerical values stored in the object. Returns False is the version string is invalid.
+        """
 
         if self.version_string == self.INVALID:
             return False

@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 sys.path.append("/opt/mri4all/console/external/")
 
 import signal

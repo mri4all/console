@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 import numpy as np
 
-from common.types import ScanTask, ResultItem
+from common.types import ResultItem
 from common.constants import *
 
 
@@ -44,7 +44,7 @@ def generate_fake_dicoms(folder, task):
 
     result = ResultItem()
     result.name = "demo"
-    result.description = "This is just a fake dicom series"
+    result.description = "This is a fake dicom series"
     result.type = "dicom"
     result.primary = True
     result.autoload_viewer = 1
