@@ -46,6 +46,7 @@ def view_traj_2d(k_traj_adc, k_traj, folder=""):
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
+        plt.show()  #TODO: get rid of this line eventually
     else:
         plt.show()
 
@@ -70,6 +71,7 @@ def view_traj_3d(k_traj_adc, k_traj, folder=""):
         fig = plt.gcf()
         pickle.dump(fig, file)
         file.close()
+        plt.show()  #TODO: get rid of this line eventually
     else:
         plt.show()
 
