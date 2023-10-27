@@ -13,7 +13,7 @@ from common.constants import ServiceAction
 
 rt.set_service_name("ui")
 log = logger.get_logger()
-sys.stdout = logger.LoggerStdCapture(log.debug)
+sys.stdout = logger.LoggerStdCapture(log.info)
 sys.stderr = logger.LoggerStdCapture(log.warning)
 
 from common.version import mri4all_version

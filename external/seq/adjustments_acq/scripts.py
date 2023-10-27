@@ -66,6 +66,16 @@ def run_pulseq(
         float: (us) Rx period
     """
 
+    print("Running flocra_pulseq using following parameters:")
+    print(f"rf_center={rf_center}")
+    print(f"rf_max={rf_max}")
+    print(f"gx_max={gx_max}")
+    print(f"gy_max={gy_max}")
+    print(f"gz_max={gz_max}")
+    print(f"shim_x={shim_x}")
+    print(f"shim_y={shim_y}")
+    print(f"shim_z={shim_z}")
+
     # Load dummy data for GUI testing
     if gui_test:
         return np.load(cfg.MGH_PATH + "test_data/gui.npy"), 25 / 3

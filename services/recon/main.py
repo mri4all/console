@@ -12,7 +12,7 @@ import common.runtime as rt
 
 rt.set_service_name("recon")
 log = logger.get_logger()
-sys.stdout = logger.LoggerStdCapture(log.debug)
+sys.stdout = logger.LoggerStdCapture(log.info)
 sys.stderr = logger.LoggerStdCapture(log.warning)
 
 
