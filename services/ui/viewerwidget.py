@@ -63,16 +63,6 @@ class ViewerWidget(QWidget):
         self.layout().setSpacing(0)
         self.set_empty_viewer()
 
-    def view_data(self, file_path: str, viewer_mode: ResultTypes, task):
-        self.clear_view()
-        if viewer_mode == "dicom":
-            self.load_dicoms(file_path, task)
-        elif viewer_mode == "plot":
-            self.load_pickled_plot(file_path, task)
-            # self.load_plot()
-        else:
-            self.set_empty_viewer()
-
     def clear_view(self):
         if self.widget:
             widget_to_delete = self.widget
@@ -81,26 +71,49 @@ class ViewerWidget(QWidget):
             self.widget = None
             self.viewed_scan_task = None
 
+    def set_empty_viewer(self):
+        self.widget = QWidget()
+        self.widget.setStyleSheet("background-color: #000;")
+        self.layout().addWidget(self.widget)
+
+    def view_data(self, file_path: str, viewer_mode: ResultTypes, task) -> bool:
+        """
+        Used to load results into the viewer for the inline widgets
+        """
+        self.clear_view()
+        if viewer_mode == "dicom":
+            self.load_dicoms(file_path, task)
+            return True
+        elif viewer_mode == "plot":
+            self.load_pickled_plot(file_path, task)
+            # self.load_plot()
+            return True
+        else:
+            self.set_empty_viewer()
+            return False
+
     def view_scan(
         self,
         file_path: str,
         type: Literal["dicom", "plot", "raw"],
         task: Optional[ScanTask],
     ) -> bool:
+        """
+        Used to load results into the viewer from the study viewer
+        """
+        # TODO: Harmonize with function view_data!
         self.clear_view()
-
         if type == "dicom":
             self.load_dicoms(file_path, task)
             return True
         elif type == "plot":
             self.load_pickled_plot(file_path, task)
-            # other_path = Path(file_path) / "other"
-            # if path := next(other_path.glob("**/*.json"), None):
-            #     self.load_plot(TimeSeriesResult(**json.loads(path.read_text())))
-            # return False
+            return True
         elif type == "other":
             self.load_pickled_plot(file_path, task)
+            return True
         else:
+            self.set_empty_viewer()
             return False
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
@@ -165,11 +178,6 @@ class ViewerWidget(QWidget):
         self.layout().addWidget(sc)
         self.widget = sc
 
-    def set_empty_viewer(self):
-        self.widget = QWidget()
-        self.widget.setStyleSheet("background-color: #000;")
-        self.layout().addWidget(self.widget)
-
     def load_pickled_plot(self, input_path, task: Optional[ScanTask] = None):
         if not input_path:
             self.set_empty_viewer()
@@ -178,7 +186,10 @@ class ViewerWidget(QWidget):
         pickled_file_path = Path(input_path)
 
         if not pickled_file_path.is_file():
+            log.error("File not found: " + str(pickled_file_path))
             return
+
+        # TODO: Add error handling!
 
         with open(pickled_file_path, "rb") as pickle_file:
             fig = pickle.load(pickle_file)
