@@ -96,6 +96,7 @@ class ExaminationWindow(QMainWindow):
         self.actionProtocol_Browser.triggered.connect(
             protocolbrowser.show_protocol_browser
         )
+        self.actionStudy_Viewer.triggered.connect(studyviewer.show_viewer)
         self.action_set2Viewers.triggered.connect(self.set2Viewers)
         self.action_set3Viewers.triggered.connect(self.set3Viewers)
 
@@ -111,7 +112,7 @@ class ExaminationWindow(QMainWindow):
         )
 
         self.resultsViewerButton.setText("")
-        self.resultsViewerButton.setToolTip("Open results viewer")
+        self.resultsViewerButton.setToolTip("Open study viewer")
         self.resultsViewerButton.setIcon(qta.icon("fa5s.x-ray"))
         self.resultsViewerButton.setIconSize(QSize(32, 32))
         self.resultsViewerButton.clicked.connect(studyviewer.show_viewer)

@@ -74,7 +74,7 @@ class StudyViewer(QDialog):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-        self.setWindowTitle("Exam Viewer")
+        self.setWindowTitle("Study Viewer")
 
         self.exams = self.organize_scan_data_from_folders(
             Path(mri4all_paths.DATA_COMPLETE)
@@ -227,7 +227,9 @@ class StudyViewer(QDialog):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
-            item = QListWidgetItem(scan_obj.task.protocol_name)
+            item = QListWidgetItem(
+                f"{scan_obj.task.scan_number}:  " + scan_obj.task.protocol_name
+            )
             item.setCheckState(Qt.CheckState.Unchecked)
             self.scanListWidget.addItem(item)
         self.scanListWidget.setCurrentRow(0)
@@ -269,6 +271,11 @@ class StudyViewer(QDialog):
                 dir=exam_dir,
             )
             exam.scans.append(scan)
+
+        # After all folders have been searched, order the scans within each exam chronologically
+        for items in exams:
+            items.scans = sorted(items.scans, key=lambda x: x.task.scan_number)
+
         return exams
 
     def close_clicked(self):

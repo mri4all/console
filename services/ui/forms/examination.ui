@@ -887,6 +887,8 @@
      <addaction name="action_set2Viewers"/>
     </widget>
     <addaction name="menuLayout"/>
+    <addaction name="separator"/>
+    <addaction name="actionStudy_Viewer"/>
     <addaction name="actionProtocol_Browser"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Examination"/>
@@ -967,6 +969,11 @@
   <action name="action_set2Viewers">
    <property name="text">
     <string>2 Viewers</string>
+   </property>
+  </action>
+  <action name="actionStudy_Viewer">
+   <property name="text">
+    <string>Study Viewer...</string>
    </property>
   </action>
  </widget>
