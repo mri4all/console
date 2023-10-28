@@ -879,6 +879,14 @@
     <property name="title">
      <string>Exam</string>
     </property>
+    <widget class="QMenu" name="menuLayout">
+     <property name="title">
+      <string>Layout</string>
+     </property>
+     <addaction name="action_set3Viewers"/>
+     <addaction name="action_set2Viewers"/>
+    </widget>
+    <addaction name="menuLayout"/>
     <addaction name="actionProtocol_Browser"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Examination"/>
@@ -949,6 +957,16 @@
   <action name="actionDebug_update_scan_list">
    <property name="text">
     <string>Update scan list</string>
+   </property>
+  </action>
+  <action name="action_set3Viewers">
+   <property name="text">
+    <string>3 Viewers</string>
+   </property>
+  </action>
+  <action name="action_set2Viewers">
+   <property name="text">
+    <string>2 Viewers</string>
    </property>
   </action>
  </widget>

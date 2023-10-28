@@ -190,19 +190,28 @@ class ViewerWidget(QWidget):
             return
 
         # TODO: Add error handling!
-
-        with open(pickled_file_path, "rb") as pickle_file:
-            fig = pickle.load(pickle_file)
-
-        fig.set_figheight(8)
-        fig.set_figwidth(5)
-
         self.widget = QWidget()
         self.widget.setLayout(QVBoxLayout(self.widget))
         self.widget.layout().setContentsMargins(0, 0, 0, 0)
         self.widget.layout().setSpacing(0)
+
+        plt.style.use("dark_background")
+        with open(pickled_file_path, "rb") as pickle_file:
+            fig = pickle.load(pickle_file)
+
         figCanvas = FigureCanvasQTAgg(fig)
+        fig.tight_layout()
+        # fig.set_figheight(8)
+        # fig.set_figwidth(5)
+
         toolbar = NavigationToolbar2QT(figCanvas, self)
+        toolbar.setStyleSheet(
+            "QToolBar::separator { background-color: #0C1123; } QFrame, QFrame:hover { border: 0px solid #000; }  QToolBar { background-color: #000; } QToolButton { background-color: #262C44; } QToolButton:checked { background-color: #FFF; }  QToolButton:disabled { background-color: #000; } QToolButton:hover { background-color: #E0A526; }"
+        )
+        unwanted_buttons = ["Back", "Forward"]
+        for x in toolbar.actions():
+            if x.text() in unwanted_buttons:
+                toolbar.removeAction(x)
 
         self.widget.layout().addWidget(figCanvas)
         self.widget.layout().addWidget(toolbar)

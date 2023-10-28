@@ -147,13 +147,13 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         if Debug is True:  # todo: debug mode
             log.info("Plotting figure now")
             # view_traj.view_sig(rxd)
-            plt.style.use("dark_background")
+
             plt.clf()
-            plt.title("Acq signal")
+            plt.title("ADC Signal")
             plt.grid(True)
             plt.plot(np.abs(rxd))
-            if self.param_debug_plot:
-                plt.show()
+            # if self.param_debug_plot:
+            #     plt.show()
 
             file = open(self.get_working_folder() + "/other/rf_se.plot", "wb")
             fig = plt.gcf()
@@ -161,8 +161,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             file.close()
 
             result = ResultItem()
-            result.name = "demo"
-            result.description = "This is just a plot"
+            result.name = "ADC"
+            result.description = "Recorded ADC signal"
             result.type = "plot"
             result.primary = True
             result.autoload_viewer = 1

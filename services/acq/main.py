@@ -23,6 +23,7 @@ from sequences import SequenceBase
 from common.version import mri4all_version
 import common.queue as queue
 from common.constants import *
+import common.plotting as plotting
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
@@ -40,6 +41,8 @@ def move_to_fail(scan_name: str) -> bool:
 
 def process_acquisition(scan_name: str) -> bool:
     log.info("Performing acquisition...")
+
+    plotting.set_plotting_defaults()
 
     # Check if json file with task definition exists in the scan folder
     if not os.path.isfile(

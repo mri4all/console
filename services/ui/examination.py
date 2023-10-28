@@ -96,6 +96,8 @@ class ExaminationWindow(QMainWindow):
         self.actionProtocol_Browser.triggered.connect(
             protocolbrowser.show_protocol_browser
         )
+        self.action_set2Viewers.triggered.connect(self.set2Viewers)
+        self.action_set3Viewers.triggered.connect(self.set3Viewers)
 
         self.menuDebug.menuAction().setVisible(rt.is_debugging_enabled())
         self.actionDebug_update_scan_list.triggered.connect(self.debug_update_scan_list)
@@ -1008,6 +1010,12 @@ class ExaminationWindow(QMainWindow):
 
     def debug_update_scan_list(self):
         self.sync_queue_widget(False)
+        
+    def set2Viewers(self):
+        self.viewer3Frame.setVisible(False)
+
+    def set3Viewers(self):
+        self.viewer3Frame.setVisible(True)
 
     def show_definition_clicked(self):
         index = self.queueWidget.currentRow()
