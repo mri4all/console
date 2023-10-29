@@ -86,31 +86,6 @@ class ViewerWidget(QWidget):
             return True
         elif viewer_mode == "plot":
             self.load_pickled_plot(file_path, task)
-            # self.load_plot()
-            return True
-        else:
-            self.set_empty_viewer()
-            return False
-
-    def view_scan(
-        self,
-        file_path: str,
-        type: Literal["dicom", "plot", "raw"],
-        task: Optional[ScanTask],
-    ) -> bool:
-        """
-        Used to load results into the viewer from the study viewer
-        """
-        # TODO: Harmonize with function view_data!
-        self.clear_view()
-        if type == "dicom":
-            self.load_dicoms(file_path, task)
-            return True
-        elif type == "plot":
-            self.load_pickled_plot(file_path, task)
-            return True
-        elif type == "other":
-            self.load_pickled_plot(file_path, task)
             return True
         else:
             self.set_empty_viewer()
@@ -142,7 +117,7 @@ class ViewerWidget(QWidget):
             ds = pydicom.dcmread(filenameDCM)
             ArrayDicom[lstFilesDCM.index(filenameDCM), :, :] = ds.pixel_array
 
-        pg.setConfigOptions(imageAxisOrder="row-major")
+        pg.setConfigOptions(imageAxisOrder="row-major", antialias=True)
 
         self.widget = pg.ImageView()
         self.widget.setImage(ArrayDicom)
@@ -169,15 +144,6 @@ class ViewerWidget(QWidget):
 
         self.layout().addWidget(self.widget)
 
-    def load_plot(self, result: Optional[TimeSeriesResult] = None):
-        sc = MplCanvas(self)
-        if result is None:
-            result = TimeSeriesResult(data=np.random.normal(size=10).tolist())
-
-        result.show(sc.axes)
-        self.layout().addWidget(sc)
-        self.widget = sc
-
     def load_pickled_plot(self, input_path, task: Optional[ScanTask] = None):
         if not input_path:
             self.set_empty_viewer()
@@ -201,8 +167,6 @@ class ViewerWidget(QWidget):
 
         figCanvas = FigureCanvasQTAgg(fig)
         fig.tight_layout()
-        # fig.set_figheight(8)
-        # fig.set_figwidth(5)
 
         toolbar = NavigationToolbar2QT(figCanvas, self)
         toolbar.setStyleSheet(
@@ -216,3 +180,13 @@ class ViewerWidget(QWidget):
         self.widget.layout().addWidget(figCanvas)
         self.widget.layout().addWidget(toolbar)
         self.layout().addWidget(self.widget)
+
+
+# def load_plot(self, result: Optional[TimeSeriesResult] = None):
+#     sc = MplCanvas(self)
+#     if result is None:
+#         result = TimeSeriesResult(data=np.random.normal(size=10).tolist())
+
+#     result.show(sc.axes)
+#     self.layout().addWidget(sc)
+#     self.widget = sc

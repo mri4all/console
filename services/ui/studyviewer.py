@@ -164,7 +164,7 @@ class StudyViewer(QDialog):
 
     def trigger_load_scan(self):
         self.loadTimer.stop()
-        self.viewer.view_scan(
+        self.viewer.view_data(
             self.load_scan_path, self.load_result_type, self.load_scan_task
         )
 
