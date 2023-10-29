@@ -2,6 +2,8 @@ import os
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
+import qtawesome as qta
+
 from typing import Tuple, List, cast
 from typing import Any
 
@@ -67,14 +69,16 @@ def shutdown():
     global app
 
     msg = QMessageBox()
-    ret = msg.question(
-        None,
-        "Shutdown Console?",
-        "Do you really want to shutdown the console?",
-        msg.Yes | msg.No,
-    )
+    dialog_icon = qta.icon("fa5s.power-off", color="#E0A526")
+    msg.setIconPixmap(dialog_icon.pixmap(64, 64))
+    msg.setWindowTitle("Shutdown Console?")
+    msg.setText("Do you really want to shutdown the console?")
+    msg.setStandardButtons(QMessageBox.Yes)
+    msg.addButton(QMessageBox.No)
+    msg.setDefaultButton(QMessageBox.No)
+    msg.setContentsMargins(12, 12, 12, 6)
 
-    if ret == msg.Yes:
+    if msg.exec() == msg.Yes:
         registration_widget.clear_form()
         examination_widget.clear_examination_ui()
         if not queue.clear_folders():
@@ -117,14 +121,16 @@ def close_patient():
     global scan_queue_list
 
     msg = QMessageBox()
-    ret = msg.question(
-        None,
-        "End Exam?",
-        "Do you really want to close the active exam?",
-        msg.Yes | msg.No,
-    )
+    dialog_icon = qta.icon("fa5s.sign-out-alt", color="#E0A526")
+    msg.setIconPixmap(dialog_icon.pixmap(64, 64))
+    msg.setWindowTitle("End Exam?")
+    msg.setText("Do you really want to close the active exam?")
+    msg.setStandardButtons(QMessageBox.Yes)
+    msg.addButton(QMessageBox.No)
+    msg.setDefaultButton(QMessageBox.No)
+    msg.setContentsMargins(12, 12, 12, 6)
 
-    if ret == msg.Yes:
+    if msg.exec() == msg.Yes:
         registration_widget.clear_form()
         stacked_widget.setCurrentIndex(0)
         examination_widget.clear_examination_ui()

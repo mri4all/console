@@ -11,8 +11,8 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
-
 import qtawesome as qta
+
 from services.ui.shimbox import ShimBox
 import sip  # type: ignore
 

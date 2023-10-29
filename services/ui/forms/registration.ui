@@ -779,7 +779,7 @@
      <x>0</x>
      <y>0</y>
      <width>1393</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuControl">
@@ -788,6 +788,7 @@
     </property>
     <addaction name="actionSystem_Status"/>
     <addaction name="actionLog_Viewer"/>
+    <addaction name="separator"/>
     <addaction name="actionStudy_Viewer"/>
     <addaction name="separator"/>
     <addaction name="actionConfiguration"/>
