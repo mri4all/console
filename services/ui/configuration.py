@@ -118,7 +118,7 @@ class ConfigurationWindow(QDialog):
         self.settingsWidget.setColumnHidden(0, True)
         self.settingsWidget.currentItemChanged.connect(self.general_start_edit)
         self.generalSettingsWidget.setStyleSheet(
-            "QLineEdit { background-color: #181e36; } QHeaderView::section { height: 30px; font-weight: bold; color: #E0A526; }"
+            "QLineEdit { background-color: #181e36; } QHeaderView::section { height: 30px; font-weight: normal; color: #E0A526; }"
         )
         self.tabWidget.setTabText(0, "General")
         self.tabWidget.setTabText(1, "DICOM Export")
@@ -182,7 +182,7 @@ class ConfigurationWindow(QDialog):
         new_config = {}
         for i in range(settingsWidget.topLevelItemCount()):
             item = settingsWidget.topLevelItem(i)
-            new_config[item.data(0, 0)] = item.data(1, 0)
+            new_config[item.data(0, 0)] = item.data(2, 0)
 
         try:
             self.config.update(new_config)
