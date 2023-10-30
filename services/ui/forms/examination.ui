@@ -885,6 +885,7 @@
      </property>
      <addaction name="action_set3Viewers"/>
      <addaction name="action_set2Viewers"/>
+     <addaction name="action_set1Viewer"/>
     </widget>
     <addaction name="menuLayout"/>
     <addaction name="separator"/>
@@ -974,6 +975,11 @@
   <action name="actionStudy_Viewer">
    <property name="text">
     <string>Study Viewer...</string>
+   </property>
+  </action>
+  <action name="action_set1Viewer">
+   <property name="text">
+    <string>1 Viewer</string>
    </property>
   </action>
  </widget>

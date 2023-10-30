@@ -97,8 +97,9 @@ class ExaminationWindow(QMainWindow):
             protocolbrowser.show_protocol_browser
         )
         self.actionStudy_Viewer.triggered.connect(studyviewer.show_viewer)
-        self.action_set2Viewers.triggered.connect(self.set2Viewers)
         self.action_set3Viewers.triggered.connect(self.set3Viewers)
+        self.action_set2Viewers.triggered.connect(self.set2Viewers)
+        self.action_set1Viewer.triggered.connect(self.set1Viewer)
 
         self.menuDebug.menuAction().setVisible(rt.is_debugging_enabled())
         self.actionDebug_update_scan_list.triggered.connect(self.debug_update_scan_list)
@@ -1011,12 +1012,30 @@ class ExaminationWindow(QMainWindow):
 
     def debug_update_scan_list(self):
         self.sync_queue_widget(False)
-        
-    def set2Viewers(self):
+        self.viewer1.layoutUpdate()
+
+    def set1Viewer(self):
+        self.viewer1Frame.setVisible(True)
+        self.viewer2Frame.setVisible(False)
         self.viewer3Frame.setVisible(False)
+        QTimer.singleShot(1, self.triggerViewerLayoutUpdate)
+
+    def set2Viewers(self):
+        self.viewer1Frame.setVisible(True)
+        self.viewer2Frame.setVisible(True)
+        self.viewer3Frame.setVisible(False)
+        QTimer.singleShot(1, self.triggerViewerLayoutUpdate)
 
     def set3Viewers(self):
+        self.viewer1Frame.setVisible(True)
+        self.viewer2Frame.setVisible(True)
         self.viewer3Frame.setVisible(True)
+        QTimer.singleShot(1, self.triggerViewerLayoutUpdate)
+
+    def triggerViewerLayoutUpdate(self):
+        self.viewer1.layoutUpdate()
+        self.viewer2.layoutUpdate()
+        self.viewer3.layoutUpdate()
 
     def show_definition_clicked(self):
         index = self.queueWidget.currentRow()

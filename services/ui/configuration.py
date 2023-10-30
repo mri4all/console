@@ -30,6 +30,11 @@ class dicomEditDelegate(QItemDelegate):
             return super(dicomEditDelegate, self).createEditor(parent, option, index)
         return None
 
+    def sizeHint(self, option, index):
+        width = option.rect.width()
+        height = 30
+        return QSize(width, height)
+
 
 class settingsEditDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
@@ -38,8 +43,8 @@ class settingsEditDelegate(QStyledItemDelegate):
         return None
 
     def sizeHint(self, option, index):
-        width = option.rect.width() + 8
-        height = 20
+        width = option.rect.width() + 20
+        height = 30
         return QSize(width, height)
 
 
@@ -113,12 +118,20 @@ class ConfigurationWindow(QDialog):
         self.settingsWidget.setColumnHidden(0, True)
         self.settingsWidget.currentItemChanged.connect(self.general_start_edit)
         self.generalSettingsWidget.setStyleSheet(
-            "QLineEdit { background-color: #181e36; }"
+            "QLineEdit { background-color: #181e36; } QHeaderView::section { height: 30px; font-weight: bold; color: #E0A526; }"
         )
-
         self.tabWidget.setTabText(0, "General")
         self.tabWidget.setTabText(1, "DICOM Export")
+        self.tabWidget.setTabText(2, "Maintenance")
         self.tabWidget.setCurrentIndex(0)
+        self.setStyleSheet(
+            """
+            QTabBar::tab {
+                margin-left:0px;
+                margin-right:10px;          
+            }
+            """
+        )
 
     def dicom_start_edit(self):
         tree: QTreeWidget = self.sender()
@@ -139,7 +152,6 @@ class ConfigurationWindow(QDialog):
         item.setData(1, 1, "name")
         for c in ["ip", "port", "aet_target", "aet_source"]:
             item.addChild(editable(QTreeWidgetItem([c, str(getattr(target, c))])))
-
         return item
 
     def cancel_clicked(self):
@@ -199,7 +211,11 @@ class ConfigurationWindow(QDialog):
     def add_target_clicked(self):
         item = self.make_target_item(
             DicomTarget(
-                name="New Target", ip="", port=11112, aet_target="", aet_source=""
+                name="New Target",
+                ip="",
+                port=11112,
+                aet_target="",
+                aet_source="MRI4ALL",
             )
         )
-        self.dicomWidget.insertTopLevelItem(self.tree.topLevelItemCount(), item)
+        self.dicomWidget.insertTopLevelItem(self.dicomWidget.topLevelItemCount(), item)

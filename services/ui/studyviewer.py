@@ -227,8 +227,13 @@ class StudyViewer(QDialog):
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
+            failed_notice = ""
+            if scan_obj.task.journal.failed_at:
+                failed_notice = "  [failed]"
             item = QListWidgetItem(
-                f"{scan_obj.task.scan_number}:  " + scan_obj.task.protocol_name
+                f"{scan_obj.task.scan_number}:  "
+                + scan_obj.task.protocol_name
+                + failed_notice
             )
             item.setCheckState(Qt.CheckState.Unchecked)
             self.scanListWidget.addItem(item)

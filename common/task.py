@@ -69,7 +69,7 @@ def create_task(
 
     try:
         with open(task_filename, "w") as task_file:
-            json.dump(scan_task.dict(), task_file, indent=4)
+            json.dump(scan_task.model_dump(), task_file, indent=4)
     except:
         log.error(f"Unable to scan task file {task_filename}")
         return ""
@@ -142,7 +142,7 @@ def write_task(folder, scan_task: ScanTask) -> bool:
 
     try:
         with open(task_filename, "w") as task_file:
-            json.dump(scan_task.dict(), task_file, indent=4)
+            json.dump(scan_task.model_dump(), task_file, indent=4)
     except Exception:
         log.error(f"Unable to write task file {task_filename}")
         return False

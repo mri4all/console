@@ -55,6 +55,7 @@ class ViewerWidget(QWidget):
     # layout: QBoxLayout
     widget: Optional[QWidget] = None
     viewed_scan_task: Optional[ScanTask] = None
+    viewer_mode: ResultTypes = "empty"
 
     def __init__(self):
         super(ViewerWidget, self).__init__()
@@ -70,6 +71,7 @@ class ViewerWidget(QWidget):
             sip.delete(widget_to_delete)
             self.widget = None
             self.viewed_scan_task = None
+        self.viewer_mode = "empty"
 
     def set_empty_viewer(self):
         self.widget = QWidget()
@@ -81,6 +83,7 @@ class ViewerWidget(QWidget):
         Used to load results into the viewer for the inline widgets
         """
         self.clear_view()
+        self.viewer_mode = viewer_mode
         if viewer_mode == "dicom":
             self.load_dicoms(file_path, task)
             return True
@@ -89,6 +92,7 @@ class ViewerWidget(QWidget):
             return True
         else:
             self.set_empty_viewer()
+            self.viewer_mode = "empty"
             return False
 
     def load_dicoms(self, input_path, task: Optional[ScanTask] = None):
@@ -180,6 +184,14 @@ class ViewerWidget(QWidget):
         self.widget.layout().addWidget(figCanvas)
         self.widget.layout().addWidget(toolbar)
         self.layout().addWidget(self.widget)
+
+        if task:
+            figCanvas.setToolTip(f"{task.scan_number}:  {task.protocol_name}")
+
+    def layoutUpdate(self):
+        if self.viewer_mode == "plot":
+            self.widget.layout().itemAt(0).widget().figure.tight_layout()
+            self.widget.layout().itemAt(0).widget().figure.canvas.draw()
 
 
 # def load_plot(self, result: Optional[TimeSeriesResult] = None):
