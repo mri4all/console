@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>877</width>
-    <height>612</height>
+    <width>1285</width>
+    <height>725</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,12 +41,26 @@
          <property name="editTriggers">
           <set>QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
          </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
          <attribute name="headerVisible">
           <bool>true</bool>
          </attribute>
          <attribute name="headerDefaultSectionSize">
           <number>200</number>
          </attribute>
+         <column>
+          <property name="text">
+           <string>Setting</string>
+          </property>
+         </column>
          <column>
           <property name="text">
            <string>Setting</string>
@@ -72,7 +86,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Dicom Targets</string>
+          <string>DICOM Targets</string>
          </property>
          <property name="flat">
           <bool>true</bool>

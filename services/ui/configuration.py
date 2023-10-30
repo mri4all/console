@@ -22,13 +22,25 @@ def show_configuration():
     configuration_window.exec_()
 
 
-class MyDelegate(QItemDelegate):
+class dicomEditDelegate(QItemDelegate):
     def createEditor(self, parent, option, index):
         if (index.column() > 0 and index.data(1) is None) or (
             index.column() == 0 and index.data(1) == "name"
         ):
-            return super(MyDelegate, self).createEditor(parent, option, index)
+            return super(dicomEditDelegate, self).createEditor(parent, option, index)
         return None
+
+
+class settingsEditDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        if index.column() > 1:
+            return super(settingsEditDelegate, self).createEditor(parent, option, index)
+        return None
+
+    def sizeHint(self, option, index):
+        width = option.rect.width() + 8
+        height = 20
+        return QSize(width, height)
 
 
 def editable(i):
@@ -37,7 +49,7 @@ def editable(i):
 
 
 class ConfigurationWindow(QDialog):
-    tree: QTreeWidget
+    dicomWidget: QTreeWidget
     settingsWidget: QTreeWidget
 
     def __init__(self):
@@ -55,7 +67,7 @@ class ConfigurationWindow(QDialog):
         self.cancelButton.setIconSize(QSize(20, 20))
         self.cancelButton.setText(" Cancel")
 
-        self.tree = self.findChild(QTreeWidget, "dicomTargetWidget")
+        self.dicomWidget = self.findChild(QTreeWidget, "dicomTargetWidget")
         self.findChild(QPushButton, "deleteTargetButton").clicked.connect(
             self.delete_target_clicked
         )
@@ -65,34 +77,60 @@ class ConfigurationWindow(QDialog):
 
         self.config = ui_runtime.get_config()
 
-        delegate = MyDelegate()
-        self.tree.setItemDelegate(delegate)
+        # Setup widget for editing DICOM targets
+        self.dicomWidget.setItemDelegate(dicomEditDelegate())
         for n, target in enumerate(self.config.dicom_targets):
             item = self.make_target_item(target)
-            self.tree.insertTopLevelItem(n, item)
+            self.dicomWidget.insertTopLevelItem(n, item)
+        self.dicomWidget.currentItemChanged.connect(self.dicom_start_edit)
+        self.dicomTargetWidget.setStyleSheet("QLineEdit{background-color: #181e36;}")
 
+        # Setup widget for general settings
         self.settingsWidget = self.findChild(QTreeWidget, "generalSettingsWidget")
-        self.settingsWidget.setItemDelegate(delegate)
+        self.settingsWidget.setItemDelegate(settingsEditDelegate())
 
         n = 0
         for key, value in Configuration.model_fields.items():
             if value.annotation in (str, int, float):
+                # Derive description that is shown in the first visible column. If the field
+                # does not provide a description, the field name is used
+                key_description = Configuration.model_fields[key].description
+                if not key_description:
+                    key_description = key
+                new_item = QTreeWidgetItem(
+                    [
+                        key,
+                        key_description,
+                        str(getattr(self.config, key)),
+                    ]
+                )
                 self.settingsWidget.insertTopLevelItem(
-                    n, editable(QTreeWidgetItem([key, str(getattr(self.config, key))]))
+                    n,
+                    editable(new_item),
                 )
                 n = n + 1
-        self.tree.currentItemChanged.connect(self.start_edit)
-        self.settingsWidget.currentItemChanged.connect(self.start_edit)
-        self.generalSettingsWidget.setStyleSheet(
-            "QLineEdit{ background-color: #0C1123; }"
-        )
-        self.dicomTargetWidget.setStyleSheet("QLineEdit{background-color: #0C1123;}")
 
-    def start_edit(self):
+        self.settingsWidget.setColumnHidden(0, True)
+        self.settingsWidget.currentItemChanged.connect(self.general_start_edit)
+        self.generalSettingsWidget.setStyleSheet(
+            "QLineEdit { background-color: #181e36; }"
+        )
+
+        self.tabWidget.setTabText(0, "General")
+        self.tabWidget.setTabText(1, "DICOM Export")
+        self.tabWidget.setCurrentIndex(0)
+
+    def dicom_start_edit(self):
         tree: QTreeWidget = self.sender()
         if tree.currentItem():
             if tree.currentItem().childCount() == 0:
                 tree.edit(tree.currentIndex().siblingAtColumn(1))
+
+    def general_start_edit(self):
+        tree: QTreeWidget = self.sender()
+        if tree.currentItem():
+            if tree.currentColumn() != 2:
+                tree.edit(tree.currentIndex().siblingAtColumn(2))
 
     def make_target_item(self, target: DicomTarget):
         item = editable(QTreeWidgetItem([target.name]))
@@ -109,8 +147,8 @@ class ConfigurationWindow(QDialog):
 
     def save_clicked(self) -> None:
         targets = []
-        for i in range(self.tree.topLevelItemCount()):
-            item = self.tree.topLevelItem(i)
+        for i in range(self.dicomWidget.topLevelItemCount()):
+            item = self.dicomWidget.topLevelItem(i)
             target = {}
             target["name"] = item.data(0, 0)
             for j in range(item.childCount()):
@@ -145,19 +183,18 @@ class ConfigurationWindow(QDialog):
             return
 
         self.config.dicom_targets = targets
-
         self.config.save_to_file()
         self.close()
 
     def delete_target_clicked(self):
-        items = self.tree.selectedItems()
+        items = self.dicomWidget.selectedItems()
         if len(items) == 0:
             return
         item = items[0]
         if item.childCount() == 0:
             item = item.parent()
-        index = self.tree.indexOfTopLevelItem(item)
-        self.tree.takeTopLevelItem(index)
+        index = self.dicomWidget.indexOfTopLevelItem(item)
+        self.dicomWidget.takeTopLevelItem(index)
 
     def add_target_clicked(self):
         item = self.make_target_item(
@@ -165,4 +202,4 @@ class ConfigurationWindow(QDialog):
                 name="New Target", ip="", port=11112, aet_target="", aet_source=""
             )
         )
-        self.tree.insertTopLevelItem(self.tree.topLevelItemCount(), item)
+        self.dicomWidget.insertTopLevelItem(self.tree.topLevelItemCount(), item)

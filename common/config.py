@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, Optional, Literal, List
 import json
 
@@ -20,7 +20,9 @@ path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 
 class Configuration(BaseModel):
-    scanner_ip: str = "10.42.0.251"
+    scanner_ip: str = Field(
+        default="10.42.0.251", description="Scanner IP (Red Pitaya)"
+    )
     debug_mode: str = "False"
     dicom_targets: List[DicomTarget] = []
     # bar_string: str = ""
