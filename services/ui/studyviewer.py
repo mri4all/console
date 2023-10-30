@@ -101,7 +101,9 @@ class StudyViewer(QDialog):
         viewerLayout = QHBoxLayout(self.viewerFrame)
         viewerLayout.setContentsMargins(0, 0, 0, 0)
         self.viewer = ViewerWidget()
-        self.viewerFrame.setStyleSheet("QFrame { border: 1px solid #262C44; }")
+        self.viewerFrame.setStyleSheet(
+            "QFrame#viewerFrame { border: 1px solid #262C44; }"
+        )
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
 

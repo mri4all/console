@@ -227,7 +227,7 @@ class ExaminationWindow(QMainWindow):
             """
         )
 
-        viewer_styles = "QFrame:hover { border: 1px solid #E0A526; }"
+        viewer_styles = "QFrame:hover#viewer1Frame, QFrame:hover#viewer2Frame, QFrame:hover#viewer3Frame { border: 1px solid #E0A526; }"
         self.viewer1Frame.setStyleSheet(viewer_styles)
         self.viewer2Frame.setStyleSheet(viewer_styles)
         self.viewer3Frame.setStyleSheet(viewer_styles)
