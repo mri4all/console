@@ -44,7 +44,7 @@ def get_logger():
         logger.addHandler(ch)
 
         file_handler = RotatingFileHandler(
-            f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=1000000, backupCount=5
+            f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=500000, backupCount=5
         )
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
@@ -59,6 +59,9 @@ def get_loglevel() -> int:
         return logging.DEBUG
 
     level = os.getenv("MRI4ALL_LOG_LEVEL", "info").lower()
+    if rt.is_debugging_enabled():
+        level = "debug"
+
     if level == "error":
         return logging.ERROR
     if level == "info":

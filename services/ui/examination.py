@@ -280,7 +280,6 @@ class ExaminationWindow(QMainWindow):
         self.monitorTimer.start(1000)
 
         self.queue_selection_changed()
-
         self.init_seqparam_ui()
 
     def received_recon(self, o):

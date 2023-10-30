@@ -55,17 +55,25 @@ class LogViewerWindow(QDialog):
             selected_log = "ui"
 
         log_filename = f"{rt.get_base_path()}/logs/{selected_log}.log"
-        log_content = ""
+        log_content = []
 
         try:
             with open(log_filename, "r") as file:
                 for line in file.readlines():
-                    log_content += line
+                    log_line = line
+                    if "| ERR |" in line:
+                        log_line = f"<span style='color: #E5554F;'>{line}</span>"
+                    if "| WRN |" in line:
+                        log_line = f"<span style='color: #E0A526;'>{line}</span>"
+                    if "| DBG |" in line:
+                        log_line = f"<span style='color: #489FDF;'>{line}</span>"
+
+                    log_content.append(log_line)
         except:
             log.exception("Unable to load log")
             log_content = "- Unable to load log -"
 
-        self.logEdit.setPlainText(log_content)
+        self.logEdit.setHtml("<br>".join(log_content))
         self.logEdit.verticalScrollBar().setValue(
             self.logEdit.verticalScrollBar().maximum()
         )
