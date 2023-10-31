@@ -27,9 +27,7 @@ mri4_all_config_path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 
 class Configuration(BaseModel):
-    scanner_ip: str = Field(
-        default="10.42.0.251", description="Scanner IP (Red Pitaya)"
-    )
+    scanner_ip: str = Field(default="10.42.0.251", description="Scanner IP (internal)")
     debug_mode: str = "False"
     dicom_targets: List[DicomTarget] = []
     # bar_string: str = ""
@@ -41,7 +39,11 @@ class Configuration(BaseModel):
             k = Configuration(
                 dicom_targets=[
                     DicomTarget(
-                        name="Default", ip="127.0.0.1", port=11112, aet_target="target"
+                        name="Default",
+                        ip="127.0.0.1",
+                        port=11112,
+                        aet_target="target",
+                        aet_source="mri4all",
                     )
                 ]
             )

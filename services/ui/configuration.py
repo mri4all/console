@@ -216,7 +216,7 @@ class ConfigurationWindow(QDialog):
                 ip="",
                 port=11112,
                 aet_target="",
-                aet_source="MRI4ALL",
+                aet_source="mri4all",
             )
         )
         self.dicomWidget.insertTopLevelItem(self.dicomWidget.topLevelItemCount(), item)

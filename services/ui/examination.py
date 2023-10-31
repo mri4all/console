@@ -506,6 +506,12 @@ class ExaminationWindow(QMainWindow):
             self.set_status_message("Failed to insert new scan. Check log file.")
 
         self.sync_queue_widget(False)
+        self.scroll_queue_end()
+
+    def scroll_queue_end(self):
+        self.queueWidget.scrollToItem(
+            self.queueWidget.item(self.queueWidget.count() - 1)
+        )
 
     def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
         """
@@ -1011,7 +1017,6 @@ class ExaminationWindow(QMainWindow):
 
     def debug_update_scan_list(self):
         self.sync_queue_widget(False)
-        self.viewer1.layoutUpdate()
 
     def set1Viewer(self):
         self.viewer1Frame.setVisible(True)
@@ -1038,7 +1043,6 @@ class ExaminationWindow(QMainWindow):
 
     def show_definition_clicked(self):
         index = self.queueWidget.currentRow()
-
         if index < 0:
             return
         if index >= len(ui_runtime.scan_queue_list):
@@ -1145,6 +1149,7 @@ class ExaminationWindow(QMainWindow):
         ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)
+        self.scroll_queue_end()
 
     def clear_viewers(self):
         self.viewer1.view_data("", "empty", {})
