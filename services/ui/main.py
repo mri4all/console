@@ -22,6 +22,7 @@ from services.ui import examination
 from services.ui.control import control_services
 import services.ui.ui_runtime as ui_runtime
 import common.queue as queue
+import common.config as config
 
 
 def set_MRI4ALL_style(app):
@@ -119,8 +120,8 @@ def prepare_system() -> bool:
 
     # TODO: Check if the acquisition and reconstruction services are running
 
-    ui_runtime.load_config()
-    if ui_runtime.config.debug_mode != "False":
+    config.load_config()
+    if config.get_config().debug_mode != "False":
         rt.set_debug(True)
 
     ui_runtime.system_information.name = "dev-system1"

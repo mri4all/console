@@ -16,6 +16,7 @@ from services.ui.control import (
     run_device_test,
 )
 from common.constants import *
+import common.config as config
 
 
 def show_systemstatus():
@@ -127,7 +128,7 @@ class SystemStatusWindow(QDialog):
         control_service(ServiceAction.KILL, Service.RECON_SERVICE)
 
     def pingButton_clicked(self) -> None:
-        if ping(ui_runtime.get_config().scanner_ip):
+        if ping(config.get_config().scanner_ip):
             self.pingLabel.setText(
                 '<span style="color: #40C1AC; font-size: 24px;"> '
                 + chr(0xF058)

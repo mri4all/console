@@ -6,6 +6,15 @@ from typing import Dict, Optional, Literal, List
 from common import runtime
 
 
+def get_config():
+    return mri4all_config_instance
+
+
+def load_config():
+    global mri4all_config_instance
+    mri4all_config_instance = Configuration.load_from_file()
+
+
 class DicomTarget(BaseModel):
     target_type: Literal["dicom"] = "dicom"
     name: str

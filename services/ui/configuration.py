@@ -13,6 +13,7 @@ from common.config import Configuration, DicomTarget
 import common.runtime as rt
 import common.logger as logger
 from services.ui import ui_runtime
+import common.config as config
 
 log = logger.get_logger()
 
@@ -80,7 +81,7 @@ class ConfigurationWindow(QDialog):
             self.add_target_clicked
         )
 
-        self.config = ui_runtime.get_config()
+        self.config = config.get_config()
 
         # Setup widget for editing DICOM targets
         self.dicomWidget.setItemDelegate(dicomEditDelegate())

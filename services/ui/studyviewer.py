@@ -19,6 +19,7 @@ from services.ui import dicomexport
 from services.ui.viewerwidget import ViewerWidget
 from services.ui import taskviewer
 from common.constants import *
+import common.config as config
 
 log = logger.get_logger()
 
@@ -94,7 +95,7 @@ class StudyViewer(QDialog):
         )
 
         self.dicomTargetComboBox.addItems(
-            [t.name for t in ui_runtime.get_config().dicom_targets]
+            [t.name for t in config.get_config().dicom_targets]
         )
         self.sendDicomsButton.clicked.connect(self.dicoms_send)
 
@@ -187,7 +188,7 @@ class StudyViewer(QDialog):
             try:
                 dicomexport.send_dicoms(
                     checked_scan.dir / "dicom",
-                    ui_runtime.get_config().dicom_targets[
+                    config.get_config().dicom_targets[
                         self.dicomTargetComboBox.currentIndex()
                     ],
                 )

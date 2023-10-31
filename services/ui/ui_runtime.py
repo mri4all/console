@@ -50,15 +50,6 @@ status_last_completed_scan = ""
 status_viewer_last_autoload_scan = ""
 
 
-def get_config():
-    return config
-
-
-def load_config():
-    global config
-    config = Configuration.load_from_file()
-
-
 def get_screen_size() -> Tuple[int, int]:
     screen = QDesktopWidget().screenGeometry()
     return screen.width(), screen.height()

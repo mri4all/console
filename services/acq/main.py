@@ -24,6 +24,7 @@ from common.version import mri4all_version
 import common.queue as queue
 from common.constants import *
 import common.plotting as plotting
+import external.marcos_client.local_config as marcos_local_config
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
@@ -43,6 +44,8 @@ def process_acquisition(scan_name: str) -> bool:
     log.info("Performing acquisition...")
 
     plotting.set_plotting_defaults()
+
+    # marcos_local_config.set_parameters("localhost")
 
     # Check if json file with task definition exists in the scan folder
     if not os.path.isfile(
