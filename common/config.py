@@ -24,7 +24,7 @@ class DicomTarget(BaseModel):
     aet_source: Optional[str] = ""
 
 
-path = Path(runtime.get_base_path()) / "config/mri4all.json"
+mri4_all_config_path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 
 class Configuration(BaseModel):
@@ -38,7 +38,7 @@ class Configuration(BaseModel):
 
     @classmethod
     def load_from_file(cls):
-        if not path.exists():
+        if not mri4_all_config_path.exists():
             k = Configuration(
                 dicom_targets=[
                     DicomTarget(
@@ -48,11 +48,13 @@ class Configuration(BaseModel):
             )
             k.save_to_file()
 
-        with open(path, "r") as f:
+        # TODO: Secure file access with LOCK file
+        with open(mri4_all_config_path, "r") as f:
             return cls.model_validate_json(f.read())
 
     def save_to_file(self):
-        with open(path, "w") as f:
+        # TODO: Secure writing of config file with LOCK file
+        with open(mri4_all_config_path, "w") as f:
             f.write(self.model_dump_json(indent=4))
 
     def update(self, data: Dict) -> "Configuration":

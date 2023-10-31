@@ -26,6 +26,7 @@ import common.task as task
 import services.recon.reconstruction as reconstruction
 from common.types import ScanTask
 import common.plotting as plotting
+import common.config as config
 
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
@@ -44,6 +45,8 @@ def move_to_fail(scan_name: str) -> bool:
 def process_reconstruction(scan_name: str) -> bool:
     log.info("Performing reconstruction...")
 
+    # Reload the configuration to get the latest settings
+    config.load_config()
     plotting.set_plotting_defaults()
 
     # Check if JSON file with task definition exists in the recon folder

@@ -12,6 +12,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 import common.logger as logger
+
+log = logger.get_logger()
+
 import threading
 from pydantic import BaseModel
 
@@ -110,7 +113,12 @@ class Communicator(QObject, Helper):
         return True
 
     def cleanup(self):
-        os.unlink(self.in_file)
+        try:
+            os.unlink(self.in_file)
+        except:
+            log.info(
+                f"Unable to remove fifo file {self.in_file}, but not to worry about"
+            )
 
     def listen(self):
         if self.receive_thread:
