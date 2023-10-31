@@ -22,20 +22,21 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
     as sequence, protocol name, patient information and system information can be found in the
     task object.
     """
-    log.info(f"Folder where the task is = {folder}")
-    log.info(f"JSON information = {task}")
-
-    log.info(f"Starting reconstruction.")
+    # log.info(f"Folder where the task is = {folder}")
+    # log.info(f"JSON information = {task}")
 
     if task.processing.recon_mode == "bypass":
+        log.info("Bypassing reconstruction")
         return True
 
     if task.processing.recon_mode == "fake_dicoms":
+        log.info("Generating fake DICOMs")
         utils.generate_fake_dicoms(folder, task)
-        time.sleep(2)
+        time.sleep(1)
         return True
 
     if task.processing.trajectory == "cartesian":
+        log.info("Running Cartesian reconstruction")
         run_reconstruction_cartesian(folder, task)
         return True
 
@@ -47,7 +48,6 @@ def run_reconstruction_cartesian(folder: str, task: ScanTask):
     """
     Runs the reconstruction pipeline for Cartesian sampling
     """
-
     fnames = os.listdir(folder)
     if not fnames:
         log.error(f"Folder {folder} is empty.")

@@ -15,7 +15,6 @@ log = logger.get_logger()
 sys.stdout = logger.LoggerStdCapture(log.info)
 sys.stderr = logger.LoggerStdCapture(log.warning)
 
-
 import common.helper as helper
 from common.ipc import Communicator
 
