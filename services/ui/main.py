@@ -85,9 +85,7 @@ def set_MRI4ALL_style(app):
     QTreeWidget QHeaderView::section {	    
         background-color: #262C44;
     }
-
     """
-
     qdarktheme.setup_theme(
         corner_shape="sharp",
         custom_colors={

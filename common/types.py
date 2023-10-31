@@ -105,6 +105,10 @@ class ScanJournal(BaseModel):
     fail_stage: FailStages = "none"
 
 
+class AdjustmentSettings(BaseModel):
+    exam_id: str = ""
+
+
 class ScanTask(BaseModel):
     id: str = ""
     sequence: str = ""
@@ -113,11 +117,11 @@ class ScanTask(BaseModel):
     system: SystemInformation = SystemInformation()
     patient: PatientInformation = PatientInformation()
     exam: ExamInformation = ExamInformation()
-    parameters: dict = {}  # TODO
-    adjustment: dict = {}  # TODO
+    parameters: dict = {}  # Contains sequence parameters (flexible content)
+    adjustment: AdjustmentSettings = AdjustmentSettings()
     processing: ProcessingConfig = ProcessingConfig()
-    other: dict = {}
-    results: List[ResultItem] = []  # TODO
+    other: dict = {}  # Contains optional parameters, such as prototypic settings
+    results: List[ResultItem] = []  # Contains list of generated results
     journal: ScanJournal = ScanJournal()
 
 

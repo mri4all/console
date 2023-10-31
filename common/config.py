@@ -27,11 +27,13 @@ mri4_all_config_path = Path(runtime.get_base_path()) / "config/mri4all.json"
 
 
 class Configuration(BaseModel):
+    """
+    Set description to "hidden" to hide the setting in the UI.
+    """
+
     scanner_ip: str = Field(default="10.42.0.251", description="Scanner IP (internal)")
-    debug_mode: str = "False"
+    debug_mode: str = Field(default="False", description="Debug Mode")
     dicom_targets: List[DicomTarget] = []
-    # bar_string: str = ""
-    # foo_int: int = 0
 
     @classmethod
     def load_from_file(cls):

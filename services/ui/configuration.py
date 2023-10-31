@@ -103,6 +103,9 @@ class ConfigurationWindow(QDialog):
                 key_description = Configuration.model_fields[key].description
                 if not key_description:
                     key_description = key
+                else:
+                    if key_description == "hidden":
+                        continue
                 new_item = QTreeWidgetItem(
                     [
                         key,
