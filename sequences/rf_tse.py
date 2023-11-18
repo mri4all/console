@@ -3,10 +3,11 @@ from pathlib import Path
 import math
 
 from PyQt5 import uic
-
 import numpy as np
+import pickle
 
 import pypulseq as pp  # type: ignore
+
 from external.seq.adjustments_acq.scripts import run_pulseq
 
 # from external.seq.adjustments_acq.util import reading_json_parameter
@@ -14,6 +15,7 @@ import external.seq.adjustments_acq.config as cfg
 import matplotlib.pyplot as plt
 from sequences import PulseqSequence
 from external.seq.adjustments_acq.calibration import run_sequence_test
+from common.types import ResultItem
 
 import common.logger as logger
 
@@ -29,13 +31,15 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         """
         Returns the user interface of the sequence.
         """
-        seq_path = os.path.dirname(os.path.abspath(__file__))
-        uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+        # seq_path = os.path.dirname(os.path.abspath(__file__))
+        # uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
 
     def calculate_sequence(self, scan_task) -> bool:
-        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
+
+        scan_task.processing.recon_mode = "bypass"
+        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         pypulseq_rftse(inputs={}, check_timing=True, output_file=self.seq_file_path)
 
@@ -46,7 +50,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
         
-        run_sequence_test("prescan_frequency")
+        # run_sequence_test("prescan_frequency")
 
         # reading configuration data from config.json
         # configuration_data=reading_json_parameter(file_name='config.json')
@@ -66,10 +70,28 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_msgs=False,
             gui_test=False,
         )
-        # Debug
-        plt.figure()
+
+        plt.clf()
+        plt.title("ADC Signal")
+        plt.grid(True, color='#333')
         plt.plot(np.abs(rxd))
-        plt.show()
+        # if self.param_debug_plot:
+        #     plt.show()
+
+        file = open(self.get_working_folder() + "/other/rf_tse.plot", "wb")
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+
+        result = ResultItem()
+        result.name = "ADC"
+        result.description = "Recorded ADC signal"
+        result.type = "plot"
+        result.primary = True
+        result.autoload_viewer = 1
+        result.file_path = "other/rf_tse.plot"
+        scan_task.results.append(result)
+
 
         log.info("Done running sequence " + self.get_name())
         return True
@@ -96,7 +118,7 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
         num_averages = 1
         adc_num_samples = 4096
         adc_duration = 6.4e-3
-        ETL = 8
+        ETL = 16
     else:
         LARMOR_FREQ = inputs["LARMOR_FREQ"]
         RF_MAX = inputs["RF_MAX"]

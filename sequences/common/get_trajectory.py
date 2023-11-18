@@ -96,6 +96,7 @@ def choose_pe_order(ndims: int = 3, npe: np.ndarray = [70, 28], traj: str = 'cen
                     pe_order[pe, 1] = pe1_order[pe2]
 
         elif traj == 'linear_up': # linear_up for both phase encoding direction
+            print("Using linear-up ordering")
             num_total_pe = np.prod(npe[0] * npe[1])
             pe_order = np.zeros((num_total_pe, 2), dtype=int)
             pe_order[0, 0] = 0  # First dimension

@@ -10,7 +10,7 @@ log = logger.get_logger()
 
 
 def pypulseq_1dse(
-    inputs=None, check_timing=True, output_file="", rf_duration=100e-6
+    inputs=None, check_timing=True, output_file="", rf_duration=50e-6
 ) -> bool:
     if not output_file:
         log.error("No output file specified")
@@ -45,8 +45,8 @@ def pypulseq_1dse(
     # BW = 64e3
     # adc_dwell = 1 / BW
     # adc_duration = 2.25e-3 # Nx * adc_dwell  # 6.4e-3
-    prephaser_duration = 1e-3  # TODO: Need to define this behind the scenes and optimze
-    rise_time = 200e-6  # dG = 200e-6 # Grad rise time
+    prephaser_duration = 5e-3  # TODO: Need to define this behind the scenes and optimze
+    rise_time = 250e-6  # dG = 200e-6 # Grad rise time
 
     # ======
     # INITIATE SEQUENCE
@@ -59,16 +59,19 @@ def pypulseq_1dse(
     # ======
 
     system = pp.Opts(
-        max_grad=400,
+        max_grad=200,
         grad_unit="mT/m",
         max_slew=4000,
         slew_unit="T/m/s",
-        rf_ringdown_time=100e-6,
+        #rf_ringdown_time=100e-6,
+        rf_ringdown_time=20e-6,
         rf_dead_time=100e-6,
         rf_raster_time=1e-6,
-        adc_dead_time=10e-6,
+        #adc_dead_time=10e-6,
+        adc_dead_time=20e-6,
     )
 
+    
     # ======
     # CREATE EVENTS
     # ======
@@ -87,7 +90,8 @@ def pypulseq_1dse(
         system=system,
         use="refocusing",
     )
-    readout_time = 2.5e-3 + (2 * system.adc_dead_time)
+    #readout_time = 2.5e-3 + (2 * system.adc_dead_time)
+    readout_time = 8.e-3 + (2 * system.adc_dead_time)
     delta_k = 1 / fov
     gx = pp.make_trapezoid(
         channel=channel,
@@ -125,21 +129,21 @@ def pypulseq_1dse(
         )
     ) * seq.grad_raster_time
 
-    tau2 = (
-        math.ceil(
-            (
-                TE / 2
-                - 0.5 * (pp.calc_duration(rf2))
-                - pp.calc_duration(gx_pre)
-                - 2 * rise_time
-            )
-            / seq.grad_raster_time
-        )
-    ) * seq.grad_raster_time  # TODO: gradient delays need to be calibrated
-
     # tau2 = (
-    #     math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx)) / seq.grad_raster_time)
-    # ) * seq.grad_raster_time
+    #     math.ceil(
+    #         (
+    #             TE / 2
+    #             - 0.5 * (pp.calc_duration(rf2))
+    #             - pp.calc_duration(gx_pre)
+    #             - 2 * rise_time
+    #         )
+    #         / seq.grad_raster_time
+    #     )
+    # ) * seq.grad_raster_time  # TODO: gradient delays need to be calibrated
+
+    tau2 = (
+        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx))) / seq.grad_raster_time)
+    ) * seq.grad_raster_time
 
     delay_TR = TR - TE - (0.5 * readout_time)
     assert np.all(tau1 >= 0)
@@ -151,6 +155,9 @@ def pypulseq_1dse(
     # ======
     # Loop over phase encodes and define sequence blocks
 
+    # gx_pre.amplitude = 0
+    # gx.amplitude = 0
+
     for avg in range(num_averages):
         seq.add_block(rf1)
         seq.add_block(gx_pre)
@@ -160,8 +167,9 @@ def pypulseq_1dse(
         seq.add_block(gx, adc)  # Projection
         seq.add_block(pp.make_delay(delay_TR))
 
-    # seq.plot(time_range=[0, 5*TR])
-    seq.write("se_1D_local.seq")
+    seq.plot(time_range=[0, 2*TR])
+    # seq.write("se_1D_local.seq")
+
     # Check whether the timing of the sequence is correct
     check_timing = True
     if check_timing:

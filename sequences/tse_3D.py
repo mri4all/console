@@ -27,7 +27,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_FOV: int = 140
     param_Base_Resolution: int = 70
     param_BW: int = 32000
-    param_Trajectory: str = "Catisian"
+    param_Trajectory: str = "Cartesian"
     param_PE_Ordering: str = "Center_out"
     param_Slice_Ordering: str = "Center_out"
     param_view_traj: bool = True
@@ -134,8 +134,10 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
-        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
+
+        scan_task.processing.recon_mode = "bypass"
+        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
         make_tse_3D.pypulseq_tse3D(
@@ -195,6 +197,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             save_mat=False,
             save_msgs=False,
             gui_test=False,
+            case_path=self.get_working_folder() 
         )
 
         log.info("Done running sequence " + self.get_name())

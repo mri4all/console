@@ -149,7 +149,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
             plt.clf()
             plt.title("ADC Signal")
-            plt.grid(True)
+            plt.grid(True, color='#333')
             plt.plot(np.abs(rxd))
             # if self.param_debug_plot:
             #     plt.show()

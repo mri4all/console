@@ -74,8 +74,9 @@ def process_reconstruction(scan_name: str) -> bool:
             mri4all_paths.DATA_RECON + "/" + scan_name, scan_task
         ):
             raise Exception("Reconstruction did not run successfully.")
-    except:
+    except Exception as e:
         log.exception(f"Exception caught during recon of scan {scan_name}.")
+        log.exception(e)
         scan_task.journal.fail_stage = "reconstruction"
         scan_task.journal.failed_at = helper.get_datetime()
         task.write_task(mri4all_paths.DATA_RECON + "/" + scan_name, scan_task)

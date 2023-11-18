@@ -93,10 +93,12 @@ def process_acquisition(scan_name: str) -> bool:
         current_step = "run_sequence"
         if not seq_instance.run_sequence(scan_task):
             raise Exception("Sequence did not run successfully.")
-    except:
+    except Exception as e:
         log.error(
             f"Failed to run sequence {scan_task.sequence}. Failure during step {current_step}."
         )
+        log.exception(e)
+
         scan_task.journal.failed_at = helper.get_datetime()
         scan_task.journal.fail_stage = "acquisition"
         task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)

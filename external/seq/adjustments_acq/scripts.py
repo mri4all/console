@@ -40,6 +40,7 @@ def run_pulseq(
     expt=None,
     plot_instructions=False,
     gui_test=False,
+    case_path="/tmp"
 ):
     """
     Interpret pulseq .seq file through flocra_pulseq
@@ -75,10 +76,7 @@ def run_pulseq(
     print(f"shim_x={shim_x}")
     print(f"shim_y={shim_y}")
     print(f"shim_z={shim_z}")
-
-    # Load dummy data for GUI testing
-    if gui_test:
-        return np.load(cfg.MGH_PATH + "test_data/gui.npy"), 25 / 3
+    print(f"Seq file={seq_file}")
 
     # Convert .seq file to machine dict
     psi = PSInterpreter(
@@ -90,20 +88,23 @@ def run_pulseq(
         gx_max=gx_max,
         gy_max=gy_max,
         gz_max=gz_max,
-        log_file="test.log",
+        log_file=case_path + "/flocra.log",
     )
     instructions, param_dict = psi.interpret(seq_file)
 
     # Shim
+    print("Running shim function...")
     instructions = shim(instructions, (shim_x, shim_y, shim_z))
 
     # Initialize experiment class
     if expt is None:
+        print("Initializing marcos client...")
         expt = ex.Experiment(
             lo_freq=rf_center,
             rx_t=param_dict["rx_t"],
             init_gpa=True,
             gpa_fhdo_offset_time=grad_t / 3,
+            grad_max_update_rate=0.1,
             halt_and_reset=True,
         )
 
@@ -134,12 +135,17 @@ def run_pulseq(
     # Load instructions
     expt.add_flodict(instructions)
 
+    print("Running instructions...")
+
     # Run experiment
     rxd, msgs = expt.run()
 
     # Optionally save messages
     if save_msgs:
+        print("Received messages:")
+        print("---")
         print(msgs)  # TODO include message saving
+        print("---")
 
     # Announce completion
     nSamples = param_dict["readout_number"]
@@ -148,10 +154,9 @@ def run_pulseq(
     # Optionally save rx output array as .npy file
     if save_np:
         from datetime import datetime
-
         now = datetime.now()
         current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = Path(mri4all_paths.DATA_RECON) / f"/{current_time}.npy"
+        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{current_time}.npy"
         if os.path.exists(filename):
             os.remove(filename)
         np.save(filename, rxd["rx0"])
@@ -159,14 +164,14 @@ def run_pulseq(
     # Optionally save rx output array as .mat file
     if save_mat:
         from datetime import datetime
-
         now = datetime.now()
         current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = Path(mri4all_paths.DATA_RECON) + f"/{current_time}.mat"
+        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{current_time}.mat"
         if os.path.exists(filename):
             os.remove(filename)
         sio.savemat(filename, {"flocra_data": rxd["rx0"]})
 
+    # Very dangerous to call the destructor here!
     expt.__del__()
 
     # Return rx output array and rx period

@@ -61,9 +61,9 @@ class PSInterpreter:
         self._grad_max = {}
         if gx_max is None: self._grad_max['gx'] = grad_max
         else: self._grad_max['gx'] = gx_max
-        if gx_max is None: self._grad_max['gy'] = grad_max
+        if gy_max is None: self._grad_max['gy'] = grad_max
         else: self._grad_max['gy'] = gy_max
-        if gx_max is None: self._grad_max['gz'] = grad_max
+        if gz_max is None: self._grad_max['gz'] = grad_max
         else: self._grad_max['gz'] = gz_max    
 
         self._tx_warmup = tx_warmup # us

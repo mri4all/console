@@ -59,7 +59,8 @@ def pypulseq_tse3D(
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
-    traj = "center_out"  # TODO: add linear, hybrid trajectory
+    #traj = "center_out"  # TODO: add linear, hybrid trajectory
+    traj = "linear_up"  # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
@@ -73,7 +74,7 @@ def pypulseq_tse3D(
         ch0 = "x"
         ch1 = "z"
         ch2 = "y"
-    elif Orientation == "coronal":
+    elif Orientation == "Coronal":
         ch0 = "y"
         ch1 = "z"
         ch2 = "x"
@@ -164,12 +165,17 @@ def pypulseq_tse3D(
         )
     ) * seq.grad_raster_time
 
+    # tau2 = (
+    #     math.ceil(
+    #         (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
+    #         / seq.grad_raster_time
+    #     )
+    # ) * seq.grad_raster_time
+
     tau2 = (
-        math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
-            / seq.grad_raster_time
-        )
+        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx))) / seq.grad_raster_time)
     ) * seq.grad_raster_time
+
 
     delay_TR = (
         math.ceil(

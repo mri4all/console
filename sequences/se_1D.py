@@ -22,7 +22,7 @@ log = logger.get_logger()
 
 class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
-    param_TE: int = 20
+    param_TE: int = 50
     param_TR: int = 3000
     param_NSA: int = 1
     param_FOV: int = 20
@@ -55,11 +55,11 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_default_parameters(self) -> dict:
         return {
-            "TE": 20,
-            "TR": 3000,
+            "TE": 50,
+            "TR": 1000,
             "NSA": 1,
-            "FOV": 20,
-            "Base_Resolution": 250,
+            "FOV": 15,
+            "Base_Resolution": 256,
             "BW": 32000,
             "Gradient": "y",
         }
@@ -88,7 +88,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
         widget.BW_SpinBox.setValue(self.param_BW)
         widget.Gradient_ComboBox.setCurrentText(self.param_Gradient)
-
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -109,9 +108,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
+        log.info("Calculating sequence " + self.get_name())
         scan_task.processing.recon_mode = "bypass"
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
-        log.info("Calculating sequence " + self.get_name())
+
+        plt.clf()
+        plt.title("Sequence")
 
         make_se_1D.pypulseq_1dse(
             inputs={
@@ -126,6 +128,28 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             check_timing=True,
             output_file=self.seq_file_path,
         )
+
+        file = open(self.get_working_folder() + "/other/seq1.plot", "wb")
+        fig = plt.figure(1)
+        pickle.dump(fig, file)
+        file.close()
+        result = ResultItem()
+        result.name = "SEQ1"
+        result.description = "Sequence diagram RF/ADC"
+        result.type = "plot"
+        result.file_path = "other/seq1.plot"
+        scan_task.results.append(result)
+
+        file = open(self.get_working_folder() + "/other/seq2.plot", "wb")
+        fig = plt.figure(2)
+        pickle.dump(fig, file)
+        file.close()
+        result = ResultItem()
+        result.name = "SEQ2"
+        result.description = "Sequence diagram Grad"
+        result.type = "plot"
+        result.file_path = "other/seq2.plot"
+        scan_task.results.append(result)
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -147,56 +171,50 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
                 grad_cal=False,
                 save_np=False,
                 save_mat=False,
-                save_msgs=False,
+                save_msgs=True,
                 gui_test=False,
             )
 
-        # Debug
-        if 1 > 0:  # TODO: set debug mode
-            # plt.figure()
-            # plt.subplot(121)
-            # plt.plot(np.abs(rxd))
-            # plt.title("acq signal")
-            # plt.subplot(122)
-            # recon = np.fft.fft(np.fft.fftshift(rxd))
-            # plt.plot(np.abs(recon))
-            # plt.title("fft signal")
-            # plt.show()
-
-            # view_traj.view_sig(rxd, self.get_working_folder())
-
-            log.info("Plotting figure now")
-            plt.style.use("dark_background")
-            plt.clf()
-            plt.subplot(121)
-            plt.title("Acq signal")
-            plt.grid(False)
-            plt.plot(np.abs(rxd))
-            plt.subplot(122)
-            recon = np.fft.fft(np.fft.fftshift(rxd))
-            plt.plot(np.abs(recon))
-            plt.title("FFT signal")
-            if self.param_debug_plot:
-                plt.show()
-            file = open(self.get_working_folder() + "/other/se_1D.plot", "wb")
-            fig = plt.gcf()
-            pickle.dump(fig, file)
-            file.close()
-            result = ResultItem()
-            result.name = "demo"
-            result.description = "This is just a plot"
-            result.type = "plot"
-            result.primary = True
-            result.autoload_viewer = 1
-            result.file_path = "other/se_1D.plot"
-            scan_task.results.append(result)
-
         log.info("Done running sequence " + self.get_name())
 
-        # save the raw data file
+        log.info("Plotting figures")     
+        plt.clf()
+        plt.title("ADC Signal")
+        plt.grid(True, color='#333')        
+        plt.plot(np.abs(rxd))
+        file = open(self.get_working_folder() + "/other/adc.plot", "wb")
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+        result = ResultItem()
+        result.name = "ADC"
+        result.description = "Acquired ADC signal"
+        result.type = "plot"
+        result.primary = True
+        result.autoload_viewer = 1
+        result.file_path = "other/adc.plot"
+        scan_task.results.append(result)
+
+        plt.clf()
+        plt.title("FFT of Signal")
+        recon = np.fft.fftshift(np.fft.ifft(np.fft.fftshift(rxd)))
+        plt.grid(True, color='#333')        
+        plt.plot(np.abs(recon))
+        file = open(self.get_working_folder() + "/other/fft.plot", "wb")
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+        result = ResultItem()
+        result.name = "FFT"
+        result.description = "FFT of ADC signal"
+        result.type = "plot"
+        result.autoload_viewer = 2
+        result.file_path = "other/fft.plot"
+        scan_task.results.append(result)
+
+        # Save the raw data file
+        log.info("Saving rawdata, sequence " + self.get_name())
         self.raw_file_path = self.get_working_folder() + "/rawdata/raw.npy"
         np.save(self.raw_file_path, rxd)
-
-        log.info("Saving rawdata, sequence " + self.get_name())
 
         return True
