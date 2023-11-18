@@ -16,6 +16,7 @@ class mri4all_paths:
     DATA_COMPLETE = DATA + "/complete"
     DATA_FAILURE = DATA + "/failure"
     DATA_ARCHIVE = DATA + "/archive"
+    DATA_STATE = DATA + "/state"
 
 
 class mri4all_files:

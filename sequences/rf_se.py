@@ -45,7 +45,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "ADC_samples": self.param_ADC_samples,
             "ADC_duration": self.param_ADC_duration,
             "debug_plot": self.param_debug_plot,
-        }  # ,
+        }
 
     @classmethod
     def get_default_parameters(self) -> dict:
@@ -78,7 +78,6 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         widget.NSA_SpinBox.setValue(self.param_NSA)
         widget.ADC_samples_SpinBox.setValue(self.param_ADC_samples)
         widget.ADC_duration_SpinBox.setValue(self.param_ADC_duration)
-
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -112,7 +111,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             },
             check_timing=True,
             output_file=self.seq_file_path,
-        )  #
+        )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -135,7 +134,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             grad_cal=False,
             save_np=False,
             save_mat=False,
-            save_msgs=False,
+            save_msgs=True,
             gui_test=False,
         )
         log.info("Pulseq ran, plotting")

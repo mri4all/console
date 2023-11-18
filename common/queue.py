@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Dict
 from pathlib import Path
 import common.runtime as rt
@@ -41,6 +42,10 @@ def check_and_create_folders() -> bool:
     if not create_folder(mri4all_paths.DATA_FAILURE):
         return False
     if not create_folder(mri4all_paths.DATA_ARCHIVE):
+        return False
+    if not create_folder(mri4all_paths.DATA_STATE):
+        return False
+    if not prepare_state():
         return False
 
     log.info("All folders exist")
@@ -111,6 +116,34 @@ def clear_folder(folder_path, target_path=mri4all_paths.DATA_ARCHIVE) -> bool:
     return True
 
 
+def prepare_state() -> bool:
+    folder_path = mri4all_paths.DATA_STATE
+    if not os.path.isdir(folder_path):
+        log.warn(f"Unable to access STATE folder")
+        return True
+
+    if os.path.isfile(folder_path + "/" + mri4all_files.LOCK):
+        # Wait one second and try again
+        time.sleep(1)
+        if os.path.isfile(folder_path + "/" + mri4all_files.LOCK):
+            log.warn(f"State folder is locked. Unable to prepare state folder...")
+            return False
+
+    # Iterate over all files and delete everything except the tune-up file
+    for file in os.listdir(folder_path):
+        if file == "." or file == "..":
+            continue
+
+        # TODO
+
+        # log.info(f"Moving folder {folder} to {target_path}")
+        # if not move_task(folder_path + "/" + folder, target_path):
+        #     log.error(f"Failed to move folder {folder} to archive {target_path}")
+        #     return False
+
+    return True
+
+
 def clear_folders() -> bool:
     log.info("Clearing data folders for next exam...")
 
@@ -125,6 +158,8 @@ def clear_folders() -> bool:
     if not clear_folder(mri4all_paths.DATA_COMPLETE):
         return False
     if not clear_folder(mri4all_paths.DATA_FAILURE):
+        return False
+    if not prepare_state():
         return False
 
     return True
