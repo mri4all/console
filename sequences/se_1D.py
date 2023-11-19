@@ -28,12 +28,16 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     param_FOV: int = 20
     param_Base_Resolution: int = 96
     param_BW: int = 32000
-    param_Gradient: str = "y"
+    param_Gradient: str = "x"
     param_debug_plot: bool = True
 
     @classmethod
     def get_readable_name(self) -> str:
         return "1D Spin-Echo"
+
+    @classmethod
+    def get_description(self) -> str:
+        return "Spin-Echo sequence with gradient encoding in a pre-selected direction (projection)"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -61,7 +65,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "FOV": 15,
             "Base_Resolution": 256,
             "BW": 32000,
-            "Gradient": "y",
+            "Gradient": "x",
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -177,10 +181,10 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
         log.info("Done running sequence " + self.get_name())
 
-        log.info("Plotting figures")     
+        log.info("Plotting figures")
         plt.clf()
-        plt.title("ADC Signal")
-        plt.grid(True, color='#333')        
+        plt.title(f"ADC Signal - Grad_{self.param_Gradient}")
+        plt.grid(True, color="#333")
         plt.plot(np.abs(rxd))
         file = open(self.get_working_folder() + "/other/adc.plot", "wb")
         fig = plt.gcf()
@@ -190,15 +194,14 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         result.name = "ADC"
         result.description = "Acquired ADC signal"
         result.type = "plot"
-        result.primary = True
         result.autoload_viewer = 1
         result.file_path = "other/adc.plot"
-        scan_task.results.append(result)
+        scan_task.results.insert(0, result)
 
         plt.clf()
-        plt.title("FFT of Signal")
+        plt.title(f"FFT of Signal - Grad_{self.param_Gradient}")
         recon = np.fft.fftshift(np.fft.ifft(np.fft.fftshift(rxd)))
-        plt.grid(True, color='#333')        
+        plt.grid(True, color="#333")
         plt.plot(np.abs(recon))
         file = open(self.get_working_folder() + "/other/fft.plot", "wb")
         fig = plt.gcf()
@@ -209,8 +212,9 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         result.description = "FFT of ADC signal"
         result.type = "plot"
         result.autoload_viewer = 2
+        result.primary = True
         result.file_path = "other/fft.plot"
-        scan_task.results.append(result)
+        scan_task.results.insert(1, result)
 
         # Save the raw data file
         log.info("Saving rawdata, sequence " + self.get_name())

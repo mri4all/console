@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1154</width>
-    <height>440</height>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,12 +26,12 @@
     <string/>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>19</x>
      <y>15</y>
-     <width>468</width>
+     <width>546</width>
      <height>483</height>
     </rect>
    </property>
@@ -63,7 +63,7 @@
        <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
-          <width>100</width>
+          <width>80</width>
           <height>0</height>
          </size>
         </property>
@@ -120,9 +120,12 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>13</width>
+        <width>10</width>
         <height>20</height>
        </size>
       </property>
@@ -165,7 +168,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Base_Resolution</string>
+         <string>Base Resolution</string>
         </property>
        </widget>
       </item>
@@ -185,7 +188,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>BW</string>
+         <string>Bandwidth</string>
         </property>
        </widget>
       </item>
@@ -205,7 +208,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Gradient</string>
+         <string>Gradient Direction</string>
         </property>
        </widget>
       </item>
@@ -255,6 +258,15 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>TESpinBox</tabstop>
+  <tabstop>TRSpinBox</tabstop>
+  <tabstop>NSA_SpinBox</tabstop>
+  <tabstop>FOV_SpinBox</tabstop>
+  <tabstop>Base_Resolution_SpinBox</tabstop>
+  <tabstop>BW_SpinBox</tabstop>
+  <tabstop>Gradient_ComboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

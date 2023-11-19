@@ -263,7 +263,9 @@ class ExaminationWindow(QMainWindow):
 
         self.statusLabel = QLabel()
         self.statusbar.addPermanentWidget(self.statusLabel, 100)
-        self.statusLabel.setStyleSheet("QLabel:hover { background-color: none; }")
+        self.statusLabel.setStyleSheet(
+            "QLabel:hover { background-color: none; } QLabel { margin-left: 12px; }"
+        )
 
         self.update_size()
 
@@ -385,6 +387,7 @@ class ExaminationWindow(QMainWindow):
                 # self.shim_dlg.canvas.axes.up
 
     def update_monitor_status(self):
+        self.monitorTimer.stop()
         self.sync_queue_widget(False)
 
         new_status_message = ""
@@ -413,6 +416,7 @@ class ExaminationWindow(QMainWindow):
             if ui_runtime.status_last_completed_scan:
                 # Autoload the results into the viewers
                 self.autoload_results_in_viewer(ui_runtime.status_last_completed_scan)
+        self.monitorTimer.start(100)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.queueWidget:
@@ -421,6 +425,7 @@ class ExaminationWindow(QMainWindow):
                     menu = QMenu()
                     menu.addAction("Duplicate", self.duplicate_scan_clicked)
                     menu.addAction("Rename...", self.rename_scan_clicked)
+                    menu.addAction("Delete", self.delete_sequence_clicked)
                     menu.addSeparator()
                     menu.addAction("Save to browser...")
                     menu.addSeparator()
@@ -794,6 +799,7 @@ class ExaminationWindow(QMainWindow):
             return
 
         # Ask the sequence to insert its UI into the first tab of the parameter widget
+        self.sequenceResolutionLabel.setText("")
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
         ui_runtime.editor_sequence_instance.init_ui(
             sequence_ui_container, self.sequenceResolutionLabel
@@ -1067,14 +1073,21 @@ class ExaminationWindow(QMainWindow):
             log.error("Invalid scan queue index selected")
             return
 
+        # Update the scan queue list to ensure that the job can still be renamed at this time
+        ui_runtime.update_scan_queue_list()
+        scan_entry = ui_runtime.get_scan_queue_entry(index)
+        if not scan_entry:
+            log.warning("Invalid scan queue index selected for renaming")
+            return
+        if not (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
+            # Jobs can only be renamed if they have not been scanned yet
+            return
+
         current_name = ""
         if not ui_runtime.editor_active:
-            # Update the scan queue list to ensure that the job can still be renamed at this time
-            ui_runtime.update_scan_queue_list()
-            scan_entry = ui_runtime.get_scan_queue_entry(index)
-            if not scan_entry:
-                log.warning("Invalid scan queue index selected")
-                return
             current_name = scan_entry.protocol_name
         else:
             current_name = ui_runtime.editor_scantask.protocol_name
@@ -1143,9 +1156,9 @@ class ExaminationWindow(QMainWindow):
             log.error("Failed to duplicate scan")
             # TODO: Show error message
             return
-
+       
         ui_runtime.get_scan_queue_entry(
-            index + 1
+            len(ui_runtime.scan_queue_list)-1
         ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)
@@ -1210,6 +1223,8 @@ class ExaminationWindow(QMainWindow):
                 self.viewer2.view_data(result_path, result_item.type, scan_task)
             elif result_item.autoload_viewer == 3:
                 self.viewer3.view_data(result_path, result_item.type, scan_task)
+            elif result_item.autoload_viewer == 0:
+                continue
             else:
                 log.warning("Invalid target viewer provided")
 

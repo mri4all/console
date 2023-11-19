@@ -44,37 +44,38 @@ def pypulseq_tse3D(
     TE = inputs["TE"] / 1000
     ETL = inputs["ETL"]
     fovx = inputs["FOV"] / 1000
-    fovy = fovx
-    fovz = fovx  # TODO: add on UI
+    fovy = inputs["FOV"] / 1000
+    # DEBUG! TODO: Expose FOV in Z on UI
+    fovz = inputs["FOV"] / 1000 / 3
     Nx = inputs["Base_Resolution"]
-    Ny = Nx
-    Nz = 28  # TODO: add on UI
+    Ny = inputs["Base_Resolution"]
+    Nz = inputs["Slices"]
     dim0 = Ny
     dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
     num_averages = inputs["NSA"]
-    Orientation = inputs["Orientation"]
+    orientation = inputs["Orientation"]
     visualize = inputs["view_traj"]
 
     BW = inputs["BW"]  # 20e3
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
-    #traj = "center_out"  # TODO: add linear, hybrid trajectory
+    # traj = "center_out"  # TODO: add linear, hybrid trajectory
     traj = "linear_up"  # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
     ch1 = "y"
     ch2 = "z"
-    if Orientation == "Axial":
+    if orientation == "Axial":
         ch0 = "x"
         ch1 = "y"
         ch2 = "z"
-    elif Orientation == "Sagittal":
+    elif orientation == "Sagittal":
         ch0 = "x"
         ch1 = "z"
         ch2 = "y"
-    elif Orientation == "Coronal":
+    elif orientation == "Coronal":
         ch0 = "y"
         ch1 = "z"
         ch2 = "x"
@@ -92,10 +93,21 @@ def pypulseq_tse3D(
     # SET SYSTEM CONFIG TODO --> ?
     # ======
 
+    # system = pp.Opts(
+    #     max_grad=12,
+    #     grad_unit="mT/m",
+    #     max_slew=25,
+    #     slew_unit="T/m/s",
+    #     rf_ringdown_time=20e-6,
+    #     rf_dead_time=100e-6,
+    #     rf_raster_time=1e-6,
+    #     adc_dead_time=20e-6,
+    # )
+
     system = pp.Opts(
-        max_grad=12,
+        max_grad=80,
         grad_unit="mT/m",
-        max_slew=25,
+        max_slew=4000,
         slew_unit="T/m/s",
         rf_ringdown_time=20e-6,
         rf_dead_time=100e-6,
@@ -149,6 +161,7 @@ def pypulseq_tse3D(
     phase_areas1 = pe_order[:, 1] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
+    # gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
     gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
 
     # ======
@@ -173,9 +186,11 @@ def pypulseq_tse3D(
     # ) * seq.grad_raster_time
 
     tau2 = (
-        math.ceil((TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx))) / seq.grad_raster_time)
+        math.ceil(
+            (TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx)))
+            / seq.grad_raster_time
+        )
     ) * seq.grad_raster_time
-
 
     delay_TR = (
         math.ceil(

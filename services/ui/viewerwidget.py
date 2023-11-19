@@ -64,6 +64,9 @@ class ViewerWidget(QWidget):
         self.layout().setSpacing(0)
         self.set_empty_viewer()
 
+    # def __del__(self):
+    #     self.clear_view()
+
     def clear_view(self):
         if self.widget:
             widget_to_delete = self.widget

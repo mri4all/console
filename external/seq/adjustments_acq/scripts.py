@@ -6,20 +6,26 @@
 
 import sys
 import os
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import scipy.signal as sig
 from operator import itemgetter
+
 import external.seq.adjustments_acq.config as cfg  # pylint: disable=import-error
 import external.marcos_client.experiment as ex  # pylint: disable=import-error
 from external.flocra_pulseq.interpreter import (
     PSInterpreter,
 )  # pylint: disable=import-error
+
 from common.constants import *
-from pathlib import Path
+import common.logger as logger
+
+log = logger.get_logger()
 
 
+# TODO: Remove references to cfg class from here
 def run_pulseq(
     seq_file,
     rf_center=cfg.LARMOR_FREQ,
@@ -40,7 +46,8 @@ def run_pulseq(
     expt=None,
     plot_instructions=False,
     gui_test=False,
-    case_path="/tmp"
+    case_path="/tmp",
+    raw_filename="",
 ):
     """
     Interpret pulseq .seq file through flocra_pulseq
@@ -66,17 +73,18 @@ def run_pulseq(
         numpy.ndarray: Rx data array
         float: (us) Rx period
     """
+    log.info(f"Pulseq scan with Larmor {rf_center}")
 
-    print("Running flocra_pulseq using following parameters:")
-    print(f"rf_center={rf_center}")
-    print(f"rf_max={rf_max}")
-    print(f"gx_max={gx_max}")
-    print(f"gy_max={gy_max}")
-    print(f"gz_max={gz_max}")
-    print(f"shim_x={shim_x}")
-    print(f"shim_y={shim_y}")
-    print(f"shim_z={shim_z}")
-    print(f"Seq file={seq_file}")
+    log.debug("Running flocra_pulseq using following parameters:")
+    log.debug(f"rf_center={rf_center}")
+    log.debug(f"rf_max={rf_max}")
+    log.debug(f"gx_max={gx_max}")
+    log.debug(f"gy_max={gy_max}")
+    log.debug(f"gz_max={gz_max}")
+    log.debug(f"shim_x={shim_x}")
+    log.debug(f"shim_y={shim_y}")
+    log.debug(f"shim_z={shim_z}")
+    log.debug(f"Seq file={seq_file}")
 
     # Convert .seq file to machine dict
     psi = PSInterpreter(
@@ -93,12 +101,12 @@ def run_pulseq(
     instructions, param_dict = psi.interpret(seq_file)
 
     # Shim
-    print("Running shim function...")
+    log.debug("Running shim function...")
     instructions = shim(instructions, (shim_x, shim_y, shim_z))
 
     # Initialize experiment class
     if expt is None:
-        print("Initializing marcos client...")
+        log.debug("Initializing marcos client...")
         expt = ex.Experiment(
             lo_freq=rf_center,
             rx_t=param_dict["rx_t"],
@@ -135,7 +143,7 @@ def run_pulseq(
     # Load instructions
     expt.add_flodict(instructions)
 
-    print("Running instructions...")
+    log.debug("Running instructions...")
 
     # Run experiment
     rxd, msgs = expt.run()
@@ -149,29 +157,29 @@ def run_pulseq(
 
     # Announce completion
     nSamples = param_dict["readout_number"]
-    print(f"Finished -- read {nSamples} samples")
+    log.debug(f"Finished -- read {nSamples} samples")
+
+    if not raw_filename:
+        from datetime import datetime
+        now = datetime.now()
+        raw_filename = now.strftime("%y-%d-%m %H_%M_%S")
 
     # Optionally save rx output array as .npy file
     if save_np:
-        from datetime import datetime
-        now = datetime.now()
-        current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{current_time}.npy"
+        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{raw_filename}.npy"
         if os.path.exists(filename):
             os.remove(filename)
         np.save(filename, rxd["rx0"])
 
     # Optionally save rx output array as .mat file
     if save_mat:
-        from datetime import datetime
-        now = datetime.now()
-        current_time = now.strftime("%y-%d-%m %H_%M_%S")
-        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{current_time}.mat"
+        filename = Path(case_path) / mri4all_taskdata.RAWDATA / f"{raw_filename}.mat"
         if os.path.exists(filename):
             os.remove(filename)
         sio.savemat(filename, {"flocra_data": rxd["rx0"]})
 
     # Very dangerous to call the destructor here!
+    # TODO: Check why this is needed and potential impact
     expt.__del__()
 
     # Return rx output array and rx period

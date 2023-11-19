@@ -24,3 +24,4 @@ def reading_json_parameter():
 def writing_json_parameter(config_data):
     with open(path, "w") as outFile:
         outFile.write(json.dumps(config_data.model_dump(mode="json"), indent=4))
+        outFile.flush()

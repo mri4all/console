@@ -20,6 +20,10 @@ from sequences import SequenceBase
 from common.types import ScanTask
 from common.constants import *
 
+from common.ipc import Communicator
+
+ipc_comm = Communicator(Communicator.ACQ)
+
 
 def larmor_step_search(
     seq_file=Path(mri4all_paths.DATA_ACQ) / "se_6.seq",
@@ -90,6 +94,9 @@ def larmor_step_search(
     # Repeat for each frequency after the first
     for i in range(1, steps):
         print(f"{swept_freqs[i]:.4f} MHz ({i}/{steps})")
+        ipc_comm.send_status(
+            f"Adjusting frequency:  Searching {swept_freqs[i]:.4f} MHz ({i}/{steps})"
+        )
         rx_arr[:, i], _ = scr.run_pulseq(
             seq_file,
             rf_center=swept_freqs[i],
@@ -110,7 +117,7 @@ def larmor_step_search(
         snr_array = []
         signal_index = 0
         noise_index = 0
-        for index in range(0, rxd.shape[0]):
+        for index in range(0, rxd.shape[0] - 1):
             if index > rxd.shape[0] / 4 and index < (rxd.shape[0] - rxd.shape[0] / 4):
                 signal_array[signal_index, i] = rx_arr[index, i]
                 signal_index += 1
@@ -118,7 +125,7 @@ def larmor_step_search(
                 noise_array[noise_index, i] = rx_arr[index, i]
                 noise_index += 1
         snr = np.mean(np.abs(signal_array[:, i])) / np.std(np.abs(noise_array[:, i]))
-        print("SNR= " + str(snr))
+        print("SNR = " + str(snr))
         snr_array.append(snr)
 
     # Find the frequency data with the largest maximum absolute value
@@ -205,11 +212,14 @@ def larmor_cal(
         return -1
 
     # Load saved spin echo train seq file that has the right number of echoes
-    print(os.getcwd())
+    # print(os.getcwd())
     # seq_file = cfg.MGH_PATH + f'/cal_seq_files/se_{echo_count}.seq'
 
     # Search for the right number of iterations
     for i in range(iterations):
+        ipc_comm.send_status(
+            f"Adjusting frequency:  Optimizing {larmor_freq:.5f} MHz ({i + 1}/{iterations})"
+        )
         print(f"Iteration {i + 1}/{iterations}: {larmor_freq:.5f} MHz")
         print(seq_file)
         # Run the experiment from seq file
@@ -269,7 +279,7 @@ def larmor_cal(
         seq_file,
         rf_center=larmor_freq,
         tx_t=1,
-        grad_t=1,
+        grad_t=10,
         tx_warmup=100,
         shim_x=cfg.SHIM_X,
         shim_y=cfg.SHIM_Y,
@@ -1212,16 +1222,17 @@ def run_sequence_test(sequence_name: str) -> bool:
     return True
 
 
-def load_plot_in_ui(working_folder=".", file_name="default_plot_name", fig=[]):
+def load_plot_in_ui(
+    working_folder=".",
+    file_name="default_plot_name",
+    fig=[],
+):
     file = open(working_folder + "/other/" + file_name + ".plot", "wb")
     pickle.dump(fig, file)
     file.close()
     plot_result = ResultItem()
     plot_result.name = file_name
-    plot_result.description = "This is just a plot"
+    plot_result.description = ""
     plot_result.type = "plot"
-    plot_result.primary = True
-    plot_result.autoload_viewer = 1
     plot_result.file_path = "/other/" + file_name + ".plot"
-
     return plot_result

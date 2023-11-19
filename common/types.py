@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from typing_extensions import Literal
 from pydantic import BaseModel
 import matplotlib.pyplot as plt
@@ -74,6 +74,8 @@ class ProcessingConfig(BaseModel):
     trajectory: TrajectoryType = "cartesian"
     recon_mode: str = ""
     denoising_strength: int = 0
+    dim: Optional[int] = None
+    dim_size: Optional[str] = None
 
 
 ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]

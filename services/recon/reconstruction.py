@@ -35,6 +35,11 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
         time.sleep(1)
         return True
 
+    if task.processing.recon_mode == "basic3d":
+        log.info("Running Basic 3D reconstruction")
+        run_reconstruction_basic3d(folder, task)
+        return True
+
     if task.processing.trajectory == "cartesian":
         log.info("Running Cartesian reconstruction")
         run_reconstruction_cartesian(folder, task)
@@ -42,6 +47,28 @@ def run_reconstruction(folder: str, task: ScanTask) -> bool:
 
     log.error(f"Unknown trajectory type: {task.processing.trajectory}")
     return False
+
+
+def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
+    if task.processing.dim != 3:
+        log.error(
+            "Unable to perform reconstruction. This algorithm only support 3 dimensions"
+        )
+        return False
+
+    kData = np.load(
+        folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.RAWDATA
+    )
+
+    dims = task.processing.dim_size.split(",")
+
+    kData = np.reshape(kData, (int(dims[1]), int(dims[0]), int(dims[2])))
+    kData = np.transpose(kData, axes=[2, 0, 1])
+    log.info(f"Matrix size = {kData.shape}")
+    fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kData)))
+    DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
+
+    return True
 
 
 def run_reconstruction_cartesian(folder: str, task: ScanTask):

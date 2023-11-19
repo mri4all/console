@@ -23,17 +23,56 @@ log = logger.get_logger()
 
 
 class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
+    # Sequence parameters
+    param_TE: int = 10
+    param_ETL: int = 8
+
     @classmethod
     def get_readable_name(self) -> str:
         return "RF Turbo Spin-Echo"
 
     def setup_ui(self, widget) -> bool:
-        """
-        Returns the user interface of the sequence.
-        """
-        # seq_path = os.path.dirname(os.path.abspath(__file__))
-        # uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+        seq_path = os.path.dirname(os.path.abspath(__file__))
+        uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
         return True
+
+    def get_parameters(self) -> dict:
+        return {
+            "TE": self.param_TE,
+            "ETL": self.param_ETL,
+        }
+
+    @classmethod
+    def get_default_parameters(self) -> dict:
+        return {
+            "TE": 10,
+            "ETL": 8,
+        }
+
+    def set_parameters(self, parameters, scan_task) -> bool:
+        self.problem_list = []
+        try:
+            self.param_TE = parameters["TE"]
+            self.param_ETL = parameters["ETL"]
+        except:
+            self.problem_list.append("Invalid parameters provided")
+            return False
+        return self.validate_parameters(scan_task)
+
+    def write_parameters_to_ui(self, widget) -> bool:
+        widget.TESpinBox.setValue(self.param_TE)
+        widget.ETLSpinBox.setValue(self.param_ETL)
+        return True
+
+    def read_parameters_from_ui(self, widget, scan_task) -> bool:
+        self.problem_list = []
+        self.param_TE = widget.TESpinBox.value()
+        self.param_ETL = widget.ETLSpinBox.value()
+        self.validate_parameters(scan_task)
+        return self.is_valid()
+
+    def validate_parameters(self, scan_task) -> bool:
+        return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
         log.info("Calculating sequence " + self.get_name())
@@ -41,7 +80,14 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         scan_task.processing.recon_mode = "bypass"
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
-        pypulseq_rftse(inputs={}, check_timing=True, output_file=self.seq_file_path)
+        pypulseq_rftse(
+            inputs={
+                "TE": self.param_TE,
+                "ETL": self.param_ETL,
+            },
+            check_timing=True,
+            output_file=self.seq_file_path,
+        )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
@@ -49,7 +95,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
-        
+
         # run_sequence_test("prescan_frequency")
 
         # reading configuration data from config.json
@@ -73,7 +119,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
 
         plt.clf()
         plt.title("ADC Signal")
-        plt.grid(True, color='#333')
+        plt.grid(True, color="#333")
         plt.plot(np.abs(rxd))
         # if self.param_debug_plot:
         #     plt.show()
@@ -92,39 +138,24 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
         result.file_path = "other/rf_tse.plot"
         scan_task.results.append(result)
 
-
         log.info("Done running sequence " + self.get_name())
         return True
 
 
 def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
-    if len(inputs) == 0:
-        # ======
-        # DEFAULTS              TODO: MOVE DEFAULTS TO UI
-        # ======
-
-        # reading configuration data from config.json
-        # configuration_data=reading_json_parameter(file_name='config.json')
-
-        LARMOR_FREQ = cfg.LARMOR_FREQ
-        RF_MAX = cfg.RF_MAX
-        RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-        alpha1 = 90  # flip angle
-        alpha1_duration = 100e-6  # pulse duration
-        alpha2 = 180  # refocusing flip angle
-        alpha2_duration = 100e-6  # pulse duration
-        TE = 54e-3
-        TR = 2000e-3
-        num_averages = 1
-        adc_num_samples = 4096
-        adc_duration = 6.4e-3
-        ETL = 16
-    else:
-        LARMOR_FREQ = inputs["LARMOR_FREQ"]
-        RF_MAX = inputs["RF_MAX"]
-        RF_PI2_FRACTION = inputs["RF_PI2_FRACTION"]
-        TR = inputs["TR"]
-        TE = inputs["TE"]
+    LARMOR_FREQ = cfg.LARMOR_FREQ
+    RF_MAX = cfg.RF_MAX
+    RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
+    alpha1 = 90  # flip angle
+    alpha1_duration = 100e-6  # pulse duration
+    alpha2 = 180  # refocusing flip angle
+    alpha2_duration = 100e-6  # pulse duration
+    TE = inputs["TE"] / 1000  # TE = 54e-3
+    TR = 2000e-3
+    num_averages = 1
+    adc_num_samples = 4096
+    adc_duration = 6.4e-3
+    ETL = inputs["ETL"]
 
     # ======
     # INITIATE SEQUENCE

@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
-import math
-import numpy as np
+import datetime
 
 from PyQt5 import uic
 
@@ -19,13 +18,14 @@ log = logger.get_logger()
 
 class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
-    param_TE: int = 70
+    param_TE: int = 50
     param_TR: int = 250
     param_ETL: int = 2
     param_NSA: int = 1
     param_Orientation: str = "Axial"
-    param_FOV: int = 140
-    param_Base_Resolution: int = 70
+    param_FOV: int = 200
+    param_Base_Resolution: int = 64
+    param_Slices: int = 8
     param_BW: int = 32000
     param_Trajectory: str = "Cartesian"
     param_PE_Ordering: str = "Center_out"
@@ -39,7 +39,37 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
+
+        widget.TRSpinBox.valueChanged.connect(self.update_info)
+        widget.Base_Resolution_SpinBox.valueChanged.connect(self.update_info)
+        widget.Slices_SpinBox.valueChanged.connect(self.update_info)
+        widget.ETL_SpinBox.valueChanged.connect(self.update_info)
         return True
+
+    def update_info(self):
+        duration_sec = int(
+            self.main_widget.TRSpinBox.value()
+            * self.main_widget.Base_Resolution_SpinBox.value()
+            * self.main_widget.Slices_SpinBox.value()
+            / self.main_widget.ETL_SpinBox.value()
+            / 1000
+        )
+        duration = str(datetime.timedelta(seconds=duration_sec))
+
+        res_slice = (
+            self.main_widget.FOV_SpinBox.value()
+            / self.main_widget.Slices_SpinBox.value()
+            * 10
+        )
+        res_inplane = (
+            self.main_widget.FOV_SpinBox.value()
+            / self.main_widget.Base_Resolution_SpinBox.value()
+            * 10
+        )
+
+        self.show_ui_info_text(
+            f"TA: {duration} sec       Voxel Size: {res_inplane:.2f} x {res_inplane:.2f} x {res_slice:.2f} mm"
+        )
 
     def get_parameters(self) -> dict:
         return {
@@ -50,6 +80,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             "Orientation": self.param_Orientation,
             "FOV": self.param_FOV,
             "Base_Resolution": self.param_Base_Resolution,
+            "Slices": self.param_Slices,
             "BW": self.param_BW,
             "Trajectory": self.param_Trajectory,
             "PE_Ordering": self.param_PE_Ordering,
@@ -62,18 +93,19 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self,
     ) -> dict:
         return {
-            "TE": 70,
+            "TE": 20,
             "TR": 250,
-            "ETL": 2,
+            "ETL": 1,
             "NSA": 1,
             "Orientation": "Axial",
-            "FOV": 140,
-            "Base_Resolution": 70,
+            "FOV": 20,
+            "Base_Resolution": 32,
+            "Slices": 8,
             "BW": 32000,
             "Trajectory": "Cartesian",
-            "PE_Ordering": "Center_out",
-            "Slice_Ordering": "Center_out",
-            "view_traj": True,
+            "PE_Ordering": "Linear_up",
+            "Slice_Ordering": "Linear_up",
+            "view_traj": False,
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -86,6 +118,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_Orientation = parameters["Orientation"]
             self.param_FOV = parameters["FOV"]
             self.param_Base_Resolution = parameters["Base_Resolution"]
+            self.param_Slices = parameters["Slices"]
             self.param_BW = parameters["BW"]
             self.param_Trajectory = parameters["Trajectory"]
             self.param_PE_Ordering = parameters["PE_Ordering"]
@@ -104,6 +137,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         widget.Orientation_ComboBox.setCurrentText(self.param_Orientation)
         widget.FOV_SpinBox.setValue(self.param_FOV)
         widget.Base_Resolution_SpinBox.setValue(self.param_Base_Resolution)
+        widget.Slices_SpinBox.setValue(self.param_Slices)
         widget.BW_SpinBox.setValue(self.param_BW)
         widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
         widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
@@ -120,6 +154,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_Orientation = widget.Orientation_ComboBox.currentText()
         self.param_FOV = widget.FOV_SpinBox.value()
         self.param_Base_Resolution = widget.Base_Resolution_SpinBox.value()
+        self.param_Slices = widget.Slices_SpinBox.value()
         self.param_BW = widget.BW_SpinBox.value()
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
         self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
@@ -136,7 +171,9 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     def calculate_sequence(self, scan_task) -> bool:
         log.info("Calculating sequence " + self.get_name())
 
-        scan_task.processing.recon_mode = "bypass"
+        scan_task.processing.recon_mode = "basic3d"
+        scan_task.processing.dim = 3
+        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution}"
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
@@ -149,6 +186,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                 "FOV": self.param_FOV,
                 "Orientation": self.param_Orientation,
                 "Base_Resolution": self.param_Base_Resolution,
+                "Slices": self.param_Slices,
                 "BW": self.param_BW,
                 "Trajectory": self.param_Trajectory,
                 "PE_Ordering": self.param_PE_Ordering,
@@ -197,7 +235,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             save_mat=False,
             save_msgs=False,
             gui_test=False,
-            case_path=self.get_working_folder() 
+            case_path=self.get_working_folder(),
+            raw_filename="raw",
         )
 
         log.info("Done running sequence " + self.get_name())

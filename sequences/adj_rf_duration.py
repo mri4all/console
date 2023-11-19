@@ -20,7 +20,7 @@ log = logger.get_logger()
 class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Adjust Radio Frequency Duration"
+        return "Adjust RF Duration"
 
     def calculate_sequence(self) -> bool:
         points = 25  # number of steps, to be added as a parameter
