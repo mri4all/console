@@ -1,11 +1,5 @@
-from datetime import datetime
-from multiprocessing import set_start_method
-import os
-import sys
-import threading
-import time
+from datetime import datetime, timedelta
 import json
-from typing import List
 
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -262,10 +256,20 @@ class ExaminationWindow(QMainWindow):
         self.sequenceResolutionLabel.setVisible(False)
 
         self.statusLabel = QLabel()
-        self.statusbar.addPermanentWidget(self.statusLabel, 100)
+        self.statusbar.addPermanentWidget(self.statusLabel, 0)
         self.statusLabel.setStyleSheet(
-            "QLabel:hover { background-color: none; } QLabel { margin-left: 12px; }"
+            "QLabel:hover { background-color: none; } QLabel { margin-left: 12px; margin-right: 4px; }"
         )
+        self.statusProgress = QProgressBar()
+        self.statusProgress.setMinimum(0)
+        self.statusProgress.setMaximum(100)
+        self.statusbar.addPermanentWidget(self.statusProgress, 0)
+        self.statusProgress.setStyleSheet(
+            "QProgressBar:hover { background-color: #040919; } QProgressBar::chunk { background-color: #262C44 }"
+        )
+        dummy_label = QLabel()
+        dummy_label.setStyleSheet("QLabel:hover { background-color: none; }")
+        self.statusbar.addPermanentWidget(dummy_label, 100)
 
         self.update_size()
 
@@ -385,6 +389,20 @@ class ExaminationWindow(QMainWindow):
                 self.shimSignal.emit(msg_value.data)
                 # self.shim_dlg.canvas.axes.plot([1, 2, 3, 4, 5, 6])  # [msg_value.data])
                 # self.shim_dlg.canvas.axes.up
+        elif isinstance(msg_value, ipc.messages.AcqDataMessage):
+            try:
+                ui_runtime.status_start_time = datetime.fromisoformat(
+                    msg_value.start_time
+                )
+                ui_runtime.status_expected_duration_sec = (
+                    msg_value.expected_duration_sec
+                )
+                ui_runtime.status_disable_statustimer = msg_value.disable_statustimer
+                ui_runtime.status_received_acqdata = True
+            except Exception as e:
+                ui_runtime.status_received_acqdata = False
+                log.warning("Received invalid acqdata message")
+                log.exception(e)
 
     def update_monitor_status(self):
         self.monitorTimer.stop()
@@ -393,11 +411,36 @@ class ExaminationWindow(QMainWindow):
         new_status_message = ""
 
         if ui_runtime.status_acq_active:
-            new_status_message = "Running scan..."
+            if ui_runtime.status_received_acqdata:
+                current_duration = int(
+                    (datetime.now() - ui_runtime.status_start_time).total_seconds()
+                )
+                if ui_runtime.status_expected_duration_sec <= 0:
+                    if not ui_runtime.status_disable_statustimer:
+                        new_status_message = f"Running scan...  ({str(timedelta(seconds=current_duration))})"
+                    self.statusProgress.setVisible(False)
+                else:
+                    current_percent = int(
+                        100 * current_duration / ui_runtime.status_expected_duration_sec
+                    )
+                    if current_percent > 100:
+                        current_percent = 100
+                    if not ui_runtime.status_disable_statustimer:
+                        new_status_message = f"Running scan...  ({str(timedelta(seconds=current_duration))})"
+                    self.statusProgress.setValue(current_percent)
+                    self.statusProgress.setVisible(True)
+            else:
+                new_status_message = "Running scan..."
         elif ui_runtime.status_recon_active:
             new_status_message = "Reconstruction data..."
+            ui_runtime.status_received_acqdata = False
+            self.statusProgress.setValue(0)
+            self.statusProgress.setVisible(False)
         else:
             new_status_message = "Scanner ready"
+            ui_runtime.status_received_acqdata = False
+            self.statusProgress.setValue(0)
+            self.statusProgress.setVisible(False)
 
         # Update the status widget, but only if the scanner status has changed
         if new_status_message != self.scanner_status_message:
@@ -496,9 +539,8 @@ class ExaminationWindow(QMainWindow):
                 not seq.startswith("adj_") or not seq.startswith("prescan_")
             ) or rt.is_debugging_enabled():
                 add_sequence_action = QAction(self)
-                add_sequence_action.setText(
-                    SequenceBase.get_sequence(seq).get_readable_name()
-                )
+                seq_name = SequenceBase.get_sequence(seq).get_readable_name()
+                add_sequence_action.setText(seq_name)
                 add_sequence_action.setProperty("sequence_class", seq)
                 add_sequence_action.triggered.connect(self.add_sequence)
                 self.add_sequence_menu.addAction(add_sequence_action)
@@ -1156,9 +1198,9 @@ class ExaminationWindow(QMainWindow):
             log.error("Failed to duplicate scan")
             # TODO: Show error message
             return
-       
+
         ui_runtime.get_scan_queue_entry(
-            len(ui_runtime.scan_queue_list)-1
+            len(ui_runtime.scan_queue_list) - 1
         ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)

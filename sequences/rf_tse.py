@@ -115,6 +115,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             save_mat=False,
             save_msgs=False,
             gui_test=False,
+            case_path=self.get_working_folder(),
         )
 
         plt.clf()

@@ -71,6 +71,9 @@ def pypulseq_tse3D(
         ch0 = "x"
         ch1 = "y"
         ch2 = "z"
+        # ch0 = "y"
+        # ch1 = "x"
+        # ch2 = "z"
     elif orientation == "Sagittal":
         ch0 = "x"
         ch1 = "z"
@@ -143,7 +146,7 @@ def pypulseq_tse3D(
         channel=ch0, flat_area=Nx * delta_kx, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
-        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+        num_samples=2 * Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
         channel=ch0, area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
@@ -161,8 +164,7 @@ def pypulseq_tse3D(
     phase_areas1 = pe_order[:, 1] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    # gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
-    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=3 * Nx * delta_kx, system=system)
 
     # ======
     # CALCULATE DELAYS

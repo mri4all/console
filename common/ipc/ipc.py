@@ -51,6 +51,7 @@ class CommunicatorEnvelope(BaseModel):
         ShowDicomMessage,
         IntensityMapResult,
         DoShimMessage,
+        AcqDataMessage,
     ]
     error: bool = False
 

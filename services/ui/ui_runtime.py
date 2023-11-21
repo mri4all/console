@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # type: ignore
@@ -49,6 +50,11 @@ status_recon_active = False
 status_last_completed_scan = ""
 status_viewer_last_autoload_scan = ""
 
+status_received_acqdata = False
+status_start_time: datetime = datetime.datetime.now()
+status_expected_duration_sec: int = -1
+status_disable_statustimer: bool = False
+
 
 def get_screen_size() -> Tuple[int, int]:
     screen = QDesktopWidget().screenGeometry()
@@ -83,6 +89,10 @@ def register_patient():
     global exam_information
     global status_last_completed_scan
     global status_viewer_last_autoload_scan
+    global status_start_time
+    global status_expected_duration_sec
+    global status_disable_statustimer
+    global status_received_acqdata
 
     if not queue.clear_folders():
         log.error("Failed to clear data folders. Cannot start exam.")
@@ -100,6 +110,11 @@ def register_patient():
     stacked_widget.setCurrentIndex(1)
     status_last_completed_scan = -1
     status_viewer_last_autoload_scan = -1
+
+    status_received_acqdata = False
+    status_start_time = datetime.datetime.now()
+    status_expected_duration_sec = -1
+    status_disable_statustimer = False
 
     log.info(f"Registered patient {patient_information.get_full_name()}")
     log.info(f"Started exam {exam_information.id}")

@@ -32,6 +32,10 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     def get_readable_name(self) -> str:
         return "RF Spin-Echo"
 
+    @classmethod
+    def get_description(self) -> str:
+        return "Acquisition of a single spin-echo without switching any gradients"
+
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
         uic.loadUi(f"{seq_path}/{self.get_name()}/interface.ui", widget)
@@ -136,6 +140,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             save_mat=False,
             save_msgs=True,
             gui_test=False,
+            case_path=self.get_working_folder(),
         )
         log.info("Pulseq ran, plotting")
 
@@ -149,7 +154,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
 
             plt.clf()
             plt.title("ADC Signal")
-            plt.grid(True, color='#333')
+            plt.grid(True, color="#333")
             plt.plot(np.abs(rxd))
             # if self.param_debug_plot:
             #     plt.show()

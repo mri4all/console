@@ -25,7 +25,7 @@ log = logger.get_logger()
 class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Calibrate B0 shims"
+        return "Calibrate B0 shims  [untested]"
 
     @classmethod
     def get_description(self) -> str:

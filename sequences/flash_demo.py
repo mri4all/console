@@ -24,7 +24,7 @@ class SequenceFlash(PulseqSequence, registry_key=Path(__file__).stem):
 
     @classmethod
     def get_readable_name(self) -> str:
-        return "UI Demo: 2D Flash"
+        return "UI Demo: 2D Flash  [dummy]"
 
     @classmethod
     def get_description(self) -> str:

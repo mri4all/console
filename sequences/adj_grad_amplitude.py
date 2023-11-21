@@ -16,7 +16,7 @@ log = logger.get_logger()
 class CalGradAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Calibrate Gradients"
+        return "Calibrate Gradients  [untested]"
 
     @classmethod
     def get_description(self) -> str:

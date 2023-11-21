@@ -60,6 +60,13 @@ class DoShimMessage(FifoMessageType):
     data: Optional[List[Any]] = None
 
 
+class AcqDataMessage(FifoMessageType):
+    type: Literal["acq_data"] = "acq_data"
+    start_time: str
+    expected_duration_sec: int = 0
+    disable_statustimer: bool = False
+
+
 class Helper:
     def show_dicoms(self, dicoms: List[str]):
         return self._query(ShowDicomMessage(dicom_files=dicoms))
@@ -67,17 +74,17 @@ class Helper:
     def do_shim(self, new_user_values, new_signal, signal_tick_mul=4, values_tick=0.1):
         log = logger.get_logger()
         self.shim_start()
-        
+
         temp_folder = "/tmp/" + helper_common.generate_uid()
-    
+
         try:
             os.mkdir(temp_folder)
-            os.mkdir(temp_folder+'/other')
-            os.mkdir(temp_folder+'/dicom')
-            os.mkdir(temp_folder+'/rawdata')
+            os.mkdir(temp_folder + "/other")
+            os.mkdir(temp_folder + "/dicom")
+            os.mkdir(temp_folder + "/rawdata")
         except:
             log.error(f"Could not create temporary folder {temp_folder}.")
-            
+
         n = 0
         while True:
             result = self.shim_get()
@@ -107,7 +114,7 @@ class Helper:
         ylabel: str = "",
         title: str = "",
         data: Union[List[List[Any]], List[List[List[Any]]]],
-        fmt: Union[str, list[str]] = []
+        fmt: Union[str, list[str]] = [],
     ):
         if not plot:
             plot = IntensityMapResult(
@@ -123,7 +130,7 @@ class Helper:
         ylabel: str = "",
         title: str = "",
         data: Union[List[List[float]], List[float]],
-        fmt: Union[str, list[str]] = []
+        fmt: Union[str, list[str]] = [],
     ):
         if not plot:
             plot = TimeSeriesResult(
@@ -180,3 +187,17 @@ class Helper:
 
     def _query(self, x: FifoMessageType):
         pass
+
+    def send_acq_data(
+        self,
+        start_time: str,
+        expected_duration_sec: int = -1,
+        disable_statustimer: bool = False,
+    ):
+        return self._send(
+            AcqDataMessage(
+                start_time=start_time,
+                expected_duration_sec=expected_duration_sec,
+                disable_statustimer=disable_statustimer,
+            )
+        )

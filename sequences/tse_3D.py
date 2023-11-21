@@ -12,8 +12,14 @@ from sequences import PulseqSequence
 from sequences.common import make_tse_3D
 import common.logger as logger
 from common.types import ResultItem
+import common.helper as helper
 
 log = logger.get_logger()
+
+
+from common.ipc import Communicator
+
+ipc_comm = Communicator(Communicator.ACQ)
 
 
 class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
@@ -35,6 +41,10 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
         return "3D Turbo Spin-Echo"
+
+    @classmethod
+    def get_description(self) -> str:
+        return "volumetric 3D TSE acquisition with Cartesian sampling"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -173,7 +183,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         scan_task.processing.recon_mode = "basic3d"
         scan_task.processing.dim = 3
-        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution}"
+        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution*2}"
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
@@ -220,6 +230,16 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
+
+        expected_duration_sec = int(
+            self.param_TR
+            * self.param_Base_Resolution
+            * self.param_Slices
+            / self.param_ETL
+            / 1000
+        )
+
+        ipc_comm.send_acq_data(helper.get_datetime(), expected_duration_sec, False)
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,

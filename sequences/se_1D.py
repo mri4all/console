@@ -177,6 +177,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
                 save_mat=False,
                 save_msgs=True,
                 gui_test=False,
+                case_path=self.get_working_folder(),
             )
 
         log.info("Done running sequence " + self.get_name())

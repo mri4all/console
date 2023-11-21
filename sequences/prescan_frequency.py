@@ -16,7 +16,7 @@ log = logger.get_logger()
 class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_readable_name(self) -> str:
-        return "Prescan Frequency"
+        return "Prescan Frequency  [untested]"
 
     def calculate_sequence(self, scan_task) -> bool:
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"

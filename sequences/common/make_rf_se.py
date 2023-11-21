@@ -35,6 +35,8 @@ def pypulseq_rfse(
     adc_num_samples = inputs["ADC_samples"]
     adc_duration = inputs["ADC_duration"] / 1e6  # us to s
 
+    # clk_t=1/122.88
+
     # ======
     # INITIATE SEQUENCE
     # ======

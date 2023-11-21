@@ -64,9 +64,22 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
 
     kData = np.reshape(kData, (int(dims[1]), int(dims[0]), int(dims[2])))
     kData = np.transpose(kData, axes=[2, 0, 1])
+    kSpace = kData.copy()
     log.info(f"Matrix size = {kData.shape}")
     fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kData)))
+
     DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
+
+    kSpace = 100 * (kSpace - kSpace.min()) / (kSpace.max() - kSpace.min())
+    DICOM.write_dicom(
+        kSpace,
+        task,
+        folder + "/" + mri4all_taskdata.DICOM,
+        series_offset=1,
+        name="k-Space",
+        primary_result=False,
+        autoload_viewer=2,
+    )
 
     return True
 

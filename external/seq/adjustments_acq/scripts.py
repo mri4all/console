@@ -96,7 +96,7 @@ def run_pulseq(
         gx_max=gx_max,
         gy_max=gy_max,
         gz_max=gz_max,
-        log_file=case_path + "/flocra.log",
+        log_file=case_path + "/flocra",
     )
     instructions, param_dict = psi.interpret(seq_file)
 

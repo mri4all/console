@@ -14,7 +14,16 @@ from common.types import ResultItem
 from common.constants import *
 
 
-def write_dicom(image_ndarray, task, folder):
+def write_dicom(
+    image_ndarray,
+    task,
+    folder,
+    series_offset=0,
+    name="",
+    description="",
+    primary_result=True,
+    autoload_viewer=1,
+):
     """
     Write DICOMS to a specified holder using information from the scan task
 
@@ -25,9 +34,12 @@ def write_dicom(image_ndarray, task, folder):
     """
     ndarray_dims = image_ndarray.shape
     assert len(ndarray_dims) == 3  # Assumes 3D ndarray: H x W x Slices
-    StudyInstanceUID = task.exam.dicom_study_uid
-    SeriesInstanceUID = generate_uid()
-    SeriesNumber = task.scan_number
+    studyInstanceUID = task.exam.dicom_study_uid
+    seriesInstanceUID = generate_uid()
+    # Temporary trick to avoid series collision: multiply scan number by 100 and add offset for addition dicom series
+    # TODO: Needs better solution to keep track of all DICOM series
+    seriesNumber = task.scan_number * 100 + series_offset
+
     instance_counter = 1
     print(f"Writing {ndarray_dims[-1]} DICOMs")
     for slc_id in range(ndarray_dims[-1]):
@@ -37,14 +49,14 @@ def write_dicom(image_ndarray, task, folder):
 
         """ Create and populate the DICOM header """
         dicom_dataset = set_dicom_header(
-            StudyInstanceUID, SeriesInstanceUID, instance_counter, task
+            studyInstanceUID, seriesInstanceUID, instance_counter, task
         )
         dicom_dataset = set_image_information(dicom_dataset, pixel_data)
         dicom_dataset = set_window_width_level(dicom_dataset, pixel_data)
         dicom_dataset.PixelData = pixel_data.tobytes()
         dicom_filename = (
             "series"
-            + str(SeriesNumber).zfill(5)
+            + str(seriesNumber).zfill(5)
             + "#"
             + str(instance_counter).zfill(5)
             + ".dcm"
@@ -55,16 +67,19 @@ def write_dicom(image_ndarray, task, folder):
         instance_counter = instance_counter + 1
 
     result = ResultItem()
-    result.name = "Dicoms for " + task.sequence
-    result.description = "DICOM series for Series" + str(SeriesNumber)
+    result.name = name
+    if not result.name:
+        result.name = "Reconstruction"
+    result.description = description
+    if not result.description:
+        result.description = "DICOM series from sequence " + str(task.sequence)
     result.type = "dicom"
-    result.primary = True
-    result.autoload_viewer = 1
+    result.primary = primary_result
+    result.autoload_viewer = autoload_viewer
     result.file_path = (
-        mri4all_taskdata.DICOM + "/" + "series" + str(SeriesNumber).zfill(5) + "#"
+        mri4all_taskdata.DICOM + "/" + "series" + str(seriesNumber).zfill(5) + "#"
     )
     task.results.append(result)
-
     return
 
 
