@@ -143,6 +143,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
                 "NSA": 1,
                 "ADC_samples": 4096,
                 "ADC_duration": 6400,
+                "FA1": 90,
+                "FA2": 180,
             },
             check_timing=True,
             output_file=self.seq_file_path,

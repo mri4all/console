@@ -60,8 +60,8 @@ def pypulseq_tse3D(
     adc_dwell = 1 / BW
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
-    # traj = "center_out"  # TODO: add linear, hybrid trajectory
-    traj = "linear_up"  # TODO: add linear, hybrid trajectory
+    traj = inputs["Ordering"]
+    # traj = "linear_up"  # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
@@ -146,7 +146,7 @@ def pypulseq_tse3D(
         channel=ch0, flat_area=Nx * delta_kx, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
-        num_samples=2 * Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
         channel=ch0, area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
@@ -209,19 +209,29 @@ def pypulseq_tse3D(
     assert np.all(tau2 >= 0)
     assert np.all(delay_TR >= pp.calc_duration(gx_spoil))
 
+    dummyshots = 5
+
     # ======
     # CONSTRUCT SEQUENCE
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
-        for i in range(n_shots):
+        for i in range(n_shots + dummyshots):
             # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
             # adc.phase_offset = rf_phase / 180 * np.pi
             # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
             # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
+            if i < dummyshots:
+                is_dummyshot = True
+            else:
+                is_dummyshot = False
+
             seq.add_block(rf1)
             for echo in range(ETL):
-                pe_idx = (ETL * i) + echo
+                if is_dummyshot:
+                    pe_idx = 0
+                else:
+                    pe_idx = (ETL * (i - dummyshots)) + echo
                 gy_pre = pp.make_trapezoid(
                     channel=ch1,
                     area=phase_areas0[pe_idx],
@@ -238,7 +248,10 @@ def pypulseq_tse3D(
                 seq.add_block(pp.make_delay(tau1))
                 seq.add_block(rf2)
                 seq.add_block(pp.make_delay(tau2))
-                seq.add_block(gx, adc)
+                if is_dummyshot:
+                    seq.add_block(gx)
+                else:
+                    seq.add_block(gx, adc)
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
                 seq.add_block(

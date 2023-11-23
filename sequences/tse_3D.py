@@ -22,7 +22,7 @@ from common.ipc import Communicator
 ipc_comm = Communicator(Communicator.ACQ)
 
 
-class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
+class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 50
     param_TR: int = 250
@@ -34,9 +34,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     param_Slices: int = 8
     param_BW: int = 32000
     param_Trajectory: str = "Cartesian"
-    param_PE_Ordering: str = "Center_out"
-    param_Slice_Ordering: str = "Center_out"
-    param_view_traj: bool = True
+    param_Ordering: str = "center_out"
+    param_view_traj: bool = False
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -93,8 +92,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             "Slices": self.param_Slices,
             "BW": self.param_BW,
             "Trajectory": self.param_Trajectory,
-            "PE_Ordering": self.param_PE_Ordering,
-            "Slice_Ordering": self.param_Slice_Ordering,
+            "Ordering": self.param_Ordering,
             "view_traj": self.param_view_traj,
         }
 
@@ -113,8 +111,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             "Slices": 8,
             "BW": 32000,
             "Trajectory": "Cartesian",
-            "PE_Ordering": "Linear_up",
-            "Slice_Ordering": "Linear_up",
+            "Ordering": "linear_up",
             "view_traj": False,
         }
 
@@ -131,8 +128,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_Slices = parameters["Slices"]
             self.param_BW = parameters["BW"]
             self.param_Trajectory = parameters["Trajectory"]
-            self.param_PE_Ordering = parameters["PE_Ordering"]
-            self.param_Slice_Ordering = parameters["Slice_Ordering"]
+            self.param_Ordering = parameters["Ordering"]
             self.param_view_traj = parameters["view_traj"]
         except:
             self.problem_list.append("Invalid parameters provided")
@@ -150,9 +146,8 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         widget.Slices_SpinBox.setValue(self.param_Slices)
         widget.BW_SpinBox.setValue(self.param_BW)
         widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
-        widget.PE_Ordering_ComboBox.setCurrentText(self.param_PE_Ordering)
-        widget.Slice_Ordering_ComboBox.setCurrentText(self.param_Slice_Ordering)
-        widget.visualize_traj_CheckBox.setCheckState(self.param_view_traj)
+        widget.Ordering_ComboBox.setCurrentText(self.param_Ordering)
+        widget.visualize_traj_CheckBox.setChecked(self.param_view_traj)
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -167,8 +162,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_Slices = widget.Slices_SpinBox.value()
         self.param_BW = widget.BW_SpinBox.value()
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
-        self.param_PE_Ordering = widget.PE_Ordering_ComboBox.currentText()
-        self.param_Slice_Ordering = widget.Slice_Ordering_ComboBox.currentText()
+        self.param_Ordering = widget.Ordering_ComboBox.currentText()
         self.param_view_traj = widget.visualize_traj_CheckBox.isChecked()
         self.validate_parameters(scan_task)
         return self.is_valid()
@@ -183,7 +177,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         scan_task.processing.recon_mode = "basic3d"
         scan_task.processing.dim = 3
-        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution*2}"
+        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution}"
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
@@ -199,8 +193,7 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
                 "Slices": self.param_Slices,
                 "BW": self.param_BW,
                 "Trajectory": self.param_Trajectory,
-                "PE_Ordering": self.param_PE_Ordering,
-                "Slice_Ordering": self.param_Slice_Ordering,
+                "Ordering": self.param_Ordering,
                 "view_traj": self.param_view_traj,
             },
             check_timing=True,
@@ -221,8 +214,6 @@ class SequenceTSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
             result.name = "traj plot"
             result.description = "Plot of trajectory in k space of current sequence."
             result.type = "plot"
-            result.primary = True
-            result.autoload_viewer = 1
             result.file_path = "other/traj.plot"
             scan_task.results.append(result)
 

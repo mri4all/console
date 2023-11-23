@@ -39,6 +39,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
                 "NSA": self.param_NSA,
                 "ADC_samples": self.param_ADC_samples,
                 "ADC_duration": self.param_ADC_duration,
+                "FA1": 90,
+                "FA2": 180,
             },
             check_timing=True,
             output_file=self.seq_file_path,

@@ -1,35 +1,40 @@
 import os
+from pathlib import Path
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+import pickle
 
+from common.types import ResultItem
 from PyQt5 import uic
 
-from pathlib import Path
-
-from external.seq.adjustments_acq.calibration import shim_cal_linear
+import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
-
-import common.logger as logger
+from external.seq.adjustments_acq.scripts import run_pulseq
 
 from sequences import PulseqSequence
 from sequences.common import make_rf_se
-
-import configparser
-from sequences.common.util import reading_json_parameter, writing_json_parameter
-
-# Extracting configuration
-configuration_data = reading_json_parameter()
-LARMOR_FREQ = configuration_data.rf_parameters.larmor_frequency_MHz
+import common.logger as logger
 
 log = logger.get_logger()
 
 
-class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
+class SequenceNoiseScan(PulseqSequence, registry_key=Path(__file__).stem):
+    # Sequence parameters
+    param_TE: int = 70
+    param_TR: int = 250
+    param_NSA: int = 1
+    param_ADC_samples: int = 4096
+    param_ADC_duration: int = 6400
+    param_debug_plot: bool = True
+
     @classmethod
     def get_readable_name(self) -> str:
-        return "Calibrate B0 shims  [untested]"
+        return "Noise Scan"
 
     @classmethod
     def get_description(self) -> str:
-        return "Adjust Shim Sequence."
+        return "Acquisition of a single spin-echo without switching any gradients"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -43,8 +48,8 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": self.param_NSA,
             "ADC_samples": self.param_ADC_samples,
             "ADC_duration": self.param_ADC_duration,
-            "N_ITER": self.param_N_ITER,
-        }  # ,
+            "debug_plot": self.param_debug_plot,
+        }
 
     @classmethod
     def get_default_parameters(self) -> dict:
@@ -54,7 +59,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             "NSA": 1,
             "ADC_samples": 4096,
             "ADC_duration": 6400,
-            "N_ITER": 1,
+            "debug_plot": True,
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -65,7 +70,7 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_NSA = parameters["NSA"]
             self.param_ADC_samples = parameters["ADC_samples"]
             self.param_ADC_duration = parameters["ADC_duration"]
-            self.param_N_ITER = parameters["N_ITER"]
+            self.param_debug_plot = parameters["debug_plot"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -77,8 +82,6 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         widget.NSA_SpinBox.setValue(self.param_NSA)
         widget.ADC_samples_SpinBox.setValue(self.param_ADC_samples)
         widget.ADC_duration_SpinBox.setValue(self.param_ADC_duration)
-        widget.N_ITER_SpinBox.setValue(self.param_N_ITER)
-
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -88,31 +91,29 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_NSA = widget.NSA_SpinBox.value()
         self.param_ADC_samples = widget.ADC_samples_SpinBox.value()
         self.param_ADC_duration = widget.ADC_duration_SpinBox.value()
-        self.param_N_ITER = widget.N_ITER_SpinBox.value()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
     def validate_parameters(self, scan_task) -> bool:
         if self.param_TE > self.param_TR:
             self.problem_list.append("TE cannot be longer than TR")
-        if self.param_N_ITER < 1:
-            self.problem_list.append("Cannot have less than 1 iteration")
         return self.is_valid()
 
     def calculate_sequence(self, scan_task) -> bool:
         scan_task.processing.recon_mode = "bypass"
 
-        self.seq_file_path = self.get_working_folder() + "/seq/shim.seq"
+        self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
+
         make_rf_se.pypulseq_rfse(
             inputs={
-                "TE": 70,
-                "TR": 250,
-                "NSA": 1,
-                "ADC_samples": 4096,
-                "ADC_duration": 6400,
-                "FA1": 90,
-                "FA2": 180,
+                "TE": self.param_TE,
+                "TR": self.param_TR,
+                "NSA": self.param_NSA,
+                "ADC_samples": self.param_ADC_samples,
+                "ADC_duration": self.param_ADC_duration,
+                "FA1": 0,
+                "FA2": 0,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -123,49 +124,56 @@ class CalShimAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
         return True
 
     def run_sequence(self, scan_task) -> bool:
-        # calculate the linear shim
-        axes = ["x", "y", "z"]
         log.info("Running sequence " + self.get_name())
 
-        shim_range = 0.1
-        n_iter_linear = 2
-        for shim_iter in range(int(n_iter_linear)):
-            for channel in axes:
-                log.info(f"Updating {channel} linear shim (iter {shim_iter + 1})")
-                shim_weight = shim_cal_linear(
-                    seq_file=self.seq_file_path,
-                    larmor_freq=LARMOR_FREQ,
-                    channel=channel,
-                    range=shim_range,
-                    shim_points=5,
-                    points=2,
-                    iterations=1,
-                    zoom_factor=2,
-                    shim_x=cfg.SHIM_X,
-                    shim_y=cfg.SHIM_Y,
-                    shim_z=cfg.SHIM_Z,
-                    tr_spacing=2,
-                    force_tr=False,
-                    first_max=False,
-                    smooth=True,
-                    plot=True,
-                    gui_test=False,
-                )
+        # run_sequence_test("prescan_frequency")
 
-                # write to config file
-                if channel == "x":
-                    configuration_data.shim_parameters.shim_x = shim_weight
-                elif channel == "y":
-                    configuration_data.shim_parameters.shim_y = shim_weight
-                elif channel == "z":
-                    configuration_data.shim_parameters.shim_z = shim_weight
-                writing_json_parameter(config_data=configuration_data)
+        rxd, rx_t = run_pulseq(
+            seq_file=self.seq_file_path,
+            rf_center=cfg.LARMOR_FREQ,
+            tx_t=1,
+            grad_t=10,
+            tx_warmup=100,
+            shim_x=0,
+            shim_y=0,
+            shim_z=0,
+            grad_cal=False,
+            save_np=False,
+            save_mat=False,
+            save_msgs=True,
+            gui_test=False,
+            case_path=self.get_working_folder(),
+        )
+        log.info("Pulseq ran, plotting")
 
-            # decrease the range a bit with each iteration, to a min bound
-            if shim_range > 0.01:
-                shim_range = shim_range / 2
-            else:
-                shim_range = shim_range
+        self.rxd = rxd
+
+        # Debug
+        Debug = True
+        if Debug is True:  # todo: debug mode
+            log.info("Plotting figure now")
+            # view_traj.view_sig(rxd)
+
+            plt.clf()
+            plt.title("ADC Signal")
+            plt.grid(True, color="#333")
+            plt.plot(np.abs(rxd))
+            # if self.param_debug_plot:
+            #     plt.show()
+
+            file = open(self.get_working_folder() + "/other/rf_se.plot", "wb")
+            fig = plt.gcf()
+            pickle.dump(fig, file)
+            file.close()
+
+            result = ResultItem()
+            result.name = "ADC"
+            result.description = "Recorded ADC signal"
+            result.type = "plot"
+            result.primary = True
+            result.autoload_viewer = 1
+            result.file_path = "other/rf_se.plot"
+            scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())
         return True

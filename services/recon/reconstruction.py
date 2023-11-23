@@ -2,6 +2,8 @@ import numpy as np
 import os
 from os import path
 import time
+import matplotlib.pyplot as plt
+
 import common.logger as logger
 from common.constants import *
 from common.types import ScanTask
@@ -56,17 +58,36 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
         )
         return False
 
+    order = np.load(
+        folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.PE_ORDER
+    )
+    print(order)
     kData = np.load(
         folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.RAWDATA
     )
-
     dims = task.processing.dim_size.split(",")
+    # dim = slices:pe:read
 
-    kData = np.reshape(kData, (int(dims[1]), int(dims[0]), int(dims[2])))
-    kData = np.transpose(kData, axes=[2, 0, 1])
-    kSpace = kData.copy()
-    log.info(f"Matrix size = {kData.shape}")
-    fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kData)))
+    # Simple recon
+    # kData = np.reshape(kData, (int(dims[1]) * int(dims[0]), int(dims[2])))
+    # kData = np.reshape(kData, (int(dims[1]), int(dims[0]), int(dims[2])))
+    # kData = np.transpose(kData, axes=[2, 0, 1])
+    # kSpace = kData.copy()
+
+    # Index-based recon
+    kData = np.reshape(kData, (int(dims[1]) * int(dims[0]), int(dims[2])))
+    kSpace = np.zeros(dtype=complex, shape=(int(dims[1]), int(dims[2]), int(dims[0])))
+    log.info(f"Matrix size = {kSpace.shape}")
+
+    center_slc = kSpace.shape[2] - int(kSpace.shape[2] / 2)
+    center_pe = kSpace.shape[1] - int(kSpace.shape[1] / 2)
+    counter = 0
+    for line in order:
+        # print(line)
+        kSpace[:, center_pe - line[0], center_slc - line[1]] = kData[counter, :]
+        counter += 1
+
+    fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kSpace)))
 
     DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
 
