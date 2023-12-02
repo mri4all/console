@@ -164,7 +164,7 @@ def pypulseq_tse3D(
     phase_areas1 = pe_order[:, 1] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    gx_spoil = pp.make_trapezoid(channel=ch0, area=3 * Nx * delta_kx, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
 
     # ======
     # CALCULATE DELAYS

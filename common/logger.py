@@ -44,7 +44,7 @@ def get_logger():
         logger.addHandler(ch)
 
         file_handler = RotatingFileHandler(
-            f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=500000, backupCount=5
+            f"/opt/mri4all/logs/{rt.service_name}.log", maxBytes=1500000, backupCount=5
         )
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)

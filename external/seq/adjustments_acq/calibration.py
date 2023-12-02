@@ -91,11 +91,14 @@ def larmor_step_search(
     # Pause for spin recovery
     time.sleep(delay_s)
 
+    snr_array = []
+    peak_array = []
+
     # Repeat for each frequency after the first
-    for i in range(1, steps):
+    for i in range(0, steps):
         print(f"{swept_freqs[i]:.4f} MHz ({i}/{steps})")
         ipc_comm.send_status(
-            f"Adjusting frequency:  Searching {swept_freqs[i]:.4f} MHz ({i}/{steps})"
+            f"Adjusting frequency:  Searching {swept_freqs[i]:.4f} MHz ({i+1}/{steps})"
         )
         rx_arr[:, i], _ = scr.run_pulseq(
             seq_file,
@@ -114,7 +117,6 @@ def larmor_step_search(
         )
 
         # Calculate signal to noise ratio
-        snr_array = []
         signal_index = 0
         noise_index = 0
         for index in range(0, rxd.shape[0] - 1):
@@ -125,18 +127,26 @@ def larmor_step_search(
                 noise_array[noise_index, i] = rx_arr[index, i]
                 noise_index += 1
         snr = np.mean(np.abs(signal_array[:, i])) / np.std(np.abs(noise_array[:, i]))
-        print("SNR = " + str(snr))
+        peak = np.max(np.abs(rx_arr[index, i]))
+        print(f"SNR({i}) = " + str(snr))
+        print(f"Peak({i}) = " + str(peak))
         snr_array.append(snr)
+        peak_array.append(peak)
+
+    # print("Test = ")
+    # print(np.max(np.abs(rx_arr), axis=0))
 
     # Find the frequency data with the largest maximum absolute value
-    max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
+    # max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
+    max_ind = np.argmax(peak_array)
+
     max_freq = swept_freqs[max_ind]
-    print(f"Max frequency: {max_freq:.4f} MHz")
+    print(f"Fequency with highest amplitude: {max_freq:.4f} MHz")
 
     # Find the frequency data with the largest maximum SNR value
     max_snr_ind = np.argmax(snr_array)
     max_snr_freq = swept_freqs[max_snr_ind]
-    print(f"Max SNR frequency: {max_snr_freq:.4f} MHz")
+    print(f"Frequency with highest SNR: {max_snr_freq:.4f} MHz")
 
     # Plot setup for UI
     plt.style.use("dark_background")
@@ -309,6 +319,8 @@ def larmor_cal(
             + str(std)
             + f"), try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}"
         )
+        larmor_freq = fft_x[np.argmax(rx_fft[:, 0])]
+        # larmor_freq = larmor_start
 
     # Plot if needed
     if plot:

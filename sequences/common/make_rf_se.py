@@ -23,8 +23,10 @@ def pypulseq_rfse(
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
     alpha1 = inputs["FA1"]  # flip angle
+    # alpha1 = 90  # flip angle
     alpha1_duration = rf_duration  # pulse duration
     alpha2 = inputs["FA2"]  # refocusing flip angle
+    # alpha2 = 180  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
     # adc_num_samples = 4096
     # adc_duration = 6.4e-3
@@ -52,6 +54,7 @@ def pypulseq_rfse(
         # grad_unit="mT/m",
         # max_slew=150,
         # slew_unit="T/m/s",
+        # rf_ringdown_time=20e-6,
         rf_ringdown_time=20e-6,
         rf_dead_time=100e-6,
         rf_raster_time=1e-6,

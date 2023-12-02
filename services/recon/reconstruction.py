@@ -76,14 +76,17 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
 
     # Index-based recon
     kData = np.reshape(kData, (int(dims[1]) * int(dims[0]), int(dims[2])))
-    kSpace = np.zeros(dtype=complex, shape=(int(dims[1]), int(dims[2]), int(dims[0])))
+    log.info(f"Readout size = {kData.shape}")
+    kSpace = np.zeros(dtype=complex, shape=(int(dims[2]), int(dims[1]), int(dims[0])))
     log.info(f"Matrix size = {kSpace.shape}")
 
     center_slc = kSpace.shape[2] - int(kSpace.shape[2] / 2)
     center_pe = kSpace.shape[1] - int(kSpace.shape[1] / 2)
     counter = 0
     for line in order:
-        # print(line)
+        # kSpace[200:511, center_pe - line[0], center_slc - line[1]] = kData[
+        #     counter, 200:511
+        # ]
         kSpace[:, center_pe - line[0], center_slc - line[1]] = kData[counter, :]
         counter += 1
 
@@ -91,6 +94,7 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
 
     DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
 
+    # kSpace = np.angle(kSpace)
     kSpace = 100 * (kSpace - kSpace.min()) / (kSpace.max() - kSpace.min())
     DICOM.write_dicom(
         kSpace,

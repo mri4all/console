@@ -152,7 +152,8 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     alpha2 = 180  # refocusing flip angle
     alpha2_duration = 100e-6  # pulse duration
     TE = inputs["TE"] / 1000  # TE = 54e-3
-    TR = 2000e-3
+    # TODO: Debug -- increase TR to always have enough space
+    TR = 2000e-3 + TE * inputs["ETL"]
     num_averages = 1
     adc_num_samples = 4096
     adc_duration = 6.4e-3

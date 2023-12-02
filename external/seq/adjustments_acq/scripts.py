@@ -86,6 +86,8 @@ def run_pulseq(
     log.debug(f"shim_z={shim_z}")
     log.debug(f"Seq file={seq_file}")
 
+    print(f"case path = {case_path}")
+
     # Convert .seq file to machine dict
     psi = PSInterpreter(
         rf_center=rf_center * 1e6,
@@ -161,6 +163,7 @@ def run_pulseq(
 
     if not raw_filename:
         from datetime import datetime
+
         now = datetime.now()
         raw_filename = now.strftime("%y-%d-%m %H_%M_%S")
 
