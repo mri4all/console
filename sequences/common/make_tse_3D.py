@@ -46,7 +46,7 @@ def pypulseq_tse3D(
     fovx = inputs["FOV"] / 1000
     fovy = inputs["FOV"] / 1000
     # DEBUG! TODO: Expose FOV in Z on UI
-    fovz = inputs["FOV"] / 1000 / 3
+    fovz = inputs["FOV"] / 1000 / 2
     Nx = inputs["Base_Resolution"]
     Ny = inputs["Base_Resolution"]
     Nz = inputs["Slices"]
@@ -108,7 +108,7 @@ def pypulseq_tse3D(
     # )
 
     system = pp.Opts(
-        max_grad=80,
+        max_grad=100,
         grad_unit="mT/m",
         max_slew=4000,
         slew_unit="T/m/s",
@@ -146,11 +146,17 @@ def pypulseq_tse3D(
         channel=ch0, flat_area=Nx * delta_kx, flat_time=adc_duration, system=system
     )
     adc = pp.make_adc(
-        num_samples=Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
+        num_samples=2 * Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
     gx_pre = pp.make_trapezoid(
-        channel=ch0, area=gx.area / 2, duration=pp.calc_duration(gx) / 2, system=system
+        channel=ch0,
+        area=gx.area / 2,
+        duration=pp.calc_duration(gx) / 2,
+        system=system,
     )
+    # gx_crush = pp.make_trapezoid(
+    #     channel=ch0, area=gx.area, duration=pp.calc_duration(gx_pre), system=system
+    # )
 
     pe_order = choose_pe_order(
         ndims=3,
@@ -172,7 +178,7 @@ def pypulseq_tse3D(
     tau1 = (
         math.ceil(
             (
-                TE / 2
+                TE / 2.0
                 - 0.5 * (pp.calc_duration(rf1) + pp.calc_duration(rf2))
                 - pp.calc_duration(gx_pre)
             )
@@ -187,29 +193,52 @@ def pypulseq_tse3D(
     #     )
     # ) * seq.grad_raster_time
 
+    # tau2 = (
+    #     math.ceil(
+    #         (TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx)))
+    #         / seq.grad_raster_time
+    #     )
+    # ) * seq.grad_raster_time
+
     tau2 = (
         math.ceil(
-            (TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx)))
-            / seq.grad_raster_time
-        )
-    ) * seq.grad_raster_time
-
-    delay_TR = (
-        math.ceil(
             (
-                TR
-                - TE
-                - pp.calc_duration(gx_pre)
-                - np.max(pp.calc_duration(gx_spoil, gx_pre))
+                TE / 2.0
+                - (
+                    0.5 * pp.calc_duration(gx)
+                    + 0.5 * pp.calc_duration(rf2)
+                    + pp.calc_duration(gx_pre)
+                )
             )
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
+
+    # delay_TR = (
+    #     math.ceil(
+    #         (
+    #             TR
+    #             - TE * ETL
+    #             - pp.calc_duration(gx_pre)
+    #             - np.max(pp.calc_duration(gx_spoil, gx_pre))
+    #         )
+    #         / seq.grad_raster_time
+    #     )
+    # ) * seq.grad_raster_time
+
+    delay_TR = (
+        math.ceil(
+            (TR - TE * ETL - TE / 2 - pp.calc_duration(gx_spoil)) / seq.grad_raster_time
+        )
+    ) * seq.grad_raster_time
+
+    duration_gx_pre = pp.calc_duration(gx_pre)
+
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
-    assert np.all(delay_TR >= pp.calc_duration(gx_spoil))
+    assert np.all(delay_TR >= 0)
 
-    dummyshots = 5
+    dummyshots = inputs["dummy_shots"]
 
     # ======
     # CONSTRUCT SEQUENCE
@@ -234,19 +263,23 @@ def pypulseq_tse3D(
                     pe_idx = (ETL * (i - dummyshots)) + echo
                 gy_pre = pp.make_trapezoid(
                     channel=ch1,
-                    area=phase_areas0[pe_idx],
+                    area=-1.0 * phase_areas0[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
                 gz_pre = pp.make_trapezoid(
                     channel=ch2,
-                    area=phase_areas1[pe_idx],
+                    area=-1.0 * phase_areas1[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
-                seq.add_block(gx_pre, gy_pre, gz_pre)
+                if echo == 0:
+                    seq.add_block(gx_pre)
+                else:
+                    seq.add_block(pp.make_delay(duration_gx_pre))
                 seq.add_block(pp.make_delay(tau1))
                 seq.add_block(rf2)
+                seq.add_block(gy_pre, gz_pre)
                 seq.add_block(pp.make_delay(tau2))
                 if is_dummyshot:
                     seq.add_block(gx)
@@ -254,11 +287,10 @@ def pypulseq_tse3D(
                     seq.add_block(gx, adc)
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(
-                    gx_spoil, gy_pre, gz_pre
-                )  # TODO: Figure if we need spoiling
+                seq.add_block(gy_pre, gz_pre)
                 seq.add_block(pp.make_delay(tau2))
 
+            seq.add_block(gx_spoil)
             seq.add_block(pp.make_delay(delay_TR))
 
     # Check whether the timing of the sequence is correct

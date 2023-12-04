@@ -36,6 +36,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     param_Trajectory: str = "Cartesian"
     param_Ordering: str = "center_out"
     param_view_traj: bool = False
+    param_dummy_shots: int = 5
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -58,9 +59,12 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     def update_info(self):
         duration_sec = int(
             self.main_widget.TRSpinBox.value()
-            * self.main_widget.Base_Resolution_SpinBox.value()
-            * self.main_widget.Slices_SpinBox.value()
-            / self.main_widget.ETL_SpinBox.value()
+            * (
+                self.main_widget.Base_Resolution_SpinBox.value()
+                * self.main_widget.Slices_SpinBox.value()
+                / self.main_widget.ETL_SpinBox.value()
+                + self.param_dummy_shots
+            )
             / 1000
         )
         duration = str(datetime.timedelta(seconds=duration_sec))
@@ -101,17 +105,17 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         self,
     ) -> dict:
         return {
-            "TE": 20,
-            "TR": 250,
-            "ETL": 1,
+            "TE": 15,
+            "TR": 1000,
+            "ETL": 8,
             "NSA": 1,
             "Orientation": "Axial",
-            "FOV": 20,
+            "FOV": 15,
             "Base_Resolution": 32,
             "Slices": 8,
             "BW": 32000,
             "Trajectory": "Cartesian",
-            "Ordering": "linear_up",
+            "Ordering": "center_out",
             "view_traj": False,
         }
 
@@ -174,10 +178,12 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
 
     def calculate_sequence(self, scan_task) -> bool:
         log.info("Calculating sequence " + self.get_name())
+        ipc_comm.send_status(f"Calculating sequence...")
 
         scan_task.processing.recon_mode = "basic3d"
         scan_task.processing.dim = 3
-        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{self.param_Base_Resolution}"
+        scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{2*self.param_Base_Resolution}"
+        scan_task.processing.oversampling_read = 2
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
@@ -195,6 +201,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 "Trajectory": self.param_Trajectory,
                 "Ordering": self.param_Ordering,
                 "view_traj": self.param_view_traj,
+                "dummy_shots": self.param_dummy_shots,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -221,16 +228,16 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
 
     def run_sequence(self, scan_task) -> bool:
         log.info("Running sequence " + self.get_name())
+        ipc_comm.send_status(f"Preparing scan...")
 
         expected_duration_sec = int(
             self.param_TR
-            * self.param_Base_Resolution
-            * self.param_Slices
-            / self.param_ETL
+            * (
+                self.param_Base_Resolution * self.param_Slices / self.param_ETL
+                + self.param_dummy_shots
+            )
             / 1000
         )
-
-        ipc_comm.send_acq_data(helper.get_datetime(), expected_duration_sec, False)
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
@@ -252,6 +259,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
             case_path=self.get_working_folder(),
             raw_filename="raw",
+            expected_duration_sec=expected_duration_sec,
         )
 
         log.info("Done running sequence " + self.get_name())

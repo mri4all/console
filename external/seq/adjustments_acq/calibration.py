@@ -153,13 +153,13 @@ def larmor_step_search(
 
     # Plot figure
     if plot:
-        fig, axs = plt.subplots(2, 1, constrained_layout=True)
+        fig, axs = plt.subplots(1, 1, constrained_layout=True)
         fig.suptitle(f"{steps}-step search around {step_search_center:.4f} MHz")
-        axs[0].plot(np.real(rx_arr))
-        axs[0].legend([f"{freq:.4f} MHz" for freq in swept_freqs])
-        axs[0].set_title("Concatenated signal -- Real")
-        axs[1].plot(np.abs(rx_arr))
-        axs[1].set_title("Concatenated signal -- Magnitude")
+        axs.plot(np.abs(rx_arr))
+        axs.set_title("Concatenated signal -- Magnitude")
+        axs.legend([f"{freq:.4f} MHz" for freq in swept_freqs])
+        # axs[0].plot(np.real(rx_arr))
+        # axs[0].set_title("Concatenated signal -- Real")
         plt.show()
         fig_signal = plt.gcf()
 
@@ -319,8 +319,8 @@ def larmor_cal(
             + str(std)
             + f"), try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}"
         )
-        larmor_freq = fft_x[np.argmax(rx_fft[:, 0])]
-        # larmor_freq = larmor_start
+        # larmor_freq = fft_x[np.argmax(rx_fft[:, 0])]
+        larmor_freq = larmor_start
 
     # Plot if needed
     if plot:

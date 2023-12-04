@@ -104,6 +104,9 @@ class SystemStatusWindow(QDialog):
         self.timer.timeout.connect(self.check_services_status)
         self.timer.start(500)
 
+        # Ping the scanner when opening the dialog
+        QTimer.singleShot(10, self.pingButton_clicked)
+
     def close_clicked(self):
         self.close()
 

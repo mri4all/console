@@ -22,7 +22,7 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
     def get_readable_name(self) -> str:
         return "Adjust RF Duration  [untested]"
 
-    def calculate_sequence(self) -> bool:
+    def calculate_sequence(self, scan_task) -> bool:
         points = 25  # number of steps, to be added as a parameter
         rf_min_duration, rf_max_duration = 50e-6, 300e-6  # in seconds
         rf_duration_vals = np.linspace(
@@ -57,7 +57,7 @@ class AdjRFDuration(PulseqSequence, registry_key=Path(__file__).stem):
 
         return True
 
-    def run_sequence(self) -> bool:
+    def run_sequence(self, scan_task) -> bool:
         log.info("Running RF calibration sequences ")
 
         # reading configuration data from config.json

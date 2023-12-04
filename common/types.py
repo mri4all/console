@@ -76,6 +76,7 @@ class ProcessingConfig(BaseModel):
     denoising_strength: int = 0
     dim: Optional[int] = None
     dim_size: Optional[str] = None
+    oversampling_read: Optional[int] = None
 
 
 ResultTypes = Literal["dicom", "plot", "rawdata", "empty"]

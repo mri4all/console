@@ -103,6 +103,7 @@ def process_acquisition(scan_name: str) -> bool:
         scan_task.journal.fail_stage = "acquisition"
         task.write_task(mri4all_paths.DATA_ACQ + "/" + scan_name, scan_task)
         move_to_fail(scan_name)
+        communicator.send_status(f"Scan failed.")
         return False
 
     scan_task.journal.acquisition_end = helper.get_datetime()

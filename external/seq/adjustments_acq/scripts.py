@@ -19,10 +19,15 @@ from external.flocra_pulseq.interpreter import (
     PSInterpreter,
 )  # pylint: disable=import-error
 
+import common.helper as helper
 from common.constants import *
 import common.logger as logger
 
 log = logger.get_logger()
+
+from common.ipc import Communicator
+
+ipc_comm = Communicator(Communicator.ACQ)
 
 
 # TODO: Remove references to cfg class from here
@@ -48,6 +53,7 @@ def run_pulseq(
     gui_test=False,
     case_path="/tmp",
     raw_filename="",
+    expected_duration_sec=-1,
 ):
     """
     Interpret pulseq .seq file through flocra_pulseq
@@ -146,6 +152,9 @@ def run_pulseq(
     expt.add_flodict(instructions)
 
     log.debug("Running instructions...")
+
+    if expected_duration_sec > 0:
+        ipc_comm.send_acq_data(helper.get_datetime(), expected_duration_sec, False)
 
     # Run experiment
     rxd, msgs = expt.run()

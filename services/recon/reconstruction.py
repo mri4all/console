@@ -82,15 +82,23 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
 
     center_slc = kSpace.shape[2] - int(kSpace.shape[2] / 2)
     center_pe = kSpace.shape[1] - int(kSpace.shape[1] / 2)
+    max_slc = kSpace.shape[2]
+    max_pe = kSpace.shape[1]
     counter = 0
     for line in order:
         # kSpace[200:511, center_pe - line[0], center_slc - line[1]] = kData[
         #     counter, 200:511
         # ]
-        kSpace[:, center_pe - line[0], center_slc - line[1]] = kData[counter, :]
+        kSpace[
+            :, (center_pe - line[0]) % max_pe, (center_slc - line[1]) % max_slc
+        ] = kData[counter, :]
         counter += 1
 
     fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kSpace)))
+
+    if task.processing.oversampling_read > 0:
+        offset = int(dims[2]) / 4
+        fft = fft[int(offset) : int(3 * offset), :, :]
 
     DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
 
