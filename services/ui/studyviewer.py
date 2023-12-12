@@ -49,7 +49,6 @@ class PatientData(BaseModel):
 
 
 class StudyViewer(QDialog):
-    examListWidget: QListWidget
     scanListWidget: QListWidget
     resultListWidget: QListWidget
     patients: List[PatientData]
@@ -87,12 +86,30 @@ class StudyViewer(QDialog):
         if not self.exams:
             return
 
-        self.examListWidget.addItems(
-            [
-                e.patientName + "     ACC " + e.acc.upper() + "     " + e.examTime
-                for e in self.exams
-            ]
-        )
+        self.examTableWidget.setColumnHidden(0, True)
+        self.examTableWidget.horizontalHeader().resizeSection(1, 500)
+        self.examTableWidget.horizontalHeader().resizeSection(2, 300)
+        self.examTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.examTableWidget.verticalHeader().setDefaultSectionSize(36)
+
+        # for e in self.exams:
+        for idx, e in enumerate(self.exams):
+            rowPosition = self.examTableWidget.rowCount()
+            self.examTableWidget.insertRow(rowPosition)
+
+            self.examTableWidget.setItem(rowPosition, 0, QTableWidgetItem(str(idx)))
+            self.examTableWidget.setItem(
+                rowPosition, 1, QTableWidgetItem(e.patientName)
+            )
+            item = QTableWidgetItem(e.acc.upper())
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.examTableWidget.setItem(rowPosition, 2, item)
+
+            item = QTableWidgetItem(e.examTime)
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.examTableWidget.setItem(rowPosition, 3, item)
+
+        self.examTableWidget.sortItems(3, Qt.DescendingOrder)
 
         self.dicomTargetComboBox.addItems(
             [t.name for t in config.get_config().dicom_targets]
@@ -133,13 +150,32 @@ class StudyViewer(QDialog):
         self.exportPushButton.setText(" Export")
         self.exportPushButton.setIconSize(QSize(20, 20))
 
+        self.loadToViewerButton.setText(" Load into")
+        self.loadToViewerButton.setIcon(qta.icon("fa5s.image"))
+        self.loadToViewerButton.setIconSize(QSize(20, 20))
+
+        loadToViewerMenu = QMenu()
+        loadToViewerMenu.addAction("Viewer 1", self.loadtoviewer1_clicked)
+        loadToViewerMenu.addAction("Viewer 2", self.loadtoviewer2_clicked)
+        loadToViewerMenu.addAction("Viewer 3", self.loadtoviewer3_clicked)
+        self.loadToViewerButton.setMenu(loadToViewerMenu)
+        self.loadToViewerButton.setStyleSheet(
+            """QPushButton::menu-indicator {
+                                                image: none;
+                                                subcontrol-position: right top;
+                                                subcontrol-origin: padding;
+                                                width: 0px;
+                                            }                                        
+            """
+        )
+
         self.sendDicomsButton.setIcon(qta.icon("fa5s.paper-plane"))
         self.sendDicomsButton.setText(" Send")
         self.sendDicomsButton.setIconSize(QSize(20, 20))
 
         self.setStyleSheet(
             """
-            QListView {
+            QListView, QTableView {
                 background-color: #0C1123;
             }
             QListView::item
@@ -154,16 +190,34 @@ class StudyViewer(QDialog):
             {
                 background-color: rgba(224, 165, 38, 120);
             }
+            QTableView::item:selected
+            {
+                background-color: #E0A526;  
+            }
+            QTableView::item:hover
+            {
+                background-color: rgba(224, 165, 38, 120);
+            }    
+            QTableView QHeaderView::section {	    
+                color: #FFFFFF;
+                padding: 6px;
+            }            
             """
         )
         self.loadTimer = QTimer(self)
         self.loadTimer.setInterval(100)
         self.loadTimer.timeout.connect(self.trigger_load_scan)
 
-        self.examListWidget.currentRowChanged.connect(self.exam_selected)
+        self.examTableWidget.currentItemChanged.connect(self.exam_selected)
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
         self.resultListWidget.currentRowChanged.connect(self.result_selected)
-        self.examListWidget.setCurrentRow(0)
+        self.examTableWidget.setCurrentCell(0, 0)
+
+    def get_selected_exam_index(self):
+        index = self.examTableWidget.currentRow()
+        if index < 0:
+            return 0
+        return int(self.examTableWidget.item(index, 0).text())
 
     def trigger_load_scan(self):
         self.loadTimer.stop()
@@ -182,7 +236,7 @@ class StudyViewer(QDialog):
         if not checked_scans_numbers:
             return
 
-        exam = self.exams[self.examListWidget.currentRow()]
+        exam = self.exams[self.get_selected_exam_index()]
         for scan_number in checked_scans_numbers:
             checked_scan = exam.scans[scan_number]
             try:
@@ -200,7 +254,8 @@ class StudyViewer(QDialog):
                 msg.exec_()
 
     def result_selected(self, row: int):
-        exam = self.exams[self.examListWidget.currentRow()]
+        exam_index = self.get_selected_exam_index()
+        exam = self.exams[exam_index]
         scan = exam.scans[self.scanListWidget.currentRow()]
         if scan.task.results:
             result_data = scan.task.results[row]
@@ -214,7 +269,8 @@ class StudyViewer(QDialog):
 
     def scan_selected(self, row: int):
         self.resultListWidget.clear()
-        exam = self.exams[self.examListWidget.currentRow()]
+        exam_index = self.get_selected_exam_index()
+        exam = self.exams[exam_index]
         scan = exam.scans[row]
 
         if not scan.task.results:
@@ -226,7 +282,11 @@ class StudyViewer(QDialog):
                 )
         self.resultListWidget.setCurrentRow(0)
 
-    def exam_selected(self, index: int):
+    def exam_selected(self):
+        index = self.get_selected_exam_index()
+        if index < 0:
+            return
+
         self.scanListWidget.clear()
         exam = self.exams[index]
         for scan_obj in exam.scans:
@@ -270,7 +330,7 @@ class StudyViewer(QDialog):
                     acc=scan_task.exam.acc,
                     scans=[],
                     patientName=patient_name,
-                    examTime=exam_date + " " + exam_time,
+                    examTime=exam_date + "  " + exam_time,
                 )
                 exams.append(exam)
 
@@ -300,6 +360,37 @@ class StudyViewer(QDialog):
             item.setCheckState(Qt.CheckState.Unchecked)
 
     def show_definition(self):
-        exam = self.exams[self.examListWidget.currentRow()]
+        exam = self.exams[self.get_selected_exam_index()]
         scan = exam.scans[self.scanListWidget.currentRow()]
         taskviewer.show_taskviewer(scan.dir)
+
+    def loadtoviewer1_clicked(self):
+        self.loadtoviewer(1)
+
+    def loadtoviewer2_clicked(self):
+        self.loadtoviewer(2)
+
+    def loadtoviewer3_clicked(self):
+        self.loadtoviewer(3)
+
+    def loadtoviewer(self, viewer_id):
+        exam = self.exams[self.get_selected_exam_index()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+
+        if scan.task.results:
+            row = self.resultListWidget.currentRow()
+            result_data = scan.task.results[row]
+            scan_path = str(scan.dir) + "/" + result_data.file_path
+
+            if viewer_id == 1:
+                ui_runtime.examination_widget.viewer1.view_data(
+                    scan_path, result_data.type, scan.task
+                )
+            if viewer_id == 2:
+                ui_runtime.examination_widget.viewer2.view_data(
+                    scan_path, result_data.type, scan.task
+                )
+            if viewer_id == 3:
+                ui_runtime.examination_widget.viewer3.view_data(
+                    scan_path, result_data.type, scan.task
+                )

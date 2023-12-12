@@ -33,10 +33,12 @@ def pypulseq_tse3D(
     # Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
     # Ny = 70
     # Nz = 28
-    alpha1 = 90  # flip angle
-    alpha1_duration = 100e-6  # pulse duration
-    alpha2 = 180  # refocusing flip angle
-    alpha2_duration = 100e-6  # pulse duration
+    calib = 0.9
+
+    alpha1 = calib * 90  # flip angle
+    alpha1_duration = 120e-6  # pulse duration
+    alpha2 = calib * 180  # refocusing flip angle
+    alpha2_duration = 120e-6  # pulse duration
 
     prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
@@ -148,15 +150,35 @@ def pypulseq_tse3D(
     adc = pp.make_adc(
         num_samples=2 * Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
+
+    # crusher_moment = gx.area / 2
+    crusher_moment = 0
+
     gx_pre = pp.make_trapezoid(
         channel=ch0,
-        area=gx.area / 2,
+        area=gx.area / 2 + crusher_moment,
+        system=system,
         duration=pp.calc_duration(gx) / 2,
+    )
+
+    gx_crush = pp.make_trapezoid(
+        channel=ch0,
+        area=crusher_moment,
+        duration=pp.calc_duration(gx_pre),
         system=system,
     )
-    # gx_crush = pp.make_trapezoid(
-    #     channel=ch0, area=gx.area, duration=pp.calc_duration(gx_pre), system=system
-    # )
+    gy_crush = pp.make_trapezoid(
+        channel=ch1,
+        area=crusher_moment,
+        duration=pp.calc_duration(gx_pre),
+        system=system,
+    )
+    gz_crush = pp.make_trapezoid(
+        channel=ch2,
+        area=crusher_moment,
+        duration=pp.calc_duration(gx_pre),
+        system=system,
+    )
 
     pe_order = choose_pe_order(
         ndims=3,
@@ -170,7 +192,9 @@ def pypulseq_tse3D(
     phase_areas1 = pe_order[:, 1] * delta_kz
 
     # Gradient spoiling -TODO: Need to see if this is really required based on data
-    gx_spoil = pp.make_trapezoid(channel=ch0, area=2 * Nx * delta_kx, system=system)
+    gx_spoil = pp.make_trapezoid(channel=ch0, area=5 * Nx * delta_kx, system=system)
+    gy_spoil = pp.make_trapezoid(channel=ch1, area=5 * Nx * delta_kx, system=system)
+    gz_spoil = pp.make_trapezoid(channel=ch2, area=5 * Nx * delta_kx, system=system)
 
     # ======
     # CALCULATE DELAYS
@@ -186,20 +210,6 @@ def pypulseq_tse3D(
         )
     ) * seq.grad_raster_time
 
-    # tau2 = (
-    #     math.ceil(
-    #         (TE / 2 - 0.5 * (pp.calc_duration(rf2)) - pp.calc_duration(gx_pre))
-    #         / seq.grad_raster_time
-    #     )
-    # ) * seq.grad_raster_time
-
-    # tau2 = (
-    #     math.ceil(
-    #         (TE / 2 - 0.5 * (pp.calc_duration(rf2) + pp.calc_duration(gx)))
-    #         / seq.grad_raster_time
-    #     )
-    # ) * seq.grad_raster_time
-
     tau2 = (
         math.ceil(
             (
@@ -214,21 +224,16 @@ def pypulseq_tse3D(
         )
     ) * seq.grad_raster_time
 
-    # delay_TR = (
-    #     math.ceil(
-    #         (
-    #             TR
-    #             - TE * ETL
-    #             - pp.calc_duration(gx_pre)
-    #             - np.max(pp.calc_duration(gx_spoil, gx_pre))
-    #         )
-    #         / seq.grad_raster_time
-    #     )
-    # ) * seq.grad_raster_time
-
     delay_TR = (
         math.ceil(
-            (TR - TE * ETL - TE / 2 - pp.calc_duration(gx_spoil)) / seq.grad_raster_time
+            (
+                TR
+                - TE * ETL
+                - TE / 2
+                - pp.calc_duration(gx_spoil)
+                - pp.calc_duration(rf1) / 2
+            )
+            / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
 
@@ -261,37 +266,60 @@ def pypulseq_tse3D(
                     pe_idx = 0
                 else:
                     pe_idx = (ETL * (i - dummyshots)) + echo
+
                 gy_pre = pp.make_trapezoid(
                     channel=ch1,
-                    area=-1.0 * phase_areas0[pe_idx],
+                    area=-1.0 * phase_areas0[pe_idx] + crusher_moment,
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
                 gz_pre = pp.make_trapezoid(
                     channel=ch2,
-                    area=-1.0 * phase_areas1[pe_idx],
+                    area=-1.0 * phase_areas1[pe_idx] + crusher_moment,
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
+                gy_rew = pp.make_trapezoid(
+                    channel=ch1,
+                    area=phase_areas0[pe_idx],
+                    duration=pp.calc_duration(gx_pre),
+                    system=system,
+                )
+                gz_rew = pp.make_trapezoid(
+                    channel=ch2,
+                    area=phase_areas1[pe_idx],
+                    duration=pp.calc_duration(gx_pre),
+                    system=system,
+                )
+
                 if echo == 0:
                     seq.add_block(gx_pre)
+                    # seq.add_block(gx_pre, gy_crush, gz_crush)
                 else:
                     seq.add_block(pp.make_delay(duration_gx_pre))
+                    # seq.add_block(gx_crush, gy_crush, gz_crush)
+
                 seq.add_block(pp.make_delay(tau1))
                 seq.add_block(rf2)
+                # seq.add_block(gx_crush, gy_pre, gz_pre)
                 seq.add_block(gy_pre, gz_pre)
                 seq.add_block(pp.make_delay(tau2))
                 if is_dummyshot:
                     seq.add_block(gx)
                 else:
                     seq.add_block(gx, adc)
-                gy_pre.amplitude = -gy_pre.amplitude
-                gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(gy_pre, gz_pre)
+                # gy_pre.amplitude = -gy_pre.amplitude
+                # gz_pre.amplitude = -gz_pre.amplitude
+                seq.add_block(gy_rew, gz_rew)
                 seq.add_block(pp.make_delay(tau2))
 
-            seq.add_block(gx_spoil)
+            seq.add_block(gx_spoil, gy_spoil, gz_spoil)
             seq.add_block(pp.make_delay(delay_TR))
+
+    log.info("=== Seq timing ===")
+    log.info(f"Prephase: {pp.calc_duration(gx_pre)}")
+    log.info(f"Readout: {pp.calc_duration(gx)}")
+    log.info(f"ADC: {pp.calc_duration(adc)}")
 
     # Check whether the timing of the sequence is correct
     if check_timing:
@@ -310,7 +338,6 @@ def pypulseq_tse3D(
         log.info("Generating plots...")
         view_traj.view_traj_3d(k_traj_adc, k_traj, output_folder)
 
-    log.debug(output_file)
     try:
         seq.write(output_file)
         log.debug("Seq file stored")

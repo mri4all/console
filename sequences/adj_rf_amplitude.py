@@ -23,7 +23,7 @@ class AdjRFAmplitude(PulseqSequence, registry_key=Path(__file__).stem):
 
         make_rf_se.pypulseq_rfse(
             inputs={
-                "TE": 70,
+                "TE": 20,
                 "TR": 250,
                 "NSA": 1,
                 "ADC_samples": 4096,

@@ -44,25 +44,66 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="examListWidget">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
+        <widget class="QTableWidget" name="examTableWidget">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="lineWidth">
           <number>0</number>
          </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="dragDropOverwriteMode">
+          <bool>false</bool>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
-         <property name="modelColumn">
-          <number>0</number>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="cornerButtonEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderHighlightSections">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Patient</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ACC</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Date / Time</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>
@@ -76,7 +117,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>30</height>
+           <height>24</height>
           </size>
          </property>
         </spacer>
@@ -161,7 +202,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>30</height>
+           <height>24</height>
           </size>
          </property>
         </spacer>
@@ -402,6 +443,22 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="loadToViewerButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>View</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -472,6 +529,9 @@
        </property>
        <property name="text">
         <string>Close</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

@@ -658,7 +658,7 @@ def rf_duration_cal(
         plt.ioff()
         plt.show()
 
-    return rf_optimal_duration_val, data_dict
+    return rf_optimal_duration_val
 
 
 # TODO Add gui test functionality

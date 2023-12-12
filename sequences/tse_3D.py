@@ -187,7 +187,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
         # ToDo: if self.trajectory == "Cartesian": # (default)
-        make_tse_3D.pypulseq_tse3D(
+        if not make_tse_3D.pypulseq_tse3D(
             inputs={
                 "TE": self.param_TE,
                 "TR": self.param_TR,
@@ -207,7 +207,9 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             output_file=self.seq_file_path,
             pe_order_file=self.get_working_folder() + "/rawdata/pe_order.npy",
             output_folder=self.get_working_folder(),
-        )
+        ):
+            log.warning("Unable to calculate sequence")
+            return False
         # elif self.trajectory == "Radial":
         # pypulseq_tse2D_radial(
         #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
