@@ -6,6 +6,7 @@ import external.seq.adjustments_acq.config as cfg
 from sequences.common.get_trajectory import choose_pe_order
 import common.logger as logger
 from sequences.common import view_traj
+from common.constants import *
 
 log = logger.get_logger()
 
@@ -23,24 +24,11 @@ def pypulseq_tse3D(
     # ======
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
-    LARMOR_FREQ = cfg.LARMOR_FREQ
-    RF_MAX = cfg.RF_MAX
-    RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
 
-    # fovx = 140e-3  # Define FOV and resolution
-    # fovy = 140e-3
-    # cfovz = 140e-3
-    # Nx = 70  # Targeting a resolution of 2 x 2 x 5mm3
-    # Ny = 70
-    # Nz = 28
-    calib = 0.9
-
-    alpha1 = calib * 90  # flip angle
+    alpha1 = 90  # flip angle
     alpha1_duration = 120e-6  # pulse duration
-    alpha2 = calib * 180  # refocusing flip angle
+    alpha2 = 170  # refocusing flip angle
     alpha2_duration = 120e-6  # pulse duration
-
-    prephaser_duration = 3e-3  # TODO: Need to define this behind the scenes and optimze
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
@@ -63,7 +51,6 @@ def pypulseq_tse3D(
     adc_duration = Nx * adc_dwell  # 6.4e-3
 
     traj = inputs["Ordering"]
-    # traj = "linear_up"  # TODO: add linear, hybrid trajectory
 
     # TODO: coordinate the orientation
     ch0 = "x"
@@ -127,14 +114,14 @@ def pypulseq_tse3D(
     rf1 = pp.make_block_pulse(
         flip_angle=alpha1 * math.pi / 180,
         duration=alpha1_duration,
-        delay=100e-6,
+        # delay=100e-6,
         system=system,
         use="excitation",
     )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
-        delay=100e-6,
+        # delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
         use="refocusing",
@@ -245,20 +232,34 @@ def pypulseq_tse3D(
 
     dummyshots = inputs["dummy_shots"]
 
+    adc_phase = []
+    rfspoil_phase = 0
+    rfspoil_inc = 0
+    rfspoil_incinc = 117
+
     # ======
     # CONSTRUCT SEQUENCE
     # ======
     # Loop over phase encodes and define sequence blocks
     for avg in range(num_averages):
         for i in range(n_shots + dummyshots):
-            # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
-            # adc.phase_offset = rf_phase / 180 * np.pi
-            # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
-            # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
+            rfspoil_inc = rfspoil_inc + rfspoil_incinc
+            rfspoil_phase = rfspoil_phase + rfspoil_inc
+            rfspoil_phase = np.mod(rfspoil_phase, 360.0)
+            rfspoil_phase_180 = np.mod(rfspoil_phase + 180.0, 360.0)
+            rfspoil_inc = np.mod(rfspoil_inc, 360.0)
+
             if i < dummyshots:
                 is_dummyshot = True
             else:
                 is_dummyshot = False
+
+            # RF spoiling to cancel contributions from residual magnetization (if TR too short)
+            rf1.phase_offset = rfspoil_phase / 180.0 * math.pi
+            rf2.phase_offset = rfspoil_phase_180 / 180.0 * math.pi
+
+            # ADCs currently don't support setting a phase -- needs to be done in post processing
+            # adc.phase_offset = rfspoil_phase / 180.0 * math.pi
 
             seq.add_block(rf1)
             for echo in range(ETL):
@@ -308,6 +309,7 @@ def pypulseq_tse3D(
                     seq.add_block(gx)
                 else:
                     seq.add_block(gx, adc)
+                    adc_phase.append(rfspoil_phase)
                 # gy_pre.amplitude = -gy_pre.amplitude
                 # gz_pre.amplitude = -gz_pre.amplitude
                 seq.add_block(gy_rew, gz_rew)
@@ -337,6 +339,19 @@ def pypulseq_tse3D(
         log.info("Completed calculating Trajectory")
         log.info("Generating plots...")
         view_traj.view_traj_3d(k_traj_adc, k_traj, output_folder)
+
+    try:
+        np.save(
+            output_folder
+            + "/"
+            + mri4all_taskdata.RAWDATA
+            + "/"
+            + mri4all_scanfiles.ADC_PHASE,
+            adc_phase,
+        )
+    except:
+        log.error("Could not write file with ADC phase")
+        return False
 
     try:
         seq.write(output_file)

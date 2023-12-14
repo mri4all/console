@@ -30,6 +30,7 @@ class mri4all_files:
 class mri4all_scanfiles:
     RAWDATA = "raw.npy"
     PE_ORDER = "pe_order.npy"
+    ADC_PHASE = "adc_phase.npy"
     TRAJ = "traj.csv"  # csv format with rows: z phase encode, columns: y phase encodes
     BDATA = "B0.npy"
 

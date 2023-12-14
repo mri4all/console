@@ -61,7 +61,9 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
     order = np.load(
         folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.PE_ORDER
     )
-    print(order)
+    adc_phases = np.load(
+        folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.ADC_PHASE
+    )
     kData = np.load(
         folder + "/" + mri4all_taskdata.RAWDATA + "/" + mri4all_scanfiles.RAWDATA
     )
@@ -84,14 +86,19 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
     center_pe = kSpace.shape[1] - int(kSpace.shape[1] / 2)
     max_slc = kSpace.shape[2]
     max_pe = kSpace.shape[1]
+
     counter = 0
     for line in order:
         # kSpace[200:511, center_pe - line[0], center_slc - line[1]] = kData[
         #     counter, 200:511
         # ]
+
+        # Remove phase offset, if RF spoiling has been used
+        adc_phase = adc_phases[counter] / 180.0 * np.pi
+
         kSpace[
             :, (center_pe - line[0]) % max_pe, (center_slc - line[1]) % max_slc
-        ] = kData[counter, :]
+        ] = kData[counter, :] * np.exp(adc_phase * 1j)
         counter += 1
 
     fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kSpace)))

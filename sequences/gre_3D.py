@@ -11,6 +11,7 @@ from external.seq.adjustments_acq.scripts import run_pulseq
 from sequences.common.get_trajectory import choose_pe_order
 from sequences import PulseqSequence
 from sequences.common import make_tse_3D
+from common.constants import *
 import common.logger as logger
 from common.types import ResultItem
 import common.helper as helper
@@ -33,8 +34,8 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     param_slices: int = 8
     param_BW: int = 32000
     param_trajectory: str = "Cartesian"
-    param_ordering: str = "center_out"
-    param_dummy_shots: int = 5
+    param_ordering: str = "linear_up"
+    param_dummy_shots: int = 10
 
     @classmethod
     def get_readable_name(self) -> str:
@@ -109,7 +110,7 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             "slices": 8,
             "BW": 32000,
             "trajectory": "Cartesian",
-            "ordering": "center_out",
+            "ordering": "linear_up",
             "FA": 20,
         }
 
@@ -220,10 +221,6 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         output_file = self.seq_file_path
         pe_order_file = self.get_working_folder() + "/rawdata/pe_order.npy"
 
-        LARMOR_FREQ = cfg.LARMOR_FREQ
-        RF_MAX = cfg.RF_MAX
-        RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-
         alpha1 = self.param_FA
         alpha1_duration = 100e-6
 
@@ -309,9 +306,10 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         gx_pre = pp.make_trapezoid(
             channel=ch0,
             area=gx.area / 2,
+            duration=pp.calc_duration(gx) / 2,
             system=system,
         )
-        gx_pre.amplitude = gx_pre.amplitude
+        gx_pre.amplitude = -1 * gx_pre.amplitude
 
         pe_order = choose_pe_order(
             ndims=3,
@@ -366,23 +364,19 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         # CONSTRUCT SEQUENCE
         # ======
 
+        adc_phase = []
         rfspoil_phase = 0
         rfspoil_inc = 0
-        rfspoil_incinc = 0
+        rfspoil_incinc = 0.0
 
         # Loop over phase encodes and define sequence blocks
         for avg in range(num_averages):
             for i in range(n_shots + dummyshots):
-                # rf1.phase_offset = rf_phase / 180 * np.pi  # TODO: Include later
-                # adc.phase_offset = rf_phase / 180 * np.pi
-                # rf_inc = divmod(rf_inc + rf_spoiling_inc, 360.0)[1]
-                # rf_phase = divmod(rf_phase + rf_inc, 360.0)[1]
-
                 rfspoil_inc = rfspoil_inc + rfspoil_incinc
                 rfspoil_phase = rfspoil_phase + rfspoil_inc
                 rfspoil_phase = np.mod(rfspoil_phase, 360.0)
                 rfspoil_inc = np.mod(rfspoil_inc, 360.0)
-                print(f"{i} = {rfspoil_phase}")
+                # print(f"{i} = {rfspoil_phase}")
 
                 if i < dummyshots:
                     is_dummyshot = True
@@ -416,8 +410,9 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 if is_dummyshot:
                     seq.add_block(gx)
                 else:
-                    adc.phase_offset = rfspoil_phase / 180 * math.pi
                     seq.add_block(gx, adc)
+                    # adc.phase_offset = rfspoil_phase / 180 * math.pi
+                    adc_phase.append(rfspoil_phase)
 
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
@@ -425,12 +420,25 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 seq.add_block(pp.make_delay(delay_TR))
 
         # Check whether the timing of the sequence is correct
-        # ok, error_report = seq.check_timing()
-        # if ok:
-        #     log.info("Timing check passed successfully")
-        # else:
-        #     log.info("Timing check failed. Error listing follows:")
-        #     [print(e) for e in error_report]
+        ok, error_report = seq.check_timing()
+        if ok:
+            log.info("Timing check passed successfully")
+        else:
+            log.info("Timing check failed. Error listing follows:")
+            [print(e) for e in error_report]
+
+        try:
+            np.save(
+                self.get_working_folder()
+                + "/"
+                + mri4all_taskdata.RAWDATA
+                + "/"
+                + mri4all_scanfiles.ADC_PHASE,
+                adc_phase,
+            )
+        except:
+            log.error("Could not write file with ADC phase")
+            return False
 
         try:
             seq.write(output_file)
