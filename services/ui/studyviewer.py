@@ -87,8 +87,8 @@ class StudyViewer(QDialog):
             return
 
         self.examTableWidget.setColumnHidden(0, True)
-        self.examTableWidget.horizontalHeader().resizeSection(1, 500)
-        self.examTableWidget.horizontalHeader().resizeSection(2, 300)
+        # self.examTableWidget.horizontalHeader().resizeSection(1, 500)
+        # self.examTableWidget.horizontalHeader().resizeSection(2, 300)
         self.examTableWidget.horizontalHeader().setStretchLastSection(True)
         self.examTableWidget.verticalHeader().setDefaultSectionSize(36)
 
@@ -134,6 +134,7 @@ class StudyViewer(QDialog):
         self.selectAllPushButton.clicked.connect(self.select_all_clicked)
         self.selectNonePushButton.clicked.connect(self.select_none_clicked)
         self.definitionPushButton.clicked.connect(self.show_definition)
+        self.cloneScanButton.clicked.connect(self.clone_scan_clicked)
 
         label_style = "font-weight: bold; color: #E0A526; font-size: 20px; margin-left: 0px; padding-left: 0px;"
         self.scansLabel.setStyleSheet(label_style)
@@ -150,9 +151,13 @@ class StudyViewer(QDialog):
         self.exportPushButton.setText(" Export")
         self.exportPushButton.setIconSize(QSize(20, 20))
 
-        self.loadToViewerButton.setText(" Load into")
+        self.loadToViewerButton.setText(" Load to")
         self.loadToViewerButton.setIcon(qta.icon("fa5s.image"))
         self.loadToViewerButton.setIconSize(QSize(20, 20))
+
+        self.cloneScanButton.setText(" Clone")
+        self.cloneScanButton.setIcon(qta.icon("fa5s.clone"))
+        self.cloneScanButton.setIconSize(QSize(20, 20))
 
         loadToViewerMenu = QMenu()
         loadToViewerMenu.addAction("Viewer 1", self.loadtoviewer1_clicked)
@@ -212,6 +217,13 @@ class StudyViewer(QDialog):
         self.scanListWidget.currentRowChanged.connect(self.scan_selected)
         self.resultListWidget.currentRowChanged.connect(self.result_selected)
         self.examTableWidget.setCurrentCell(0, 0)
+
+        QTimer.singleShot(1, self.update_control_size)
+
+    def update_control_size(self):
+        table_width = self.examTableWidget.width()
+        self.examTableWidget.horizontalHeader().resizeSection(1, int(table_width * 0.5))
+        self.examTableWidget.horizontalHeader().resizeSection(2, int(table_width * 0.2))
 
     def get_selected_exam_index(self):
         index = self.examTableWidget.currentRow()
@@ -394,3 +406,8 @@ class StudyViewer(QDialog):
                 ui_runtime.examination_widget.viewer3.view_data(
                     scan_path, result_data.type, scan.task
                 )
+
+    def clone_scan_clicked(self):
+        exam = self.exams[self.get_selected_exam_index()]
+        scan = exam.scans[self.scanListWidget.currentRow()]
+        # TODO: Generate new scan from scan.dir
