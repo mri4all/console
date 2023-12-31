@@ -150,6 +150,12 @@ def close_patient():
             log.error("Error while clearing data folders.")
 
 
+def is_exam_active() -> bool:
+    if stacked_widget.currentIndex() == 1:
+        return True
+    else:
+        return False
+
 def get_scan_queue_entry(index: int) -> Any:
     global scan_queue_list
 
@@ -270,7 +276,11 @@ def create_new_scan(requested_sequence: str) -> bool:
 
 def duplicate_sequence(index: int) -> bool:
     template_scan_path = get_scan_location(index)
-    template_scan_data = task.read_task(template_scan_path)
+    return duplicate_sequence_dir(template_scan_path)
+
+
+def duplicate_sequence_dir(template_path: str) -> bool:
+    template_scan_data = task.read_task(template_path)
 
     if not create_new_scan(template_scan_data.sequence):
         log.error("Failed to create new scan of same sequence.")

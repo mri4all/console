@@ -87,8 +87,6 @@ class StudyViewer(QDialog):
             return
 
         self.examTableWidget.setColumnHidden(0, True)
-        # self.examTableWidget.horizontalHeader().resizeSection(1, 500)
-        # self.examTableWidget.horizontalHeader().resizeSection(2, 300)
         self.examTableWidget.horizontalHeader().setStretchLastSection(True)
         self.examTableWidget.verticalHeader().setDefaultSectionSize(36)
 
@@ -135,6 +133,10 @@ class StudyViewer(QDialog):
         self.selectNonePushButton.clicked.connect(self.select_none_clicked)
         self.definitionPushButton.clicked.connect(self.show_definition)
         self.cloneScanButton.clicked.connect(self.clone_scan_clicked)
+
+        if not ui_runtime.is_exam_active():
+            self.cloneScanButton.setEnabled(False)
+            self.loadToViewerButton.setEnabled(False)
 
         label_style = "font-weight: bold; color: #E0A526; font-size: 20px; margin-left: 0px; padding-left: 0px;"
         self.scansLabel.setStyleSheet(label_style)
@@ -410,4 +412,6 @@ class StudyViewer(QDialog):
     def clone_scan_clicked(self):
         exam = self.exams[self.get_selected_exam_index()]
         scan = exam.scans[self.scanListWidget.currentRow()]
-        # TODO: Generate new scan from scan.dir
+        if not ui_runtime.duplicate_sequence_dir(scan.dir):
+            # TODO: Error handling
+            pass
