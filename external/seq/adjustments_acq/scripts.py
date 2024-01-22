@@ -112,6 +112,19 @@ def run_pulseq(
     log.debug("Running shim function...")
     instructions = shim(instructions, (shim_x, shim_y, shim_z))
 
+    # temp = instructions
+    # instructions = {
+    #     "tx0": temp["tx0"],
+    #     "tx1": temp["tx0"],  # DBG: Running the TX0 also on TX1 for testing purpose
+    #     "grad_vx": temp["grad_vx"],
+    #     "grad_vy": temp["grad_vy"],
+    #     "grad_vz": temp["grad_vz"],
+    #     "grad_vz2": temp["grad_vz2"],
+    #     "rx0_en": temp["rx0_en"],
+    #     "tx_gate": temp["tx_gate"],
+    # }
+    # print(instructions)
+
     # Initialize experiment class
     if expt is None:
         log.debug("Initializing marcos client...")
@@ -120,7 +133,7 @@ def run_pulseq(
             rx_t=param_dict["rx_t"],
             init_gpa=True,
             gpa_fhdo_offset_time=grad_t / 3,
-            grad_max_update_rate=0.1,
+            grad_max_update_rate=0.125,
             halt_and_reset=True,
         )
 
@@ -150,6 +163,8 @@ def run_pulseq(
 
     # Load instructions
     expt.add_flodict(instructions)
+
+    expt.plot_sequence()
 
     log.debug("Running instructions...")
 

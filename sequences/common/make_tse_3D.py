@@ -27,7 +27,7 @@ def pypulseq_tse3D(
 
     alpha1 = 90  # flip angle
     alpha1_duration = 120e-6  # pulse duration
-    alpha2 = 170  # refocusing flip angle
+    alpha2 = 180  # refocusing flip angle
     alpha2_duration = 120e-6  # pulse duration
 
     TR = inputs["TR"] / 1000
@@ -114,14 +114,14 @@ def pypulseq_tse3D(
     rf1 = pp.make_block_pulse(
         flip_angle=alpha1 * math.pi / 180,
         duration=alpha1_duration,
-        # delay=100e-6,
+        delay=100e-6,
         system=system,
         use="excitation",
     )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
-        # delay=100e-6,
+        delay=100e-6,
         phase_offset=math.pi / 2,
         system=system,
         use="refocusing",

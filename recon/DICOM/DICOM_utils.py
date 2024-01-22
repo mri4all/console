@@ -23,6 +23,7 @@ def write_dicom(
     description="",
     primary_result=True,
     autoload_viewer=1,
+    result_index=0,
 ):
     """
     Write DICOMS to a specified holder using information from the scan task
@@ -79,7 +80,7 @@ def write_dicom(
     result.file_path = (
         mri4all_taskdata.DICOM + "/" + "series" + str(seriesNumber).zfill(5) + "#"
     )
-    task.results.append(result)
+    task.results.insert(result_index, result)
     return
 
 

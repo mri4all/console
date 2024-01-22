@@ -146,14 +146,14 @@ class StudyViewer(QDialog):
         self.viewerLabel.setStyleSheet(label_style)
 
         self.definitionPushButton.setIcon(qta.icon("fa5s.binoculars"))
-        self.definitionPushButton.setText(" Show definition")
+        self.definitionPushButton.setText(" Definition")
         self.definitionPushButton.setIconSize(QSize(20, 20))
 
         self.exportPushButton.setIcon(qta.icon("fa5s.save"))
         self.exportPushButton.setText(" Export")
         self.exportPushButton.setIconSize(QSize(20, 20))
 
-        self.loadToViewerButton.setText(" Load to")
+        self.loadToViewerButton.setText(" View in")
         self.loadToViewerButton.setIcon(qta.icon("fa5s.image"))
         self.loadToViewerButton.setIconSize(QSize(20, 20))
 

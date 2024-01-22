@@ -2,7 +2,9 @@ import os
 from pathlib import Path
 import datetime
 
+import matplotlib.pyplot as plt
 from PyQt5 import uic
+import pickle
 
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
@@ -263,6 +265,18 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             raw_filename="raw",
             expected_duration_sec=expected_duration_sec,
         )
+
+        file = open(self.get_working_folder() + "/other/seq.plot", "wb")
+        fig = plt.gcf()
+        pickle.dump(fig, file)
+        file.close()
+
+        result = ResultItem()
+        result.name = "seq_plot"
+        result.description = "Timing diagram of sequence"
+        result.type = "plot"
+        result.file_path = "other/seq.plot"
+        scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())
         return True

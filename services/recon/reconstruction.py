@@ -107,7 +107,7 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
         offset = int(dims[2]) / 4
         fft = fft[int(offset) : int(3 * offset), :, :]
 
-    DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM)
+    DICOM.write_dicom(fft, task, folder + "/" + mri4all_taskdata.DICOM, result_index=0)
 
     # kSpace = np.angle(kSpace)
     kSpace = 100 * (kSpace - kSpace.min()) / (kSpace.max() - kSpace.min())
@@ -119,6 +119,7 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
         name="k-Space",
         primary_result=False,
         autoload_viewer=2,
+        result_index=1,
     )
 
     return True
