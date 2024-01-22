@@ -76,12 +76,8 @@ class StudyViewer(QDialog):
 
         self.setWindowTitle("Study Viewer")
 
-        self.exams = self.organize_scan_data_from_folders(
-            Path(mri4all_paths.DATA_COMPLETE)
-        )
-        self.exams += self.organize_scan_data_from_folders(
-            Path(mri4all_paths.DATA_ARCHIVE)
-        )
+        self.exams = self.organize_scan_data_from_folders(Path(mri4all_paths.DATA_COMPLETE))
+        self.exams += self.organize_scan_data_from_folders(Path(mri4all_paths.DATA_ARCHIVE))
 
         if not self.exams:
             return
@@ -96,9 +92,7 @@ class StudyViewer(QDialog):
             self.examTableWidget.insertRow(rowPosition)
 
             self.examTableWidget.setItem(rowPosition, 0, QTableWidgetItem(str(idx)))
-            self.examTableWidget.setItem(
-                rowPosition, 1, QTableWidgetItem(e.patientName)
-            )
+            self.examTableWidget.setItem(rowPosition, 1, QTableWidgetItem(e.patientName))
             item = QTableWidgetItem(e.acc.upper())
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.examTableWidget.setItem(rowPosition, 2, item)
@@ -109,17 +103,13 @@ class StudyViewer(QDialog):
 
         self.examTableWidget.sortItems(3, Qt.DescendingOrder)
 
-        self.dicomTargetComboBox.addItems(
-            [t.name for t in config.get_config().dicom_targets]
-        )
+        self.dicomTargetComboBox.addItems([t.name for t in config.get_config().dicom_targets])
         self.sendDicomsButton.clicked.connect(self.dicoms_send)
 
         viewerLayout = QHBoxLayout(self.viewerFrame)
         viewerLayout.setContentsMargins(0, 0, 0, 0)
         self.viewer = ViewerWidget()
-        self.viewerFrame.setStyleSheet(
-            "QFrame#viewerFrame { border: 1px solid #262C44; }"
-        )
+        self.viewerFrame.setStyleSheet("QFrame#viewerFrame { border: 1px solid #262C44; }")
         viewerLayout.addWidget(self.viewer)
         self.viewerFrame.setLayout(viewerLayout)
 
@@ -165,6 +155,7 @@ class StudyViewer(QDialog):
         loadToViewerMenu.addAction("Viewer 1", self.loadtoviewer1_clicked)
         loadToViewerMenu.addAction("Viewer 2", self.loadtoviewer2_clicked)
         loadToViewerMenu.addAction("Viewer 3", self.loadtoviewer3_clicked)
+        loadToViewerMenu.addAction("Flex Viewer", self.loadtoflexviewer_clicked)
         self.loadToViewerButton.setMenu(loadToViewerMenu)
         self.loadToViewerButton.setStyleSheet(
             """QPushButton::menu-indicator {
@@ -235,9 +226,7 @@ class StudyViewer(QDialog):
 
     def trigger_load_scan(self):
         self.loadTimer.stop()
-        self.viewer.view_data(
-            self.load_scan_path, self.load_result_type, self.load_scan_task
-        )
+        self.viewer.view_data(self.load_scan_path, self.load_result_type, self.load_scan_task)
 
     def dicoms_send(self):
         # TODO: Add mechanism for sending DICOMs in background task
@@ -256,9 +245,7 @@ class StudyViewer(QDialog):
             try:
                 dicomexport.send_dicoms(
                     checked_scan.dir / "dicom",
-                    config.get_config().dicom_targets[
-                        self.dicomTargetComboBox.currentIndex()
-                    ],
+                    config.get_config().dicom_targets[self.dicomTargetComboBox.currentIndex()],
                 )
             except Exception as e:
                 msg = QMessageBox()
@@ -291,9 +278,7 @@ class StudyViewer(QDialog):
             self.viewer.clear_view()
         else:
             for result in scan.task.results:
-                self.resultListWidget.addItem(
-                    result.name + "  (" + result.type.upper() + ")"
-                )
+                self.resultListWidget.addItem(result.name + "  (" + result.type.upper() + ")")
         self.resultListWidget.setCurrentRow(0)
 
     def exam_selected(self):
@@ -307,11 +292,7 @@ class StudyViewer(QDialog):
             failed_notice = ""
             if scan_obj.task.journal.failed_at:
                 failed_notice = "  [failed]"
-            item = QListWidgetItem(
-                f"{scan_obj.task.scan_number}:  "
-                + scan_obj.task.protocol_name
-                + failed_notice
-            )
+            item = QListWidgetItem(f"{scan_obj.task.scan_number}:  " + scan_obj.task.protocol_name + failed_notice)
             item.setCheckState(Qt.CheckState.Unchecked)
             self.scanListWidget.addItem(item)
         self.scanListWidget.setCurrentRow(0)
@@ -330,9 +311,7 @@ class StudyViewer(QDialog):
             if not scan_task:
                 continue
 
-            patient_name = (
-                f"{scan_task.patient.last_name}, {scan_task.patient.first_name}"
-            )
+            patient_name = f"{scan_task.patient.last_name}, {scan_task.patient.first_name}"
 
             # create a new exam object if not found
             exam = next((e for e in exams if e.id == exam_id), None)
@@ -387,6 +366,9 @@ class StudyViewer(QDialog):
     def loadtoviewer3_clicked(self):
         self.loadtoviewer(3)
 
+    def loadtoflexviewer_clicked(self):
+        self.loadtoviewer(4)
+
     def loadtoviewer(self, viewer_id):
         exam = self.exams[self.get_selected_exam_index()]
         scan = exam.scans[self.scanListWidget.currentRow()]
@@ -397,17 +379,13 @@ class StudyViewer(QDialog):
             scan_path = str(scan.dir) + "/" + result_data.file_path
 
             if viewer_id == 1:
-                ui_runtime.examination_widget.viewer1.view_data(
-                    scan_path, result_data.type, scan.task
-                )
+                ui_runtime.examination_widget.viewer1.view_data(scan_path, result_data.type, scan.task)
             if viewer_id == 2:
-                ui_runtime.examination_widget.viewer2.view_data(
-                    scan_path, result_data.type, scan.task
-                )
+                ui_runtime.examination_widget.viewer2.view_data(scan_path, result_data.type, scan.task)
             if viewer_id == 3:
-                ui_runtime.examination_widget.viewer3.view_data(
-                    scan_path, result_data.type, scan.task
-                )
+                ui_runtime.examination_widget.viewer3.view_data(scan_path, result_data.type, scan.task)
+            if viewer_id == 4:
+                ui_runtime.examination_widget.flexViewer.view_data(scan_path, result_data.type, scan.task)
 
     def clone_scan_clicked(self):
         exam = self.exams[self.get_selected_exam_index()]
