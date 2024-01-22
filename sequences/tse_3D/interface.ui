@@ -31,7 +31,7 @@
     <rect>
      <x>19</x>
      <y>10</y>
-     <width>852</width>
+     <width>875</width>
      <height>483</height>
     </rect>
    </property>
@@ -337,18 +337,18 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="1">
-       <spacer name="verticalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="minimumSize">
          <size>
-          <width>20</width>
-          <height>238</height>
+          <width>150</width>
+          <height>0</height>
          </size>
         </property>
-       </spacer>
+        <property name="text">
+         <string>Ordering</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1" colspan="2">
        <widget class="QComboBox" name="Ordering_ComboBox">
@@ -383,26 +383,26 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="minimumSize">
+      <item row="4" column="1">
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>150</width>
-          <height>0</height>
+          <width>20</width>
+          <height>238</height>
          </size>
         </property>
-        <property name="text">
-         <string>Ordering</string>
-        </property>
-       </widget>
+       </spacer>
       </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="visualize_traj_CheckBox">
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="PlotTiming_CheckBox">
         <property name="whatsThis">
          <string>Visualize the trajectory</string>
         </property>
         <property name="text">
-         <string>Visualize Traj</string>
+         <string>Plot Sequence Timing</string>
         </property>
         <property name="checked">
          <bool>true</bool>

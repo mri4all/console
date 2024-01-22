@@ -783,28 +783,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="protocolBrowserButton">
-              <property name="minimumSize">
-               <size>
-                <width>64</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>64</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>prot browse</string>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="flexViewerButton">
               <property name="minimumSize">
                <size>
@@ -823,6 +801,28 @@
               </property>
               <property name="checkable">
                <bool>true</bool>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="protocolBrowserButton">
+              <property name="minimumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>prot browse</string>
               </property>
               <property name="flat">
                <bool>true</bool>
@@ -880,7 +880,7 @@
      <x>0</x>
      <y>0</y>
      <width>1228</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuControl">

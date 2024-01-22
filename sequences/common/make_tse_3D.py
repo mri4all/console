@@ -44,7 +44,7 @@ def pypulseq_tse3D(
     dim1 = Nz  # TODO: remove redundancy and bind it closer to UI - next step
     num_averages = inputs["NSA"]
     orientation = inputs["Orientation"]
-    visualize = inputs["view_traj"]
+    visualize = False
 
     BW = inputs["BW"]  # 20e3
     adc_dwell = 1 / BW

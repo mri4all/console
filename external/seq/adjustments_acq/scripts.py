@@ -153,18 +153,19 @@ def run_pulseq(
         instructions[buf] = (instructions[buf][0] + flat_delay, instructions[buf][1])
 
     # Plot instructions if needed
-    if plot_instructions:
-        _, axs = plt.subplots(len(instructions), 1, constrained_layout=True)
-        for i, key in enumerate(instructions.keys()):
-            axs[i].step(instructions[key][0], instructions[key][1], where="post")
-            axs[i].plot(instructions[key][0], instructions[key][1], "rx")
-            axs[i].set_title(key)
-        plt.show()
+    # if plot_instructions:
+    #     _, axs = plt.subplots(len(instructions), 1, constrained_layout=True)
+    #     for i, key in enumerate(instructions.keys()):
+    #         axs[i].step(instructions[key][0], instructions[key][1], where="post")
+    #         axs[i].plot(instructions[key][0], instructions[key][1], "rx")
+    #         axs[i].set_title(key)
+    #     plt.show()
 
     # Load instructions
     expt.add_flodict(instructions)
 
-    expt.plot_sequence()
+    if plot_instructions:
+         expt.plot_sequence()
 
     log.debug("Running instructions...")
 

@@ -37,7 +37,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     param_BW: int = 32000
     param_Trajectory: str = "Cartesian"
     param_Ordering: str = "center_out"
-    param_view_traj: bool = False
+    param_plot_timing: bool = False
     param_dummy_shots: int = 5
 
     @classmethod
@@ -99,7 +99,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             "BW": self.param_BW,
             "Trajectory": self.param_Trajectory,
             "Ordering": self.param_Ordering,
-            "view_traj": self.param_view_traj,
+            "Plot_Timing": self.param_plot_timing,
         }
 
     @classmethod
@@ -118,7 +118,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             "BW": 32000,
             "Trajectory": "Cartesian",
             "Ordering": "center_out",
-            "view_traj": False,
+            "Plot_Timing": False,
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -135,7 +135,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             self.param_BW = parameters["BW"]
             self.param_Trajectory = parameters["Trajectory"]
             self.param_Ordering = parameters["Ordering"]
-            self.param_view_traj = parameters["view_traj"]
+            self.param_plot_timing = parameters["Plot_Timing"]
         except:
             self.problem_list.append("Invalid parameters provided")
             return False
@@ -153,7 +153,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         widget.BW_SpinBox.setValue(self.param_BW)
         widget.Trajectory_ComboBox.setCurrentText(self.param_Trajectory)
         widget.Ordering_ComboBox.setCurrentText(self.param_Ordering)
-        widget.visualize_traj_CheckBox.setChecked(self.param_view_traj)
+        widget.PlotTiming_CheckBox.setChecked(self.param_plot_timing)
         return True
 
     def read_parameters_from_ui(self, widget, scan_task) -> bool:
@@ -169,7 +169,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         self.param_BW = widget.BW_SpinBox.value()
         self.param_Trajectory = widget.Trajectory_ComboBox.currentText()
         self.param_Ordering = widget.Ordering_ComboBox.currentText()
-        self.param_view_traj = widget.visualize_traj_CheckBox.isChecked()
+        self.param_plot_timing = widget.PlotTiming_CheckBox.isChecked()
         self.validate_parameters(scan_task)
         return self.is_valid()
 
@@ -188,7 +188,6 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         scan_task.processing.oversampling_read = 2
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
-        # ToDo: if self.trajectory == "Cartesian": # (default)
         if not make_tse_3D.pypulseq_tse3D(
             inputs={
                 "TE": self.param_TE,
@@ -202,7 +201,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 "BW": self.param_BW,
                 "Trajectory": self.param_Trajectory,
                 "Ordering": self.param_Ordering,
-                "view_traj": self.param_view_traj,
+                "Plot_Timing": self.param_plot_timing,
                 "dummy_shots": self.param_dummy_shots,
             },
             check_timing=True,
@@ -212,21 +211,9 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         ):
             log.warning("Unable to calculate sequence")
             return False
-        # elif self.trajectory == "Radial":
-        # pypulseq_tse2D_radial(
-        #    inputs={"TE": self.param_TE, "TR": self.param_TR}, check_timing=True, output_file=self.seq_file_path
-        # )
 
         log.info("Done calculating sequence " + self.get_name())
         self.calculated = True
-        if self.param_view_traj is True:
-            log.info("Displaying trajectory... " + self.get_name())
-            result = ResultItem()
-            result.name = "traj plot"
-            result.description = "Plot of trajectory in k space of current sequence."
-            result.type = "plot"
-            result.file_path = "other/traj.plot"
-            scan_task.results.append(result)
 
         return True
 
@@ -242,6 +229,8 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             )
             / 1000
         )
+
+        plot_instructions = self.param_plot_timing
 
         rxd, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
@@ -264,19 +253,21 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             case_path=self.get_working_folder(),
             raw_filename="raw",
             expected_duration_sec=expected_duration_sec,
+            plot_instructions=plot_instructions,
         )
 
-        file = open(self.get_working_folder() + "/other/seq.plot", "wb")
-        fig = plt.gcf()
-        pickle.dump(fig, file)
-        file.close()
+        if plot_instructions:
+            file = open(self.get_working_folder() + "/other/seq.plot", "wb")
+            fig = plt.gcf()
+            pickle.dump(fig, file)
+            file.close()
 
-        result = ResultItem()
-        result.name = "seq_plot"
-        result.description = "Timing diagram of sequence"
-        result.type = "plot"
-        result.file_path = "other/seq.plot"
-        scan_task.results.append(result)
+            result = ResultItem()
+            result.name = "seq_plot"
+            result.description = "Timing diagram of sequence"
+            result.type = "plot"
+            result.file_path = "other/seq.plot"
+            scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())
         return True

@@ -89,7 +89,9 @@ class ExaminationWindow(QMainWindow):
         self.actionLog_Viewer.triggered.connect(logviewer.show_logviewer)
         self.actionConfiguration.triggered.connect(configuration.show_configuration)
         self.actionSystem_Status.triggered.connect(systemstatus.show_systemstatus)
-        self.actionProtocol_Browser.triggered.connect(protocolbrowser.show_protocol_browser)
+        self.actionProtocol_Browser.triggered.connect(
+            protocolbrowser.show_protocol_browser
+        )
         self.actionStudy_Viewer.triggered.connect(studyviewer.show_viewer)
         self.action_set3Viewers.triggered.connect(self.set3Viewers)
         self.action_set2Viewers.triggered.connect(self.set2Viewers)
@@ -102,7 +104,9 @@ class ExaminationWindow(QMainWindow):
         self.protocolBrowserButton.setToolTip("Open protocol browser")
         self.protocolBrowserButton.setIcon(qta.icon("fa5s.list"))
         self.protocolBrowserButton.setIconSize(QSize(32, 32))
-        self.protocolBrowserButton.clicked.connect(protocolbrowser.show_protocol_browser)
+        self.protocolBrowserButton.clicked.connect(
+            protocolbrowser.show_protocol_browser
+        )
 
         self.resultsViewerButton.setText("")
         self.resultsViewerButton.setToolTip("Open study viewer")
@@ -112,7 +116,7 @@ class ExaminationWindow(QMainWindow):
 
         self.flexViewerButton.setText("")
         self.flexViewerButton.setToolTip("Open flex viewer")
-        self.flexViewerButton.setIcon(qta.icon("fa5s.window-maximize"))
+        self.flexViewerButton.setIcon(qta.icon("fa5.window-maximize"))
         self.flexViewerButton.setIconSize(QSize(32, 32))
         self.flexViewerButton.clicked.connect(self.toggle_flexviewer)
         self.flexViewerButton.setProperty("type", "dimmedcheck")
@@ -153,7 +157,9 @@ class ExaminationWindow(QMainWindow):
 
         self.deleteScanButton.setText("")
         self.deleteScanButton.setToolTip("Delete selected sequence")
-        self.deleteScanButton.setIcon(qta.icon("fa5s.trash-alt", color_disabled="#515669"))
+        self.deleteScanButton.setIcon(
+            qta.icon("fa5s.trash-alt", color_disabled="#515669")
+        )
         self.deleteScanButton.setIconSize(QSize(24, 24))
         self.deleteScanButton.setProperty("type", "toolbar")
         self.deleteScanButton.clicked.connect(self.delete_sequence_clicked)
@@ -206,7 +212,9 @@ class ExaminationWindow(QMainWindow):
         self.scanParametersWidget.widget(3).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(4).setStyleSheet("background-color: #0C1123;")
         self.scanParametersWidget.widget(5).setStyleSheet("background-color: #0C1123;")
-        self.scanParametersWidget.tabBar().setTabIcon(5, qta.icon("fa5s.exclamation-circle", color="#E5554F"))
+        self.scanParametersWidget.tabBar().setTabIcon(
+            5, qta.icon("fa5s.exclamation-circle", color="#E5554F")
+        )
         self.scanParametersWidget.setTabVisible(5, False)
 
         self.problemsWidget.setStyleSheet(
@@ -248,8 +256,12 @@ class ExaminationWindow(QMainWindow):
         viewer3Layout.addWidget(self.viewer3)
         self.viewer3Frame.setLayout(viewer3Layout)
 
-        self.sequenceResolutionLabel.setStyleSheet("color: #515669; font-size: 18px; font-weight: normal;")
-        self.sequenceResolutionLabel.setText("TA: 4.5 min   Voxel Size: 1.0 x 1.0 x 1.0 mm")
+        self.sequenceResolutionLabel.setStyleSheet(
+            "color: #515669; font-size: 18px; font-weight: normal;"
+        )
+        self.sequenceResolutionLabel.setText(
+            "TA: 4.5 min   Voxel Size: 1.0 x 1.0 x 1.0 mm"
+        )
         self.sequenceResolutionLabel.setVisible(False)
 
         self.statusLabel = QLabel()
@@ -322,7 +334,9 @@ class ExaminationWindow(QMainWindow):
                     dlg.setWindowTitle(msg_value.request.capitalize())
                     dlg.resize(500, 100)
                     ok = dlg.exec_()
-                    get_value = dict(text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue)[msg_value.input_type]
+                    get_value = dict(
+                        text=dlg.textValue, int=dlg.intValue, float=dlg.doubleValue
+                    )[msg_value.input_type]
                     value = get_value()
                 pipe.send_user_response(response=value, error=False)
 
@@ -389,8 +403,12 @@ class ExaminationWindow(QMainWindow):
                 # self.shim_dlg.canvas.axes.up
         elif isinstance(msg_value, ipc.messages.AcqDataMessage):
             try:
-                ui_runtime.status_start_time = datetime.fromisoformat(msg_value.start_time)
-                ui_runtime.status_expected_duration_sec = msg_value.expected_duration_sec
+                ui_runtime.status_start_time = datetime.fromisoformat(
+                    msg_value.start_time
+                )
+                ui_runtime.status_expected_duration_sec = (
+                    msg_value.expected_duration_sec
+                )
                 ui_runtime.status_disable_statustimer = msg_value.disable_statustimer
                 ui_runtime.status_received_acqdata = True
             except Exception as e:
@@ -406,13 +424,17 @@ class ExaminationWindow(QMainWindow):
 
         if ui_runtime.status_acq_active:
             if ui_runtime.status_received_acqdata:
-                current_duration = int((datetime.now() - ui_runtime.status_start_time).total_seconds())
+                current_duration = int(
+                    (datetime.now() - ui_runtime.status_start_time).total_seconds()
+                )
                 if ui_runtime.status_expected_duration_sec <= 0:
                     if not ui_runtime.status_disable_statustimer:
                         new_status_message = f"Running scan...  ({str(timedelta(seconds=current_duration))})"
                     self.statusProgress.setVisible(False)
                 else:
-                    current_percent = int(100 * current_duration / ui_runtime.status_expected_duration_sec)
+                    current_percent = int(
+                        100 * current_duration / ui_runtime.status_expected_duration_sec
+                    )
                     if current_percent > 100:
                         current_percent = 100
                     if not ui_runtime.status_disable_statustimer:
@@ -437,9 +459,14 @@ class ExaminationWindow(QMainWindow):
             self.scanner_status_message = new_status_message
             self.set_status_message(self.scanner_status_message)
 
-        if ui_runtime.status_last_completed_scan != ui_runtime.status_viewer_last_autoload_scan:
+        if (
+            ui_runtime.status_last_completed_scan
+            != ui_runtime.status_viewer_last_autoload_scan
+        ):
             # Trigger autoload of the last case
-            ui_runtime.status_viewer_last_autoload_scan = ui_runtime.status_last_completed_scan
+            ui_runtime.status_viewer_last_autoload_scan = (
+                ui_runtime.status_last_completed_scan
+            )
 
             if ui_runtime.status_last_completed_scan:
                 # Autoload the results into the viewers
@@ -520,7 +547,9 @@ class ExaminationWindow(QMainWindow):
         )
         for seq in sequence_list:
             # Adjustment sequences should not be shown here
-            if (not seq.startswith("adj_") or not seq.startswith("prescan_")) or rt.is_debugging_enabled():
+            if (
+                not seq.startswith("adj_") or not seq.startswith("prescan_")
+            ) or rt.is_debugging_enabled():
                 add_sequence_action = QAction(self)
                 seq_name = SequenceBase.get_sequence(seq).get_readable_name()
                 add_sequence_action.setText(seq_name)
@@ -539,7 +568,9 @@ class ExaminationWindow(QMainWindow):
         self.scroll_queue_end()
 
     def scroll_queue_end(self):
-        self.queueWidget.scrollToItem(self.queueWidget.item(self.queueWidget.count() - 1))
+        self.queueWidget.scrollToItem(
+            self.queueWidget.item(self.queueWidget.count() - 1)
+        )
 
     def insert_entry_to_queue_widget(self, entry: ScanQueueEntry):
         """
@@ -593,7 +624,9 @@ class ExaminationWindow(QMainWindow):
         widgetButton.setProperty("state", str(entry.state))
         if widget_icon:
             if (entry.state != "acq") and (entry.state != "recon"):
-                widgetButton.setIcon(qta.icon(f"fa5s.{widget_icon}", color=widget_font_color))
+                widgetButton.setIcon(
+                    qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
+                )
             else:
                 widgetButton.setIcon(
                     qta.icon(
@@ -613,16 +646,24 @@ class ExaminationWindow(QMainWindow):
         imageWidgetButton.setIconSize(QSize(24, 24))
         imageWidgetButton.setStyleSheet("background-color: transparent;")
         image_button_menu = QMenu(self)
-        view_action = image_button_menu.addAction("Show in Viewer 1", self.load_result_in_viewer)
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 1", self.load_result_in_viewer
+        )
         view_action.setProperty("source", str(entry.folder_name))
         view_action.setProperty("target", "viewer1")
-        view_action = image_button_menu.addAction("Show in Viewer 2", self.load_result_in_viewer)
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 2", self.load_result_in_viewer
+        )
         view_action.setProperty("source", str(entry.folder_name))
         view_action.setProperty("target", "viewer2")
-        view_action = image_button_menu.addAction("Show in Viewer 3", self.load_result_in_viewer)
+        view_action = image_button_menu.addAction(
+            "Show in Viewer 3", self.load_result_in_viewer
+        )
         view_action.setProperty("source", str(entry.folder_name))
         view_action.setProperty("target", "viewer3")
-        view_action = image_button_menu.addAction("Show in Flex Viewer", self.load_result_in_viewer)
+        view_action = image_button_menu.addAction(
+            "Show in Flex Viewer", self.load_result_in_viewer
+        )
         view_action.setProperty("source", str(entry.folder_name))
         view_action.setProperty("target", "flex")
         imageWidgetButton.setMenu(image_button_menu)
@@ -699,10 +740,14 @@ class ExaminationWindow(QMainWindow):
 
         self.queueWidget.item(index).setBackground(QColor(widget_background_color))
         selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(index))
-        selected_widget.layout().itemAt(0).widget().setText(f"{entry.scan_counter}. {entry.protocol_name}")
+        selected_widget.layout().itemAt(0).widget().setText(
+            f"{entry.scan_counter}. {entry.protocol_name}"
+        )
         selected_widget.layout().itemAt(0).widget().setStyleSheet(widget_stylesheet)
 
-        selected_widget.layout().itemAt(1).widget().setIcon(qta.icon(f"fa5s.image", color=widget_font_color))
+        selected_widget.layout().itemAt(1).widget().setIcon(
+            qta.icon(f"fa5s.image", color=widget_font_color)
+        )
         if entry.has_results:
             selected_widget.layout().itemAt(1).widget().setVisible(True)
         else:
@@ -710,7 +755,9 @@ class ExaminationWindow(QMainWindow):
 
         if widget_icon:
             # Only update the icon if the change has state. Otherwise, the animation gets reset during every update
-            if str(entry.state) != selected_widget.layout().itemAt(2).widget().property("state"):
+            if str(entry.state) != selected_widget.layout().itemAt(2).widget().property(
+                "state"
+            ):
                 if (entry.state != "acq") and (entry.state != "recon"):
                     selected_widget.layout().itemAt(2).widget().setIcon(
                         qta.icon(f"fa5s.{widget_icon}", color=widget_font_color)
@@ -720,7 +767,9 @@ class ExaminationWindow(QMainWindow):
                         qta.icon(
                             f"fa5s.{widget_icon}",
                             color=widget_font_color,
-                            animation=qta.Spin(selected_widget.layout().itemAt(2).widget()),
+                            animation=qta.Spin(
+                                selected_widget.layout().itemAt(2).widget()
+                            ),
                         )
                     )
         else:
@@ -764,7 +813,10 @@ class ExaminationWindow(QMainWindow):
 
         # Protocols can only be edited if they have not been scanned yet
         read_only = True
-        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
             read_only = False
 
         # Make the selected item bold
@@ -791,12 +843,16 @@ class ExaminationWindow(QMainWindow):
         log.info(f"Editing protocol {scan_entry.protocol_name} of type {sequence_type}")
 
         if not sequence_type in SequenceBase.installed_sequences():
-            log.error(f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed")
+            log.error(
+                f"Invalid sequence type selected for edit. Sequence {sequence_type} not installed"
+            )
             return
 
         try:
             # Create an instance of the sequence class and buffer it
-            ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(sequence_type)()
+            ui_runtime.editor_sequence_instance = SequenceBase.get_sequence(
+                sequence_type
+            )()
         except:
             log.error(f"Failed to create instance of sequence {sequence_type}")
             return
@@ -804,7 +860,9 @@ class ExaminationWindow(QMainWindow):
         # Ask the sequence to insert its UI into the first tab of the parameter widget
         self.sequenceResolutionLabel.setText("")
         sequence_ui_container = self.clear_seq_tab_and_return_empty()
-        ui_runtime.editor_sequence_instance.init_ui(sequence_ui_container, self.sequenceResolutionLabel)
+        ui_runtime.editor_sequence_instance.init_ui(
+            sequence_ui_container, self.sequenceResolutionLabel
+        )
         scan_path = ui_runtime.get_scan_location(index)
         if not scan_path:
             log.error("Case has invalid state. Cannot read scan parameters")
@@ -818,7 +876,9 @@ class ExaminationWindow(QMainWindow):
         scan_task = task.read_task(scan_path)
         ui_runtime.editor_protocol_name = scan_task.protocol_name
 
-        if not ui_runtime.editor_sequence_instance.set_parameters(scan_task.parameters, scan_task):
+        if not ui_runtime.editor_sequence_instance.set_parameters(
+            scan_task.parameters, scan_task
+        ):
             # TODO: Parameters from task file are invalid. Needs error handling.
             pass
 
@@ -826,7 +886,9 @@ class ExaminationWindow(QMainWindow):
         self.load_seqparam_to_ui(scan_task)
 
         ui_runtime.editor_scantask = scan_task
-        ui_runtime.editor_sequence_instance.write_parameters_to_ui(sequence_ui_container)
+        ui_runtime.editor_sequence_instance.write_parameters_to_ui(
+            sequence_ui_container
+        )
 
         # Configure UI for editing
         for i in range(self.scanParametersWidget.count()):
@@ -847,8 +909,12 @@ class ExaminationWindow(QMainWindow):
         if update_job:
             # Update the scan job with the new settings
             scan_path = ui_runtime.get_scan_location(ui_runtime.editor_queue_index)
-            ui_runtime.editor_scantask.parameters = ui_runtime.editor_sequence_instance.get_parameters()
-            ui_runtime.editor_scantask.other = json.loads(self.otherParametersTextEdit.toPlainText())
+            ui_runtime.editor_scantask.parameters = (
+                ui_runtime.editor_sequence_instance.get_parameters()
+            )
+            ui_runtime.editor_scantask.other = json.loads(
+                self.otherParametersTextEdit.toPlainText()
+            )
             self.store_seqparam_from_ui(ui_runtime.editor_scantask)
             ui_runtime.editor_scantask.journal.prepared_at = helper.get_datetime()
             task.write_task(scan_path, ui_runtime.editor_scantask)
@@ -858,7 +924,9 @@ class ExaminationWindow(QMainWindow):
         # Remove the bold font from the selected item
         for i in range(self.queueWidget.count()):
             selected_widget = self.queueWidget.itemWidget(self.queueWidget.item(i))
-            selected_widget.layout().itemAt(0).widget().setStyleSheet("font-weight: normal;")
+            selected_widget.layout().itemAt(0).widget().setStyleSheet(
+                "font-weight: normal;"
+            )
 
         self.clear_seq_tab_and_return_empty()
         self.scanParametersWidget.setCurrentIndex(0)
@@ -896,13 +964,17 @@ class ExaminationWindow(QMainWindow):
             json.loads(self.otherParametersTextEdit.toPlainText())
         except:
             parameters_valid = False
-            problems_list.append("Other additional parameters have invalid format. Please validate JSON syntax.")
+            problems_list.append(
+                "Other additional parameters have invalid format. Please validate JSON syntax."
+            )
 
         if not parameters_valid:
             self.scanParametersWidget.setTabVisible(5, True)
             self.scanParametersWidget.setStyleSheet(scanParameters_stylesheet_error)
             self.scanParametersWidget.setCurrentIndex(5)
-            problems_list = ui_runtime.editor_sequence_instance.get_problems() + problems_list
+            problems_list = (
+                ui_runtime.editor_sequence_instance.get_problems() + problems_list
+            )
             self.problemsWidget.clear()
             for problem in problems_list:
                 self.problemsWidget.addItem(str(problem))
@@ -1066,7 +1138,10 @@ class ExaminationWindow(QMainWindow):
         if not scan_entry:
             log.warning("Invalid scan queue index selected for renaming")
             return
-        if not (scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ):
+        if not (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
             # Jobs can only be renamed if they have not been scanned yet
             return
 
@@ -1090,7 +1165,10 @@ class ExaminationWindow(QMainWindow):
                 ui_runtime.update_scan_queue_list()
                 scan_entry = ui_runtime.get_scan_queue_entry(index)
 
-                if scan_entry.state != mri4all_states.CREATED and scan_entry.state != mri4all_states.SCHEDULED_ACQ:
+                if (
+                    scan_entry.state != mri4all_states.CREATED
+                    and scan_entry.state != mri4all_states.SCHEDULED_ACQ
+                ):
                     log.warning("Cannot rename scan. Scan has already been started.")
                     # TODO: Post message to UI
                     return
@@ -1138,7 +1216,9 @@ class ExaminationWindow(QMainWindow):
             # TODO: Show error message
             return
 
-        ui_runtime.get_scan_queue_entry(len(ui_runtime.scan_queue_list) - 1).protocol_name = scan_entry.protocol_name
+        ui_runtime.get_scan_queue_entry(
+            len(ui_runtime.scan_queue_list) - 1
+        ).protocol_name = scan_entry.protocol_name
 
         self.sync_queue_widget(True)
         self.scroll_queue_end()
@@ -1227,12 +1307,18 @@ class ExaminationWindow(QMainWindow):
         ui_runtime.update_scan_queue_list()
         scan_entry = ui_runtime.get_scan_queue_entry(index)
 
-        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
             self.deleteScanButton.setEnabled(True)
         else:
             self.deleteScanButton.setEnabled(False)
 
-        if scan_entry.state == mri4all_states.CREATED or scan_entry.state == mri4all_states.SCHEDULED_ACQ:
+        if (
+            scan_entry.state == mri4all_states.CREATED
+            or scan_entry.state == mri4all_states.SCHEDULED_ACQ
+        ):
             self.deleteScanButton.setEnabled(True)
         else:
             self.deleteScanButton.setEnabled(False)
