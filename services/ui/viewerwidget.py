@@ -14,6 +14,7 @@ from PyQt5 import QtGui
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
+from matplotlib.widgets import SpanSelector
 import matplotlib.pyplot as plt
 import common.logger as logger
 from common.types import ResultTypes, ScanTask, TimeSeriesResult
@@ -190,6 +191,49 @@ class ViewerWidget(QWidget):
 
         if task:
             figCanvas.setToolTip(f"{task.scan_number}:  {task.protocol_name}")
+
+        # list to store the axis last used with a mouseclick
+        curr_ax = []
+        axis = plt.gcf().get_axes()
+        self.textvar = None
+
+        # detect the currently modified axis
+        def on_click(event):
+            if event.inaxes:
+                curr_ax[:] = [event.inaxes]
+
+        # modify the current axis objects
+        def onselect(xmin, xmax):
+            # ignore if accidentally clicked into an axis object
+            if xmin == xmax:
+                return
+            # set all span selectors invisible accept the current
+            for ax, span in zip(axis, list_of_spans):
+                if ax != curr_ax[0]:
+                    span.set_visible(False)
+            txt = f"start = {xmin:.2f}, end = {xmax:.2f}, delta = {xmax-xmin:.2f}"
+            if self.textvar:
+                self.textvar.remove()
+            self.textvar = plt.figtext(
+                0.5, 0.01, txt, wrap=True, horizontalalignment="center", fontsize=10
+            )
+            fig.canvas.draw_idle()
+
+        # collect span selectors in a list in the same order as their axes objects
+        list_of_spans = [
+            SpanSelector(
+                ax,
+                onselect,
+                "horizontal",
+                useblit=True,
+                props=dict(alpha=0.5, facecolor="#262C44"),
+                interactive=True,
+                drag_from_anywhere=True,
+            )
+            for ax in axis
+        ]
+
+        plt.connect("button_press_event", on_click)
 
     def layoutUpdate(self):
         if self.viewer_mode == "plot":
