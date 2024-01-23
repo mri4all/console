@@ -33,6 +33,7 @@ class Configuration(BaseModel):
 
     scanner_ip: str = Field(default="10.42.0.251", description="Scanner IP (internal)")
     debug_mode: str = Field(default="False", description="Debug Mode")
+    hardware_simulation: str = Field(default="False", description="Hardware Simulation")
     dicom_targets: List[DicomTarget] = []
 
     @classmethod

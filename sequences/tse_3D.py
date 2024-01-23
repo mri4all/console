@@ -15,6 +15,7 @@ from sequences.common import make_tse_3D
 import common.logger as logger
 from common.types import ResultItem
 import common.helper as helper
+import common.config as config
 
 log = logger.get_logger()
 
@@ -182,7 +183,11 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
         ipc_comm.send_status(f"Calculating sequence...")
 
-        scan_task.processing.recon_mode = "basic3d"
+        if config.get_config().hardware_simulation:
+            scan_task.processing.recon_mode = "bypass"
+        else:
+            scan_task.processing.recon_mode = "basic3d"
+
         scan_task.processing.dim = 3
         scan_task.processing.dim_size = f"{self.param_Slices},{self.param_Base_Resolution},{2*self.param_Base_Resolution}"
         scan_task.processing.oversampling_read = 2
@@ -254,6 +259,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             raw_filename="raw",
             expected_duration_sec=expected_duration_sec,
             plot_instructions=plot_instructions,
+            hardware_simulation=config.get_config().hardware_simulation,
         )
 
         if plot_instructions:
@@ -267,6 +273,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             result.description = "Timing diagram of sequence"
             result.type = "plot"
             result.file_path = "other/seq.plot"
+            result.autoload_viewer = 4
             scan_task.results.append(result)
 
         log.info("Done running sequence " + self.get_name())

@@ -196,6 +196,8 @@ def pypulseq_tse3D(
             / seq.grad_raster_time
         )
     ) * seq.grad_raster_time
+    tau1a = (math.ceil((tau1 / 2.0) / seq.grad_raster_time)) * seq.grad_raster_time
+    tau1b = tau1 - tau1a
 
     tau2 = (
         math.ceil(
@@ -211,14 +213,17 @@ def pypulseq_tse3D(
         )
     ) * seq.grad_raster_time
 
+    tau2a = (math.ceil((tau2 / 2.0) / seq.grad_raster_time)) * seq.grad_raster_time
+    tau2b = tau2 - tau2a
+
     delay_TR = (
         math.ceil(
             (
                 TR
                 - TE * ETL
-                - TE / 2
+                - TE / 2.0
                 - pp.calc_duration(gx_spoil)
-                - pp.calc_duration(rf1) / 2
+                # - 2 * pp.calc_duration(rf1)
             )
             / seq.grad_raster_time
         )
@@ -229,6 +234,8 @@ def pypulseq_tse3D(
     assert np.all(tau1 >= 0)
     assert np.all(tau2 >= 0)
     assert np.all(delay_TR >= 0)
+    assert np.all(tau1a + tau1b == tau1)
+    assert np.all(tau2a + tau2b == tau2)
 
     dummyshots = inputs["dummy_shots"]
 
@@ -294,17 +301,19 @@ def pypulseq_tse3D(
                 )
 
                 if echo == 0:
+                    seq.add_block(pp.make_delay(tau1a))
                     seq.add_block(gx_pre)
+                    seq.add_block(pp.make_delay(tau1b))
                     # seq.add_block(gx_pre, gy_crush, gz_crush)
                 else:
                     seq.add_block(pp.make_delay(duration_gx_pre))
                     # seq.add_block(gx_crush, gy_crush, gz_crush)
 
-                seq.add_block(pp.make_delay(tau1))
                 seq.add_block(rf2)
                 # seq.add_block(gx_crush, gy_pre, gz_pre)
+                seq.add_block(pp.make_delay(tau2a))
                 seq.add_block(gy_pre, gz_pre)
-                seq.add_block(pp.make_delay(tau2))
+                seq.add_block(pp.make_delay(tau2b))
                 if is_dummyshot:
                     seq.add_block(gx)
                 else:
@@ -312,8 +321,9 @@ def pypulseq_tse3D(
                     adc_phase.append(rfspoil_phase)
                 # gy_pre.amplitude = -gy_pre.amplitude
                 # gz_pre.amplitude = -gz_pre.amplitude
+                seq.add_block(pp.make_delay(tau2a))
                 seq.add_block(gy_rew, gz_rew)
-                seq.add_block(pp.make_delay(tau2))
+                seq.add_block(pp.make_delay(tau2b))
 
             seq.add_block(gx_spoil, gy_spoil, gz_spoil)
             seq.add_block(pp.make_delay(delay_TR))

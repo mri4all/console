@@ -54,6 +54,7 @@ def run_pulseq(
     case_path="/tmp",
     raw_filename="",
     expected_duration_sec=-1,
+    hardware_simulation=False,
 ):
     """
     Interpret pulseq .seq file through flocra_pulseq
@@ -125,6 +126,24 @@ def run_pulseq(
     # }
     # print(instructions)
 
+    if plot_instructions:
+        plt.clf()
+        _, axs = plt.subplots(3, 1, sharex="col", constrained_layout=True)
+        for key in ["tx0"]:
+            axs[0].step(
+                instructions[key][0], abs(instructions[key][1]), where="post", label=key
+            )
+        for key in ["rx0_en"]:
+            axs[1].step(instructions[key][0], instructions[key][1], where="post", label=key)
+        for key in ["grad_vx", "grad_vy", "grad_vz", "grad_vz2"]:
+            axs[2].step(instructions[key][0], instructions[key][1], where="post", label=key)
+        for ax in axs:
+            ax.legend()
+            ax.grid(True, color="#333")
+
+    if hardware_simulation:
+        return [], []
+
     # Initialize experiment class
     if expt is None:
         log.debug("Initializing marcos client...")
@@ -152,20 +171,11 @@ def run_pulseq(
     for buf in instructions.keys():
         instructions[buf] = (instructions[buf][0] + flat_delay, instructions[buf][1])
 
-    # Plot instructions if needed
-    # if plot_instructions:
-    #     _, axs = plt.subplots(len(instructions), 1, constrained_layout=True)
-    #     for i, key in enumerate(instructions.keys()):
-    #         axs[i].step(instructions[key][0], instructions[key][1], where="post")
-    #         axs[i].plot(instructions[key][0], instructions[key][1], "rx")
-    #         axs[i].set_title(key)
-    #     plt.show()
-
     # Load instructions
     expt.add_flodict(instructions)
 
-    if plot_instructions:
-         expt.plot_sequence()
+    # if plot_instructions:
+    #     expt.plot_sequence()
 
     log.debug("Running instructions...")
 

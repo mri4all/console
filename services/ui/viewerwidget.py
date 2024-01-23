@@ -206,11 +206,18 @@ class ViewerWidget(QWidget):
         def onselect(xmin, xmax):
             # ignore if accidentally clicked into an axis object
             if xmin == xmax:
+                for ax, span in zip(axis, list_of_spans):
+                    span.set_visible(False)
+                if self.textvar:
+                    self.textvar.remove()
+                    self.textvar = None
+                fig.canvas.draw_idle()
                 return
             # set all span selectors invisible accept the current
             for ax, span in zip(axis, list_of_spans):
-                if ax != curr_ax[0]:
-                    span.set_visible(False)
+                # if ax != curr_ax[0]:
+                span.set_visible(True)
+                span.extents = (xmin, xmax)
             txt = f"start = {xmin:.2f}, end = {xmax:.2f}, delta = {xmax-xmin:.2f}"
             if self.textvar:
                 self.textvar.remove()
