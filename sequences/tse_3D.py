@@ -183,7 +183,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         log.info("Calculating sequence " + self.get_name())
         ipc_comm.send_status(f"Calculating sequence...")
 
-        if config.get_config().hardware_simulation:
+        if config.get_config().is_hardware_simulation():
             scan_task.processing.recon_mode = "bypass"
         else:
             scan_task.processing.recon_mode = "basic3d"
@@ -259,7 +259,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             raw_filename="raw",
             expected_duration_sec=expected_duration_sec,
             plot_instructions=plot_instructions,
-            hardware_simulation=config.get_config().hardware_simulation,
+            hardware_simulation=config.get_config().is_hardware_simulation() == "True",
         )
 
         if plot_instructions:

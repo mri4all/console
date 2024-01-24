@@ -134,14 +134,19 @@ def run_pulseq(
                 instructions[key][0], abs(instructions[key][1]), where="post", label=key
             )
         for key in ["rx0_en"]:
-            axs[1].step(instructions[key][0], instructions[key][1], where="post", label=key)
+            axs[1].step(
+                instructions[key][0], instructions[key][1], where="post", label=key
+            )
         for key in ["grad_vx", "grad_vy", "grad_vz", "grad_vz2"]:
-            axs[2].step(instructions[key][0], instructions[key][1], where="post", label=key)
+            axs[2].step(
+                instructions[key][0], instructions[key][1], where="post", label=key
+            )
         for ax in axs:
             ax.legend()
             ax.grid(True, color="#333")
 
     if hardware_simulation:
+        log.info("Hardware simulation set. Skipping scan.")
         return [], []
 
     # Initialize experiment class

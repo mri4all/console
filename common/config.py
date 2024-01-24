@@ -61,7 +61,7 @@ class Configuration(BaseModel):
         with open(mri4_all_config_path, "w") as f:
             f.write(self.model_dump_json(indent=4))
 
-    def update(self, data: Dict) -> "Configuration":
+    def update(self, data: Dict):
         update = self.model_dump()
         update.update(data)
         for k, v in (
@@ -69,3 +69,6 @@ class Configuration(BaseModel):
         ):
             setattr(self, k, v)
         return self
+
+    def is_hardware_simulation(self):
+        return self.hardware_simulation == "True"

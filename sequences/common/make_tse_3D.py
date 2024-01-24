@@ -26,9 +26,9 @@ def pypulseq_tse3D(
     # ======
 
     alpha1 = 90  # flip angle
-    alpha1_duration = 120e-6  # pulse duration
+    alpha1_duration = 80e-6  # pulse duration
     alpha2 = 180  # refocusing flip angle
-    alpha2_duration = 120e-6  # pulse duration
+    alpha2_duration = 80e-6  # pulse duration
 
     TR = inputs["TR"] / 1000
     TE = inputs["TE"] / 1000
@@ -36,7 +36,7 @@ def pypulseq_tse3D(
     fovx = inputs["FOV"] / 1000
     fovy = inputs["FOV"] / 1000
     # DEBUG! TODO: Expose FOV in Z on UI
-    fovz = inputs["FOV"] / 1000 / 2
+    fovz = inputs["FOV"] / 1000 / 2.5
     Nx = inputs["Base_Resolution"]
     Ny = inputs["Base_Resolution"]
     Nz = inputs["Slices"]
@@ -114,14 +114,14 @@ def pypulseq_tse3D(
     rf1 = pp.make_block_pulse(
         flip_angle=alpha1 * math.pi / 180,
         duration=alpha1_duration,
-        delay=100e-6,
+        delay=0 * 100e-6,
         system=system,
         use="excitation",
     )
     rf2 = pp.make_block_pulse(
         flip_angle=alpha2 * math.pi / 180,
         duration=alpha2_duration,
-        delay=100e-6,
+        delay=0 * 100e-6,
         phase_offset=math.pi / 2,
         system=system,
         use="refocusing",
@@ -138,14 +138,14 @@ def pypulseq_tse3D(
         num_samples=2 * Nx, duration=gx.flat_time, delay=gx.rise_time, system=system
     )
 
-    # crusher_moment = gx.area / 2
-    crusher_moment = 0
+    crusher_moment = gx.area / 2
+    # crusher_moment = 0
 
     gx_pre = pp.make_trapezoid(
         channel=ch0,
         area=gx.area / 2 + crusher_moment,
         system=system,
-        duration=pp.calc_duration(gx) / 2,
+        # duration=pp.calc_duration(gx) / 2,
     )
 
     gx_crush = pp.make_trapezoid(
@@ -277,13 +277,13 @@ def pypulseq_tse3D(
 
                 gy_pre = pp.make_trapezoid(
                     channel=ch1,
-                    area=-1.0 * phase_areas0[pe_idx] + crusher_moment,
+                    area=-1.0 * phase_areas0[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
                 gz_pre = pp.make_trapezoid(
                     channel=ch2,
-                    area=-1.0 * phase_areas1[pe_idx] + crusher_moment,
+                    area=-1.0 * phase_areas1[pe_idx],
                     duration=pp.calc_duration(gx_pre),
                     system=system,
                 )
@@ -306,23 +306,23 @@ def pypulseq_tse3D(
                     seq.add_block(pp.make_delay(tau1b))
                     # seq.add_block(gx_pre, gy_crush, gz_crush)
                 else:
-                    seq.add_block(pp.make_delay(duration_gx_pre))
+                    pass
+                    # seq.add_block(pp.make_delay(duration_gx_pre))
                     # seq.add_block(gx_crush, gy_crush, gz_crush)
 
                 seq.add_block(rf2)
-                # seq.add_block(gx_crush, gy_pre, gz_pre)
                 seq.add_block(pp.make_delay(tau2a))
-                seq.add_block(gy_pre, gz_pre)
+                # seq.add_block(gy_pre, gz_pre)
+                seq.add_block(gx_crush, gy_pre, gz_pre)
                 seq.add_block(pp.make_delay(tau2b))
                 if is_dummyshot:
                     seq.add_block(gx)
                 else:
                     seq.add_block(gx, adc)
                     adc_phase.append(rfspoil_phase)
-                # gy_pre.amplitude = -gy_pre.amplitude
-                # gz_pre.amplitude = -gz_pre.amplitude
                 seq.add_block(pp.make_delay(tau2a))
-                seq.add_block(gy_rew, gz_rew)
+                # seq.add_block(gy_rew, gz_rew)
+                seq.add_block(gx_crush, gy_rew, gz_rew)
                 seq.add_block(pp.make_delay(tau2b))
 
             seq.add_block(gx_spoil, gy_spoil, gz_spoil)
