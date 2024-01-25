@@ -36,7 +36,7 @@ def pypulseq_tse3D(
     fovx = inputs["FOV"] / 1000
     fovy = inputs["FOV"] / 1000
     # DEBUG! TODO: Expose FOV in Z on UI
-    fovz = inputs["FOV"] / 1000 / 2.5
+    fovz = inputs["FOV"] / 1000 / 2
     Nx = inputs["Base_Resolution"]
     Ny = inputs["Base_Resolution"]
     Nz = inputs["Slices"]

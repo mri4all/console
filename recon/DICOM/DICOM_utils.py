@@ -43,9 +43,13 @@ def write_dicom(
 
     instance_counter = 1
     print(f"Writing {ndarray_dims[-1]} DICOMs")
+
+    val_max = np.max(np.abs(image_ndarray))
+
     for slc_id in range(ndarray_dims[-1]):
-        """Generate magnitude image per slice"""
-        pixel_data = 100 * np.abs(image_ndarray[..., slc_id])
+        # Generate magnitude image per slice
+        # Normalize the value range to avoid clipping (max 32k)
+        pixel_data = np.abs(image_ndarray[..., slc_id]) / val_max * 30000
         pixel_data = np.uint16(pixel_data)
 
         """ Create and populate the DICOM header """
