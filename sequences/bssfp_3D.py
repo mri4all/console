@@ -25,7 +25,7 @@ from common.ipc import Communicator
 ipc_comm = Communicator(Communicator.ACQ)
 
 
-class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
+class SequenceBSSFP_3D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
     param_TE: int = 50
     param_TR: int = 250
@@ -37,15 +37,16 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     param_BW: int = 32000
     param_trajectory: str = "Cartesian"
     param_ordering: str = "linear_up"
-    param_dummy_shots: int = 20
+    param_dummy_shots: int = 40
+    param_FA: int = 90
 
     @classmethod
     def get_readable_name(self) -> str:
-        return "3D Gradient Echo"
+        return "3D bSSFP"
 
     @classmethod
     def get_description(self) -> str:
-        return "Volumetric 3D GRE acquisition with Cartesian sampling"
+        return "Volumetric 3D bSSFP acquisition with Cartesian sampling"
 
     def setup_ui(self, widget) -> bool:
         seq_path = os.path.dirname(os.path.abspath(__file__))
@@ -104,7 +105,7 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
     ) -> dict:
         return {
             "TE": 0,
-            "TR": 1000,
+            "TR": 0,
             "NSA": 1,
             "orientation": "Axial",
             "FOV": 15,
@@ -113,7 +114,7 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             "BW": 32000,
             "trajectory": "Cartesian",
             "ordering": "linear_up",
-            "FA": 20,
+            "FA": 90,
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:
@@ -325,7 +326,6 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         gx_pre = pp.make_trapezoid(
             channel=ch0,
             area=gx.area / 2.0,
-            # duration=pp.calc_duration(gx) / 2,
             system=system,
         )
         gx_pre.amplitude = -1 * gx_pre.amplitude
@@ -356,11 +356,6 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         pre_duration = max(pp.calc_duration(gy_pre), pp.calc_duration(gz_pre))
         pre_duration = max(pre_duration, pp.calc_duration(gx_pre))
 
-        # Gradient spoiling -TODO: Need to see if this is really required based on data
-        gx_spoil = pp.make_trapezoid(channel=ch0, area=Nx * delta_kx, system=system)
-        # gy_spoil = pp.make_trapezoid(channel=ch1, area=5 * Nx * delta_kx, system=system)
-        # gz_spoil = pp.make_trapezoid(channel=ch2, area=5 * Nx * delta_kx, system=system)
-
         # ======
         # CALCULATE DELAYS
         # ======
@@ -386,21 +381,21 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 )
             ) * seq.grad_raster_time
 
-        delay_TR = (
-            math.ceil(
-                (
-                    TR
-                    - 0.5 * pp.calc_duration(rf1)
-                    - TE
-                    - 0.5 * pp.calc_duration(gx)
-                    - pp.calc_duration(gx_spoil)
-                )
-                / seq.grad_raster_time
-            )
-        ) * seq.grad_raster_time
+        # delay_TR = (
+        #     math.ceil(
+        #         (
+        #             TR
+        #             - 0.5 * pp.calc_duration(rf1)
+        #             - TE
+        #             - 0.5 * pp.calc_duration(gx)
+        #             - pre_duration
+        #         )
+        #         / seq.grad_raster_time
+        #     )
+        # ) * seq.grad_raster_time
 
         assert np.all(tau1 >= 0)
-        assert np.all(delay_TR >= 0)
+        # assert np.all(delay_TR >= 0)
 
         dummyshots = self.param_dummy_shots
 
@@ -409,26 +404,17 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         # ======
 
         adc_phase = []
-        rfspoil_phase = 0
-        rfspoil_inc = 0
-        rfspoil_incinc = 117.0
-        # rfspoil_incinc = 50.0
+        rf_phase = 0
 
         # Loop over phase encodes and define sequence blocks
         for avg in range(num_averages):
             for i in range(n_shots + dummyshots):
-                rfspoil_inc = rfspoil_inc + rfspoil_incinc
-                rfspoil_phase = rfspoil_phase + rfspoil_inc
-                rfspoil_phase = np.mod(rfspoil_phase, 360.0)
-                rfspoil_inc = np.mod(rfspoil_inc, 360.0)
-                # print(f"{i} = {rfspoil_phase}")
-
                 if i < dummyshots:
                     is_dummyshot = True
                 else:
                     is_dummyshot = False
 
-                rf1.phase_offset = rfspoil_phase / 180 * math.pi
+                rf1.phase_offset = rf_phase / 180 * math.pi
                 seq.add_block(rf1)
 
                 if is_dummyshot:
@@ -456,12 +442,18 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                     seq.add_block(gx)
                 else:
                     seq.add_block(gx, adc)
-                    adc_phase.append(rfspoil_phase)
+                    adc_phase.append(rf_phase)
 
+                seq.add_block(pp.make_delay(tau1))
                 gy_pre.amplitude = -gy_pre.amplitude
                 gz_pre.amplitude = -gz_pre.amplitude
-                seq.add_block(gx_spoil, gy_pre, gz_pre)
-                seq.add_block(pp.make_delay(delay_TR))
+                seq.add_block(gx_pre, gy_pre, gz_pre)
+                # seq.add_block(pp.make_delay(delay_TR))
+
+                if rf_phase == 0:
+                    rf_phase = 180
+                else:
+                    rf_phase = 0
 
         # Check whether the timing of the sequence is correct
         ok, error_report = seq.check_timing()

@@ -119,7 +119,18 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
         name="k-Space",
         primary_result=False,
         autoload_viewer=2,
-        result_index=1,
+        result_index=2,
+    )
+
+    DICOM.write_dicom(
+        np.angle(fft),
+        task,
+        folder + "/" + mri4all_taskdata.DICOM,
+        series_offset=2,
+        name="Phase",
+        primary_result=False,
+        result_index=3,
+        autoload_viewer=3,
     )
 
     return True
