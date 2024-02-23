@@ -10,7 +10,7 @@ log = logger.get_logger()
 
 
 def pypulseq_rfse(
-    inputs=None, check_timing=True, output_file="", rf_duration=100e-6
+    inputs=None, check_timing=True, output_file="", rf_duration=80e-6
 ) -> bool:
     if not output_file:
         log.error("No output file specified")

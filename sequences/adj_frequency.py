@@ -126,6 +126,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # scan_task.results.append(plot_result_noise2)
 
         opt_max_freq = 1.831
+        # opt_max_freq = 1.820
 
         larmor_freq, data_dict, fig1 = larmor_cal(
             seq_file=self.seq_file_path,

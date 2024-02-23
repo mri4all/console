@@ -103,6 +103,14 @@ def run_reconstruction_basic3d(folder: str, task: ScanTask) -> bool:
 
     fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(kSpace)))
 
+    base_res = fft.shape[0]
+    for sample in range(0, base_res):
+        fft[sample, :, :] = fft[sample, :, :] * np.exp(
+            # np.pi * 1j + base_res / 16 * (sample - base_res / 2) / (2 * base_res) * np.pi * 1j
+            np.pi * 1j
+            + (sample - base_res / 2) / 32 * np.pi * 1j
+        )
+
     if task.processing.oversampling_read > 0:
         offset = int(dims[2]) / 4
         fft = fft[int(offset) : int(3 * offset), :, :]

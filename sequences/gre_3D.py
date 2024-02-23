@@ -249,6 +249,7 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         fovy = self.param_FOV / 1000
         # DEBUG! TODO: Expose FOV in Z on UI
         fovz = self.param_FOV / 1000 / 2
+        # fovz = self.param_FOV / 1000 / 4
         Nx = self.param_baseresolution
         Ny = self.param_baseresolution
         Nz = self.param_slices

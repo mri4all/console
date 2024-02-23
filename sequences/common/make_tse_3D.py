@@ -27,7 +27,7 @@ def pypulseq_tse3D(
 
     alpha1 = 90  # flip angle
     alpha1_duration = 80e-6  # pulse duration
-    alpha2 = 180  # refocusing flip angle
+    alpha2 = 220  # refocusing flip angle
     alpha2_duration = 80e-6  # pulse duration
 
     TR = inputs["TR"] / 1000
@@ -37,6 +37,7 @@ def pypulseq_tse3D(
     fovy = inputs["FOV"] / 1000
     # DEBUG! TODO: Expose FOV in Z on UI
     fovz = inputs["FOV"] / 1000 / 2
+    fovz = inputs["FOV"] / 1000 / 4
     Nx = inputs["Base_Resolution"]
     Ny = inputs["Base_Resolution"]
     Nz = inputs["Slices"]
