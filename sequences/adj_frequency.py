@@ -40,8 +40,8 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
                 "NSA": self.param_NSA,
                 "ADC_samples": self.param_ADC_samples,
                 "ADC_duration": self.param_ADC_duration,
-                "FA1": 90,
-                "FA2": 180,
+                "FA1": cfg.DBG_FA_EXC,
+                "FA2": cfg.DBG_FA_REF,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -126,7 +126,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         # scan_task.results.append(plot_result_noise2)
 
         opt_max_freq = 1.831
-        # opt_max_freq = 1.820
+        opt_max_freq = 1.828
 
         larmor_freq, data_dict, fig1 = larmor_cal(
             seq_file=self.seq_file_path,
@@ -135,6 +135,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
             delay_s=1,
             echo_count=1,
             # step_size=0.6,
+            # step_size=0.1,
             step_size=0.1,
             plot=True,  # For debug
             shim_x=cfg.SHIM_X,
@@ -171,6 +172,7 @@ class AdjFrequency(PulseqSequence, registry_key=Path(__file__).stem):
         log.info(
             f"Final Larmor frequency (using peak signal): {calibrated_larmor_freq} MHz"
         )
+        scan_task.adjustment.rf.larmor_frequency = calibrated_larmor_freq
 
         # Updating the Larmor frequency in the config.json file
         # TODO: Needs to be reworked

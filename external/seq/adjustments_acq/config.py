@@ -22,6 +22,9 @@ SHIM_Y = configuration_data.shim_parameters.shim_y
 SHIM_Z = configuration_data.shim_parameters.shim_z
 SHIM_MC = configuration_data.shim_parameters.shim_mc
 
+DBG_FA_EXC = 90
+DBG_FA_REF = 180
+
 
 def update():
     global configuration_data

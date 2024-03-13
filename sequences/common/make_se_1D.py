@@ -24,9 +24,9 @@ def pypulseq_1dse(
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    alpha1 = 90  # flip angle
+    alpha1 = cfg.DBG_FA_EXC  # flip angle
     alpha1_duration = rf_duration  # pulse duration
-    alpha2 = 180  # refocusing flip angle
+    alpha2 = cfg.DBG_FA_REF  # refocusing flip angle
     alpha2_duration = rf_duration  # pulse duration
     # TE = 20e-3
     # TR = 3000e-3

@@ -59,7 +59,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_default_parameters(self) -> dict:
         return {
-            "TE": 50,
+            "TE": 20,
             "TR": 1000,
             "NSA": 1,
             "FOV": 15,
@@ -177,6 +177,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
             case_path=self.get_working_folder(),
         )
+        scan_task.adjustment.rf.larmor_frequency = cfg.LARMOR_FREQ
 
         log.info("Done running sequence " + self.get_name())
 

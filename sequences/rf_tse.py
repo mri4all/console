@@ -117,6 +117,7 @@ class SequenceRFTSE(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
             case_path=self.get_working_folder(),
         )
+        scan_task.adjustment.rf.larmor_frequency = cfg.LARMOR_FREQ
 
         plt.clf()
         plt.title("ADC Signal")
@@ -147,10 +148,10 @@ def pypulseq_rftse(inputs=None, check_timing=True, output_file="") -> bool:
     LARMOR_FREQ = cfg.LARMOR_FREQ
     RF_MAX = cfg.RF_MAX
     RF_PI2_FRACTION = cfg.RF_PI2_FRACTION
-    alpha1 = 90  # flip angle
-    alpha1_duration = 100e-6  # pulse duration
-    alpha2 = 180  # refocusing flip angle
-    alpha2_duration = 100e-6  # pulse duration
+    alpha1 = cfg.DBG_FA_EXC  # flip angle
+    alpha1_duration = 80e-6  # pulse duration
+    alpha2 = cfg.DBG_FA_REF  # refocusing flip angle
+    alpha2_duration = 80e-6  # pulse duration
     TE = inputs["TE"] / 1000  # TE = 54e-3
     # TODO: Debug -- increase TR to always have enough space
     TR = 2000e-3 + TE * inputs["ETL"]

@@ -26,6 +26,9 @@ from common.constants import *
 import common.plotting as plotting
 import common.config as config
 
+import external.seq.adjustments_acq.config as cfg
+
+
 main_loop = None  # type: helper.AsyncTimer # type: ignore
 
 communicator = Communicator(Communicator.ACQ)
@@ -77,6 +80,12 @@ def process_acquisition(scan_name: str) -> bool:
     task.clear_task_subfolder(
         mri4all_paths.DATA_ACQ + "/" + scan_name, mri4all_taskdata.SEQ
     )
+
+    try:
+        # TODO: Replace with better management of scanner settings
+        cfg.update()
+    except:
+        log.warn("Unable to update configuration")
 
     current_step = ""
     try:

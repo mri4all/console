@@ -218,6 +218,7 @@ class SequenceGRE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             expected_duration_sec=expected_duration_sec,
             plot_instructions=plot_instructions,
         )
+        scan_task.adjustment.rf.larmor_frequency = cfg.LARMOR_FREQ
 
         if plot_instructions:
             file = open(self.get_working_folder() + "/other/seq.plot", "wb")

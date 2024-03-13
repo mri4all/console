@@ -105,6 +105,13 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
         log.info("Calculating sequence " + self.get_name())
 
+        fa_exc = cfg.DBG_FA_EXC
+        fa_ref = cfg.DBG_FA_REF
+        if "FA1" in scan_task.other:
+            fa_exc = int(scan_task.other["FA1"])
+        if "FA2" in scan_task.other:
+            fa_ref = int(scan_task.other["FA2"])
+
         make_rf_se.pypulseq_rfse(
             inputs={
                 "TE": self.param_TE,
@@ -112,8 +119,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
                 "NSA": self.param_NSA,
                 "ADC_samples": self.param_ADC_samples,
                 "ADC_duration": self.param_ADC_duration,
-                "FA1": 90,
-                "FA2": 180,
+                "FA1": fa_exc,
+                "FA2": fa_ref,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -144,6 +151,8 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             gui_test=False,
             case_path=self.get_working_folder(),
         )
+        scan_task.adjustment.rf.larmor_frequency = cfg.LARMOR_FREQ
+
         log.info("Pulseq ran, plotting")
 
         self.rxd = rxd

@@ -193,6 +193,13 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
         scan_task.processing.oversampling_read = 2
         self.seq_file_path = self.get_working_folder() + "/seq/acq0.seq"
 
+        fa_exc = cfg.DBG_FA_EXC
+        fa_ref = cfg.DBG_FA_REF
+        if "FA1" in scan_task.other:
+            fa_exc = int(scan_task.other["FA1"])
+        if "FA2" in scan_task.other:
+            fa_ref = int(scan_task.other["FA2"])
+
         if not make_tse_3D.pypulseq_tse3D(
             inputs={
                 "TE": self.param_TE,
@@ -208,6 +215,8 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
                 "Ordering": self.param_Ordering,
                 "Plot_Timing": self.param_plot_timing,
                 "dummy_shots": self.param_dummy_shots,
+                "FA1": fa_exc,
+                "FA2": fa_ref,
             },
             check_timing=True,
             output_file=self.seq_file_path,
@@ -261,6 +270,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
             plot_instructions=plot_instructions,
             hardware_simulation=config.get_config().is_hardware_simulation() == "True",
         )
+        scan_task.adjustment.rf.larmor_frequency = cfg.LARMOR_FREQ
 
         if plot_instructions:
             file = open(self.get_working_folder() + "/other/seq.plot", "wb")

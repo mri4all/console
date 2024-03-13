@@ -25,9 +25,9 @@ def pypulseq_tse3D(
     # DEFAULTS FROM CONFIG FILE              TODO: MOVE DEFAULTS TO UI
     # ======
 
-    alpha1 = 90  # flip angle
+    alpha1 = inputs["FA1"]  # flip angle
     alpha1_duration = 80e-6  # pulse duration
-    alpha2 = 220  # refocusing flip angle
+    alpha2 = inputs["FA2"]  # refocusing flip angle
     alpha2_duration = 80e-6  # pulse duration
 
     TR = inputs["TR"] / 1000
