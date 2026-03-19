@@ -14,19 +14,20 @@ from sequences.common import make_se_2D
 from sequences.common import view_traj
 import common.logger as logger
 from common.types import ResultItem
+import sigpy as sp
 
 log = logger.get_logger()
 
 
 class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
-    param_TE: int = 40
+    param_TE: int = 5
     param_TR: int = 1000
     param_NSA: int = 1
     param_FOV: int = 128
     param_Orientation: str = "Coronal"
-    param_Base_Resolution: int = 64
-    param_BW: int = 32000
+    param_Base_Resolution: int = 32
+    param_BW: int = 16000
     param_Trajectory: str = "Cartesian"
     param_PE_Ordering: str = "Center_out"
     param_PF: int = 1
@@ -59,13 +60,13 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_default_parameters(self) -> dict:
         return {
-            "TE": 40,
-            "TR": 1000,
+            "TE": 5,
+            "TR": 100,
             "NSA": 1,
-            "FOV": 128,
-            "Orientation": "Coronal",
+            "FOV": 64,
+            "Orientation": "Axial",
             "Base_Resolution": 64,
-            "BW": 32000,
+            "BW": 16000,
             "Trajectory": "Cartesian",
             "PE_Ordering": "Center_out",
             "PF": 1,
@@ -134,7 +135,9 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
         # scan_task.processing.dim_size = f"{self.param_baseresolution},{2*self.param_baseresolution}"
         # scan_task.processing.oversampling_read = 2
         # scan_task.processing.recon_mode = "basic2d"
+        # This needs to be better done, need to user per axis max. otherwise the propotionality of the gradients will be wrong and the trajectory will be distorted. For example, if the x gradient is much stronger than the y gradient, then the trajectory will be stretched in the x direction and compressed in the y direction. This will lead to a distorted image.
         max_grad = np.min([cfg.GX_MAX, cfg.GY_MAX, cfg.GZ_MAX])
+        log.info(f"***** Using max gradient strength of {max_grad} Hz/m")
         self.system = pp.Opts(
             max_grad=max_grad,  
             grad_unit="Hz/m", # 
@@ -224,26 +227,69 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         # # Compute the average
         self.param_oversampling = 2
-        self.param_phase_oversampling = 1.5
-        rxd_rs = np.reshape(rxd, (self.param_oversampling * self.param_Base_Resolution, int(self.param_phase_oversampling * self.param_Base_Resolution), self.param_NSA), order='F')
+        rxd_rs = np.reshape(rxd, (self.param_oversampling * self.param_Base_Resolution, int(self.param_Base_Resolution), self.param_NSA), order='F')
         log.info("type of rx data:", type(rxd_rs))
         log.info("New shape of rx data:", rxd_rs.shape)
         rxd_avg = (np.average(rxd_rs, axis=2))
-        
+        rxd_avg = np.squeeze(rxd_avg)
+        log.info("Shape of averaged rx data:", rxd_avg.shape)
         log.info("Done running sequence " + self.get_name())
+
+        # Generate phase areas for inside-out ordering
+        if self.param_PE_Ordering == "Center_out":
+            Ny = self.param_Base_Resolution
+            pe_table = np.zeros(Ny, dtype=int)
+            center_index = Ny // 2
+
+            for i in range(Ny -1):
+                if i % 2 == 0:
+                    pe_table[i] = center_index - (i // 2)
+                else:
+                    pe_table[i] = center_index + (i // 2 + 1)
+
+            log.info('Maximum phase encode value:', np.max(pe_table))
+        # reformat the data according to the phase encoding order
+        if self.param_PE_Ordering == "Center_out":
+            rxd_avg_ordered = np.zeros_like(rxd_avg)
+            for i in range(self.param_Base_Resolution):
+                rxd_avg_ordered[:, pe_table[i]] = rxd_avg[:, i]
+            rxd_avg = rxd_avg_ordered
+
+
+        
+        
         # data = rxd_avg.reshape((2 * self.param_Base_Resolution, self.param_Base_Resolution))
         # log.info("Shape of data:", data.shape)
         
-        filtering = True
+        
+
+
+        filtering = False
+        filt_type = "Gaussian"  # "convolution" or "Gaussian"
         if filtering is True:
-            for i in range(rxd_avg.shape[1]):
-                rxd_avg[:, i] = np.convolve(rxd_avg[:, i], np.ones(9)/9, mode='same')
+            if filt_type == "convolution":
+                log.info("Applying convolution filter to data")
+                # Apply a convolution filter to the data
+                # rxd_avg = np.convolve(rxd_avg, np.ones(9)/9, mode='same')
+                # rxd_avg = np.apply_along_axis(lambda m: np.convolve(m, np.ones(9)/9, mode='same'), axis=0, arr=rxd_avg)
+                for i in range(rxd_avg.shape[1]):
+                    rxd_avg[:, i] = np.convolve(rxd_avg[:, i], np.ones(9)/9, mode='same')
+            elif filt_type == "Gaussian":
+                log.info("Applying a 2D Gaussian filter to data")
+                # Apply a 2D Gaussian filter to the data
+                x = np.linspace(-1, 1, rxd_avg.shape[0])
+                y = np.linspace(-1, 1, rxd_avg.shape[1])
+                xv, yv = np.meshgrid(x, y, indexing='ij')
+                sigma = 0.7  # Standard deviation of the Gaussian
+                gaussian_filter = np.exp(-((xv**2 + yv**2) / (2 * sigma**2)))
+                rxd_avg = rxd_avg * gaussian_filter
 
 
-        data = rxd_avg #rxd_avg.reshape((self.param_Base_Resolution, 2 * self.param_Base_Resolution))
+        # data = rxd_avg #rxd_avg.reshape((self.param_Base_Resolution, 2 * self.param_Base_Resolution))
+        data = rxd_avg.reshape((self.param_Base_Resolution * self.param_oversampling,  self.param_Base_Resolution))
         log.info("Plotting figures")
         
-        kspace_chop = True
+        kspace_chop = False
         if kspace_chop is True:
             # filter = np.zeros(data.shape)
             flat_start = 5
@@ -286,30 +332,23 @@ class SequenceSE_2D(PulseqSequence, registry_key=Path(__file__).stem):
 
         plt.clf()
         plt.title(f"Image data")
-        # recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(data)))
-        recon = np.fft.fftshift(np.fft.ifft2(data))
+        # recon = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(data)))
+        # recon = np.fft.fftshift(np.fft.fft2(data))
+        recon = sp.fft(data, norm='ortho')
+        # recon = (np.fft.fft2((data)))
 
-        # for tenacity gradients, use this
-        tenacity_gradients = False
-        if tenacity_gradients is True:
-            m, n = recon.shape
-            recon2 = np.zeros((m, n), dtype=complex)
-            recon2[int(m * 0.5):, :] = recon[int(m * 0.5):, :] + np.flip((recon[:int(m * 0.5), :]), axis=0)
-            recon = recon2
-
+        
         # plt.grid(True, color="#333")
-        half_width = int(self.param_Base_Resolution / 2)
-        half_length = int(self.param_Base_Resolution / 4)
-        recon2 = np.squeeze(recon[half_width:self.param_Base_Resolution + half_width, 
-                                  half_length: self.param_Base_Resolution + half_length]) # TODO : also remove the phase oversampling
+        crop_top = int(self.param_Base_Resolution * 0.25 * 2)
+        crop_bottom = int(self.param_Base_Resolution * 0.75 * 2)
+        recon2 = np.squeeze(recon[crop_top:crop_bottom, :])
         
-        
-        recon3 = recon2[16:48, :]
-        recon4 = np.zeros(recon2.shape, dtype=complex)
-        recon4[16:48, :] = (np.roll(recon3, 16, axis=0))
+  
 
+
+        
         # recon2 = np.fft.fftshift(np.abs(recon2), axes = 0)
-        plt.imshow(np.abs(recon2))
+        plt.imshow(np.abs(recon))
         plt.set_cmap('gray')
         file = open(self.get_working_folder() + "/other/fft.plot", "wb")
         fig = plt.gcf()

@@ -114,7 +114,7 @@ def run_pulseq(
             halt_and_reset=True,
         )
     
-    # Optionbally run gradient linearization calibration
+    # Optionally run gradient linearization calibration
     if grad_cal:
         expt.gradb.calibrate(
             channels=[0, 1, 2],

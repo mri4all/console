@@ -1,6 +1,5 @@
 import math
 import numpy as np
-
 import pypulseq as pp  # type: ignore
 import external.seq.adjustments_acq.config as cfg
 
@@ -35,7 +34,6 @@ def pypulseq_1dse(
     fov = inputs["FOV"] / 1000 # mm to m
     Nx = inputs["Base_Resolution"]
     BW = inputs["BW"]
-    adc_dwell = 1 / BW
     channel = inputs["Gradient"]
     system = inputs["system"]
 
@@ -93,9 +91,12 @@ def pypulseq_1dse(
         use="refocusing",
     )
     
-    readout_time = (Nx / BW) + (2 * system.adc_dead_time)
+    # readout_time = (Nx / BW) + (2 * system.adc_dead_time)
+    readout_time = (Nx / BW)
+    # readout_time = np.max([readout_time, 4e-3])  # limit readout time based on max gradient strength
     prephaser_duration = 0.5 * readout_time
-    delta_k = 1 / fov
+    delta_k = 1 / fov   
+    log.info("**Gradient max amplitude**: ", system.max_grad)
     gx = pp.make_trapezoid(
         channel=channel,
         flat_area=Nx * delta_k,
@@ -113,7 +114,7 @@ def pypulseq_1dse(
         system=system,
     )
     adc = pp.make_adc(
-        num_samples=Nx,
+        num_samples=2 * Nx, # oversampling by factor 2
         duration=gx.flat_time,
         delay=gx.rise_time,
         phase_offset=np.pi / 2,

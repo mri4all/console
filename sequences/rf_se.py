@@ -61,7 +61,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             "ADC_samples": 512,
             "ADC_duration": 5120,
             "debug_plot": True,
-            "TX_Freq": 11.4725,
+            # "TX_Freq": 11.42,  # MHz
         }
 
     def set_parameters(self, parameters, scan_task) -> bool:

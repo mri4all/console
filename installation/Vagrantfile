@@ -10,6 +10,7 @@ SCRIPT
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/ubuntu-22.04" # 22.04 LTS
   config.vm.provision "shell", inline: $script
+
   
   config.vm.provider "virtualbox" do |vb|
     # Increase memory for Virtualbox

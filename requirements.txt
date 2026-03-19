@@ -32,7 +32,6 @@ deap~=1.4.1
 imageio~=2.19.3
 numpy==1.25
 tqdm~=4.66.1
-numba==0.58.0
 pypulseq==1.4.2
 # Dependencies of the GUI service
 PyQt5~=5.15.9
@@ -40,7 +39,7 @@ qtawesome~=1.2.3
 pyqtdarktheme~=2.1.0
 sip~=6.7.12
 pyqtgraph~=0.13.3
-GDCM
+# GDCM
 pylibjpeg
 pylibjpeg-libjpeg
 

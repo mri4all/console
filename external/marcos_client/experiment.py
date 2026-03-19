@@ -65,7 +65,7 @@ class Experiment:
                  seq_dict=None,
                  seq_csv=None,
                  rx_lo=0, # which of internal NCO local oscillators (LOs), out of 0, 1, 2, to use for each channel
-                 grad_max_update_rate=0.125, # MSPS, across all channels in parallel, best-effort
+                 grad_max_update_rate=0.125, # was 0.125 MSPS, across all channels in parallel, best-effort
                  gpa_fhdo_offset_time=0, # when GPA-FHDO is used, offset the Y, Z and Z2 gradient times by 1x, 2x and 3x this value to emulate 'simultaneous' updates
                  print_infos=True, # show server info messages
                  assert_errors=True, # halt on server errors

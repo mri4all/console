@@ -237,7 +237,7 @@ class SequenceTSE_3D(PulseqSequence, registry_key=Path(__file__).stem):
 
         plot_instructions = self.param_plot_timing
 
-        rxd, rx_t = run_pulseq(
+        rdx, rx_t = run_pulseq(
             seq_file=self.seq_file_path,
             rf_center=cfg.LARMOR_FREQ,
             tx_t=1,

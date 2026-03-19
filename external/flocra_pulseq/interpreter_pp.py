@@ -263,7 +263,7 @@ class seq2flocra:
         
         # log.info('Obtained amplitudes and times for all blocks')
         # log.info('Making the flodict: six lines to the spectrometer')
-        
+       
         flo_dict = dict()
         # Tx - gate and first channel
         flo_dict['tx_gate'] = self.curate(tx0_gate_time_cat, tx0_gate_amp_cat)
@@ -277,6 +277,7 @@ class seq2flocra:
         # Rx
         flo_dict['rx0_en'] = self.curate(rx0_gate_time_cat, rx0_gate_amp_cat)  # no control on sampling rate
         
+        log.info('flodict', flo_dict)
         # Save the final dictionary as a property of the object
         self._grad_t = self._grad_t * 1e6 #us - seq world to marcos world
         self._rx_t = self._rx_t * 1e6 #us

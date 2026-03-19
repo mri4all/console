@@ -28,7 +28,7 @@ ipc_comm = Communicator(Communicator.ACQ)
 def larmor_step_search(
     seq_file=Path(mri4all_paths.DATA_ACQ) / "se_6.seq",
     step_search_center=cfg.LARMOR_FREQ,
-    steps=30,
+    steps=10,
     step_bw_MHz=5e-3,
     plot=False,
     shim_x=cfg.SHIM_X,
@@ -36,9 +36,10 @@ def larmor_step_search(
     shim_z=cfg.SHIM_Z,
     delay_s=1,
     gui_test=False,
+    dummy_scans=3,
 ):
     """
-    Run a stepped search through a range of frequencies to find the highest signal response
+    Run a stepped search through a range of frequencies to find the highest signal response and highest SNR signal.
     Used to find a starting point, not for precision
 
     Args:
@@ -66,43 +67,10 @@ def larmor_step_search(
     # seq_file = constants.SCANNER_CONTROL_CAL_SEQ_FILES/'se_6.seq' # TODO: Seq file should be loadable or new sequence should be made
 
     # Run the experiment once to prep array
-    rxd, rx_t = scr.run_pulseq(
-        seq_file,
-        rf_center=larmor_freq,
-        tx_t=1,
-        grad_t=10,
-        tx_warmup=100,
-        shim_x=shim_x,
-        shim_y=shim_y,
-        shim_z=shim_z,
-        grad_cal=False,
-        save_np=False,
-        save_mat=False,
-        save_msgs=False,
-        gui_test=gui_test,
-    )
-
-    # Create array for storing data
-    rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
-    rx_arr[:, 0] = rxd
-    noise_array = np.zeros((int(rxd.shape[0] / 2), steps), dtype=np.cdouble)
-    signal_array = np.zeros((int(rxd.shape[0] / 2), steps), dtype=np.cdouble)
-
-    # Pause for spin recovery
-    time.sleep(delay_s)
-
-    snr_array = []
-    peak_array = []
-
-    # Repeat for each frequency after the first
-    for i in range(0, steps):
-        print(f"{swept_freqs[i]:.4f} MHz ({i}/{steps})")
-        ipc_comm.send_status(
-            f"Adjusting frequency:  Searching {swept_freqs[i]:.4f} MHz ({i+1}/{steps})"
-        )
-        rx_arr[:, i], _ = scr.run_pulseq(
+    for dummy_scan in range(1): # no dummy scan required for first run
+        rxd, rx_t = scr.run_pulseq(
             seq_file,
-            rf_center=swept_freqs[i],
+            rf_center=larmor_freq,
             tx_t=1,
             grad_t=10,
             tx_warmup=100,
@@ -116,40 +84,75 @@ def larmor_step_search(
             gui_test=gui_test,
         )
 
+    # Create array for storing data
+    rx_arr = np.zeros((rxd.shape[0], steps), dtype=np.cdouble)
+    rx_arr[:, 0] = rxd
+    noise_array = np.zeros((int(rxd.shape[0] / 2), steps), dtype=np.cdouble)
+    signal_array = np.zeros((int(rxd.shape[0] / 2), steps), dtype=np.cdouble)
+
+    # Pause for spin recovery
+    time.sleep(delay_s)
+
+    # Repeat for each frequency after the first
+    for i in range(0, steps):
+ 
+        print(f"{swept_freqs[i]:.4f} MHz ({i}/{steps})")
+        ipc_comm.send_status(
+            f"Adjusting frequency:  Searching {swept_freqs[i]:.4f} MHz ({i+1}/{steps})"
+        )
+        for dummy_scan in range(dummy_scans): # to get steady state 
+            rxd_rep, _ = scr.run_pulseq(
+                seq_file,
+                rf_center=swept_freqs[i],
+                tx_t=1,
+                grad_t=10,
+                tx_warmup=100,
+                shim_x=shim_x,
+                shim_y=shim_y,
+                shim_z=shim_z,
+                grad_cal=False,
+                save_np=False,
+                save_mat=False,
+                save_msgs=False,
+                gui_test=gui_test,
+            )
+            rx_arr[:, i] += rxd_rep
+        rx_arr[:, i] = rx_arr[:, i] / dummy_scans  # averaging instead of using the last scan
+    larmor_freq_peak, larmor_freq_snr, _, _, best_snr_index  = get_freq_vals_from_echoes(steps, rx_arr, larmor_freq, swept_freqs[1]- swept_freqs[0])
+
         # Calculate signal to noise ratio
-        signal_index = 0
-        noise_index = 0
-        for index in range(0, rxd.shape[0] - 1):
-            if index > rxd.shape[0] / 4 and index < (rxd.shape[0] - rxd.shape[0] / 4):
-                signal_array[signal_index, i] = rx_arr[index, i]
-                signal_index += 1
-            else:
-                noise_array[noise_index, i] = rx_arr[index, i]
-                noise_index += 1
-        snr = np.mean(np.abs(signal_array[:, i])) / np.std(np.abs(noise_array[:, i]))
-        peak = np.max(np.abs(rx_arr[index, i]))
-        print(f"SNR({i}) = " + str(snr))
-        print(f"Peak({i}) = " + str(peak))
-        snr_array.append(snr)
-        peak_array.append(peak)
+        # signal_index = 0
+        # noise_index = 0
+        # for index in range(0, rxd.shape[0] - 1):
+        #     if index > rxd.shape[0] / 4 and index < (rxd.shape[0] - rxd.shape[0] / 4):
+        #         signal_array[signal_index, i] = rx_arr[index, i]
+        #         signal_index += 1
+        #     else:
+        #         noise_array[noise_index, i] = rx_arr[index, i]
+        #         noise_index += 1
+        # snr = np.mean(np.abs(signal_array[:, i])) / np.std(np.abs(noise_array[:, i]))
+        # peak = np.max(np.abs(rx_arr[index, i]))
+        # print(f"SNR({i}) = " + str(snr))
+        # print(f"Peak({i}) = " + str(peak))
+        # snr_array.append(snr)
+        # peak_array.append(peak)
 
     # print("Test = ")
     # print(np.max(np.abs(rx_arr), axis=0))
 
     # Find the frequency data with the largest maximum absolute value
     # max_ind = np.argmax(np.max(np.abs(rx_arr), axis=0, keepdims=False))
-    max_ind = np.argmax(peak_array)
+    # max_ind = np.argmax(peak_array)
+    # max_freq = swept_freqs[max_ind]
+    # print(f"Frequency with highest amplitude: {max_freq:.4f} MHz")
 
-    max_freq = swept_freqs[max_ind]
-    print(f"Fequency with highest amplitude: {max_freq:.4f} MHz")
+    # # Find the frequency data with the largest maximum SNR value
+    # max_snr_ind = np.argmax(snr_array)
+    # max_snr_freq = swept_freqs[max_snr_ind]
+    # print(f"Frequency with highest SNR: {max_snr_freq:.4f} MHz")
 
-    # Find the frequency data with the largest maximum SNR value
-    max_snr_ind = np.argmax(snr_array)
-    max_snr_freq = swept_freqs[max_snr_ind]
-    print(f"Frequency with highest SNR: {max_snr_freq:.4f} MHz")
-
-    # Plot setup for UI
-    plt.style.use("dark_background")
+    # # Plot setup for UI
+    # plt.style.use("dark_background")
 
     # Plot figure
     if plot:
@@ -178,7 +181,7 @@ def larmor_step_search(
     data_dict = {"rx_arr": rx_arr, "rx_t": rx_t, "larmor_freq": larmor_freq}
 
     # Return the frequency that worked the best with SNR
-    return max_freq, max_snr_freq, data_dict, fig_signal, fig_noise
+    return larmor_freq_peak, larmor_freq_snr, data_dict, fig_signal, fig_noise, best_snr_index
 
 
 def larmor_cal(
@@ -261,25 +264,32 @@ def larmor_cal(
         #   - Calculating the difference between every point in the middle third of the echo data
         #   - Cutting out the largest differences (representing phase wraps) by removing all changes above a certain size
         #   - Averaging from there
+        print(
+            "Using old method for calculating average phase slope, this will be deprecated in the future"
+        )
+        ordered_dphis = np.zeros(rx_count // 3 - 1)
         for echo_n in range(echo_count):
             dphis = np.ediff1d(
                 np.angle(rx_arr[echo_n, rx_count // 3 : 2 * (rx_count // 3)])
             )
             stds[echo_n] = np.std(dphis)
-            ordered_dphis = dphis[np.argsort(np.abs(dphis))]
-            large_change_ind = np.argmax(np.abs(np.ediff1d(np.abs(ordered_dphis))))
+            ordered_dphis[:] = dphis[np.argsort(np.abs(dphis))]
+            large_change_ind = np.argmax(
+                np.abs(np.ediff1d(np.abs(ordered_dphis)))
+            )
             dphi_vals = ordered_dphis[: large_change_ind - 1]
             avgs[echo_n] = np.mean(dphi_vals)
 
-        # Find the average slopes across echoes, find expected change in larmor frequency from there
-        dphi = np.mean(avgs)
-        dw = dphi / (rx_t * np.pi)
-        std = np.mean(stds)
-        print(f"  Estimated frequency offset: {dw:.6f} MHz")
-        print(f"  Spread (std): {std:.6f}")
+            
+        # Calculate the best SNR by dividing avgs by stds element-wise
+            snr_values = avgs / stds
+            best_snr_index = np.argmax(snr_values)
+            print(f"Best SNR index: {best_snr_index}, SNR: {snr_values[best_snr_index]:.6f}")
 
+                
         # Update larmor frequency
-        larmor_freq += dw * step_size
+        larmor_freq += best_snr_index * step_size
+        print(f"New larmor frequency: {larmor_freq:.5f} MHz")
 
         # Delay for spin recovery
         time.sleep(delay_s)
@@ -312,24 +322,24 @@ def larmor_cal(
     )
 
     # Announce results
-    print(f"Calibrated Larmor frequency: {larmor_freq:.6f} MHz")
-    if std >= 1:
-        print(
-            "Didn't converge (std = "
-            + str(std)
-            + f"), try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}"
-        )
-        # larmor_freq = fft_x[np.argmax(rx_fft[:, 0])]
-        larmor_freq = larmor_start
+    # print(f"Calibrated Larmor frequency: {larmor_freq:.6f} MHz")
+    # if std >= 1:
+    #     print(
+    #         "Didn't converge (std = "
+    #         + str(std)
+    #         + f"), try {fft_x[np.argmax(rx_fft[:, 0])]:.6f}"
+    #     )
+    #     larmor_freq = fft_x[np.argmax(rx_fft[:, 0])]
+    #     # larmor_freq = larmor_start
 
     # Plot if needed
     if plot:
         fig, axs = plt.subplots(5, 1, constrained_layout=True)
 
-        if std < 1:
-            fig.suptitle(f"Larmor: {larmor_freq:.4f} MHz")
-        else:
-            fig.suptitle(f"Didn't converge -- Try eyeballing from bottom graph")
+        # if std < 1:
+        #     fig.suptitle(f"Larmor: {larmor_freq:.4f} MHz")
+        # else:
+        #     fig.suptitle(f"Didn't converge -- Try eyeballing from bottom graph")
 
         axs[0].plot(np.real(rxd))
         axs[0].set_title("Concatenated signal -- Real")
@@ -1260,3 +1270,83 @@ def load_plot_in_ui(
     plot_result.type = "plot"
     plot_result.file_path = "/other/" + file_name + ".plot"
     return plot_result
+
+
+def get_freq_vals_from_echoes(steps, rx_arr, larmor_freq, step_size, threshold=0.01, snr_tolerance = 0.1):
+    peaks = np.zeros(steps)
+    stds = np.zeros(steps)
+    snr_values = np.zeros(steps)
+    larmor_freq_peak = larmor_freq
+    larmor_freq_snr = larmor_freq
+    larmor_freq_played = np.zeros(steps)
+    print(f"Calculating SNR for {steps} echoes...")
+    for echo_n in range(steps):
+                
+        # Calculate the absolute value of the signal for the current echo
+        abs_signal = np.abs(rx_arr[echo_n, :])
+        
+        # Determine the number of points to use for noise calculation
+        n_points = int(0.4 * abs_signal.shape[0])
+        
+        # Calculate the peak value of the signal
+        peak_value = np.max(abs_signal)
+
+        # Calculate noise level using the last n points
+        noise_level_right = np.mean(abs_signal[-n_points:]) 
+        noise_level_left = np.mean(abs_signal[:n_points])
+        noise_level = (noise_level_right + noise_level_left) / 2
+
+
+        # Calculate the standard deviation of the last n points
+        if noise_level == 0:
+            print(f"  Echo {echo_n + 1}: Noise standard deviation is zero, setting SNR to zero.")
+            snr = 0
+        else:
+            # Calculate the SNR 
+            # snr = peak_value / noise_std
+            snr = peak_value / noise_level if noise_level != 0 else 0
+
+        # Calculate the coefficient of variation
+        if peak_value == 0:
+            CV = 0
+        else:
+            CV = (noise_level / peak_value) * 100  # susing level instead of std
+
+
+        # Store the SNR for the current echo
+        peaks[echo_n] = peak_value
+        stds[echo_n] = noise_level
+        snr_values[echo_n] = snr
+        larmor_freq_played[echo_n] = larmor_freq + (echo_n * step_size)
+        print(f"  Echo {echo_n + 1}: Frequency = {larmor_freq + (echo_n * step_size):.4f}, Peak = {peak_value:.6f}, Noise  = {noise_level:.6f}, SNR = {snr:.6f}, CV_like = {CV:.2f}%")
+
+        # Calculate the best SNR by dividing avgs by stds element-wise
+
+        # Check if the top two or three SNR values are within the tolerance
+        sorted_indices = np.argsort(snr_values)[::-1]  # Sort indices by SNR in descending order
+        top_snr_indices = sorted_indices[:3]  # Get indices of top three SNR values
+
+        if len(top_snr_indices) > 1 and (snr_values[top_snr_indices[0]] - snr_values[top_snr_indices[1]] <= snr_tolerance):
+            # If the top two SNR values are within the tolerance
+            if len(top_snr_indices) > 2 and (snr_values[top_snr_indices[1]] - snr_values[top_snr_indices[2]] <= snr_tolerance):
+                # If the top three SNR values are also within the tolerance
+                best_snr_index = top_snr_indices[np.argmax(peaks[top_snr_indices[:3]])]
+            else:
+                best_snr_index = top_snr_indices[np.argmax(peaks[top_snr_indices[:2]])]
+        else:
+            # If the top two SNR values are not within the tolerance, take the best SNR index
+            best_snr_index = np.argmax(snr_values)
+
+
+    best_peak_index = np.argmax(peaks)
+    print(f"Best SNR index: {best_snr_index}, SNR: {snr_values[best_snr_index]:.6f}")
+
+                
+    # Update larmor frequency
+    
+    larmor_freq_peak = larmor_freq_played[best_peak_index] 
+    print(f"New larmor frequency peak: {larmor_freq_peak:.5f} MHz")
+    larmor_freq_snr = larmor_freq_played[best_snr_index]
+    print(f"New larmor frequency snr: {larmor_freq_snr:.5f} MHz")
+    
+    return larmor_freq_peak, larmor_freq_snr, peaks, stds, best_snr_index

@@ -19,12 +19,12 @@ log = logger.get_logger()
 
 class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     # Sequence parameters
-    param_TE: int = 3
-    param_TR: int = 1000
+    param_TE: int = 10
+    param_TR: int = 3000
     param_NSA: int = 1
     param_FOV: int = 64
     param_Base_Resolution: int = 64
-    param_BW: int = 32000
+    param_BW: int = 16000
     param_Gradient: str = "x"
     param_debug_plot: bool = True
 
@@ -56,12 +56,12 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
     @classmethod
     def get_default_parameters(self) -> dict:
         return {
-            "TE": 3,
+            "TE": 5,
             "TR": 1000,
             "NSA": 1,
             "FOV": 64,
             "Base_Resolution": 64,
-            "BW": 32000,
+            "BW": 16000,
             "Gradient": "x",
         }
 
@@ -122,7 +122,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
             max_grad = cfg.GY_MAX
         elif channel == "z":
             max_grad = cfg.GZ_MAX
-
+        
         # seq = pp.Sequence()
         self.system = pp.Opts(
             max_grad=max_grad,  
@@ -203,7 +203,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         rxd_rs = np.reshape(rxd, (int(rxd.shape[0]/self.param_NSA), self.param_NSA), order='F')
         log.info("New shape of rx data:", rxd_rs.shape)
         rxd_avg = (np.average(rxd_rs, axis=1))
-        filtering = True
+        filtering = False
         if filtering is True:
             rxd_avg = np.convolve(rxd_avg, np.ones(5)/5, mode='same')
 
@@ -217,7 +217,7 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         dt = 1e6 / self.param_BW
         log.info("dt: ", dt)
         
-        t = np.arange(0, self.param_Base_Resolution * dt, dt).T
+        t = np.arange(0, self.param_Base_Resolution * dt * 2, dt).T # oversampling by factor 2
         plt.plot(t, np.abs(rxd_avg))
         plt.xlabel('Time (us)')
         plt.ylabel('Signal')
@@ -238,7 +238,10 @@ class SequenceRF_SE(PulseqSequence, registry_key=Path(__file__).stem):
         plt.title(f"FFT of Signal - Grad_{self.param_Gradient}")
         recon = np.fft.fftshift(np.fft.ifft(np.fft.fftshift(rxd_avg)))
         plt.grid(True, color="#333")
-        r = np.linspace(-self.param_FOV/2, self.param_FOV/2, self.param_Base_Resolution)
+        kmax_half = -self.param_Base_Resolution / self.param_FOV / 2
+        k_array = np.linspace(-kmax_half, kmax_half, self.param_Base_Resolution)
+
+        r = np.linspace(-self.param_FOV/2, self.param_FOV/2, self.param_Base_Resolution * 2)
         plt.plot(r, np.abs(recon))
         plt.xlabel("Position (mm)")
         plt.ylabel("Projection")
